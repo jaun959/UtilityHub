@@ -5,7 +5,7 @@ import ImageToPdfConverter from '../components/ImageToPdfConverter.jsx';
 import ImageResizer from '../components/ImageResizer.jsx';
 import ImageCompressor from '../components/ImageCompressor.jsx';
 import ImageFormatConverter from '../components/ImageFormatConverter.jsx';
-import Base64ImageConverter from '../components/Base64ImageConverter.jsx';
+import ImageCropper from '../components/ImageCropper.jsx';
 
 const ImageToolsPage = () => {
   return (
@@ -27,9 +27,10 @@ const ImageToolsPage = () => {
         <ToolCard title="PNG to JPG Converter" description="Quickly convert PNG images to JPG format.">
           <PngToJpgConverter />
         </ToolCard>
-        <ToolCard title="Base64 Image Converter" description="Encode or decode images to/from Base64 strings.">
-          <Base64ImageConverter />
+        <ToolCard title="Image Cropper" description="Crop images to a specific area.">
+          <ImageCropper />
         </ToolCard>
+        
       </div>
     </main>
   );
