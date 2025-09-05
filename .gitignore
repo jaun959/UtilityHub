@@ -39,3 +39,7 @@ backend/uploads/
 
 # Frontend specific
 frontend/build/
+
+# Untracked files
+error.txt
+req.md
