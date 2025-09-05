@@ -1,13 +1,26 @@
 
 require('dotenv').config();
 const mongoose = require('mongoose');
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+const testSupabaseConnection = async () => {
+  try {
+    const { data: bucket, error: getBucketError } = await supabase.storage.getBucket('utilityhub');
+    if (getBucketError) throw getBucketError;
+    console.log(`Supabase Storage connected!\nBucket '${bucket.name}' found.`);
+  } catch (error) {
+    console.error('Supabase Storage connection failed:', error.message);
+  }
+};
 
 mongoose.connect(process.env.MONGO_URI);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
+db.once('open', function () {
   console.log('MongoDB connected!');
+  testSupabaseConnection();
 });
 
 const express = require('express');

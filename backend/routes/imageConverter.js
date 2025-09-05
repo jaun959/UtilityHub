@@ -13,8 +13,6 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-
-
 const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/png-to-jpg
@@ -24,9 +22,7 @@ router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
   try {
     const convertedFiles = [];
     for (const file of req.files) {
-      // Download image from Cloudinary
-      const response = await axios.get(file.path, { responseType: 'arraybuffer' });
-      const imageBuffer = Buffer.from(response.data);
+      const imageBuffer = file.buffer;
 
       // Process with sharp
       const jpgBuffer = await sharp(imageBuffer).jpeg().toBuffer();
@@ -75,8 +71,7 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
     });
 
     for (const file of req.files) {
-      const response = await axios.get(file.path, { responseType: 'arraybuffer' });
-      const imageBuffer = Buffer.from(response.data);
+      const imageBuffer = file.buffer;
 
       const image = sharp(imageBuffer);
       const metadata = await image.metadata();
@@ -122,8 +117,7 @@ router.post('/resize-image', upload.array('images'), async (req, res) => {
     const convertedFiles = [];
 
     for (const file of req.files) {
-      const response = await axios.get(file.path, { responseType: 'arraybuffer' });
-      const imageBuffer = Buffer.from(response.data);
+      const imageBuffer = file.buffer;
 
       const resizedBuffer = await sharp(imageBuffer)
         .resize(parseInt(width), parseInt(height))
@@ -168,8 +162,7 @@ router.post('/compress-image', upload.array('images'), async (req, res) => {
     const convertedFiles = [];
 
     for (const file of req.files) {
-      const response = await axios.get(file.path, { responseType: 'arraybuffer' });
-      const imageBuffer = Buffer.from(response.data);
+      const imageBuffer = file.buffer;
 
       const compressedBuffer = await sharp(imageBuffer)
         .jpeg({ quality: parseInt(quality) })
@@ -214,8 +207,7 @@ router.post('/convert-image-format', upload.array('images'), async (req, res) =>
     const convertedFiles = [];
 
     for (const file of req.files) {
-      const response = await axios.get(file.path, { responseType: 'arraybuffer' });
-      const imageBuffer = Buffer.from(response.data);
+      const imageBuffer = file.buffer;
 
       const convertedBuffer = await sharp(imageBuffer)
         .toFormat(format)
@@ -259,8 +251,7 @@ router.post('/base64-image', upload.single('image'), async (req, res) => {
     const { type, base64String } = req.body;
 
     if (type === 'encode' && req.file) {
-      const response = await axios.get(req.file.path, { responseType: 'arraybuffer' });
-      const imageBuffer = Buffer.from(response.data);
+      const imageBuffer = req.file.buffer;
       const base64 = imageBuffer.toString('base64');
       res.json({ base64 });
     } else if (type === 'decode' && base64String) {
