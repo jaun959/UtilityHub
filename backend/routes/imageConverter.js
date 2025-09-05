@@ -1,15 +1,13 @@
-
-const auth = require('../middleware/auth');
-const authorize = require('../middleware/authorize');
 const PDFDocument = require('pdfkit');
 const router = require('express').Router();
-const axios = require('axios');
 const multer = require('multer');
 const archiver = require('archiver');
 
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+const fsp = require('fs').promises;
 
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
@@ -21,35 +19,45 @@ const upload = multer({ storage: multer.memoryStorage() });
 // @access  Public
 router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
   try {
-    const convertedFiles = [];
-    for (const file of req.files) {
-      const imageBuffer = file.buffer;
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Sets the compression level.
+    });
 
-      // Process with sharp
-      const jpgBuffer = await sharp(imageBuffer).jpeg().toBuffer();
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
 
-      // Upload to Supabase Storage
-      const fileName = `converted-${Date.now()}.jpg`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('utilityhub')
-        .upload(fileName, jpgBuffer, {
-          contentType: 'image/jpeg',
-        });
+      for (const file of req.files) {
+        const imageBuffer = file.buffer;
+        const originalname = file.originalname;
+        const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
 
-      if (uploadError) {
-        throw uploadError;
+        const jpgBuffer = await sharp(imageBuffer).jpeg().toBuffer();
+
+        archive.append(jpgBuffer, { name: `${nameWithoutExt}_converted.jpg` });
       }
+      archive.finalize();
+    });
 
-      const { data: publicUrlData } = supabase.storage
-        .from('utilityhub')
-        .getPublicUrl(fileName);
-
-      convertedFiles.push({
-        originalname: fileName,
-        path: publicUrlData.publicUrl
+    const zipFileName = `converted_png_to_jpg_${Date.now()}.zip`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
       });
+
+    if (uploadError) {
+      throw uploadError;
     }
-    res.json(convertedFiles);
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
+
   } catch (err) {
     console.error(err);
     console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
@@ -87,43 +95,70 @@ module.exports = router;
 // @access  Public
 router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
   try {
-    const pdfDoc = new PDFDocument();
-    const pdfBufferPromise = new Promise((resolve, reject) => {
-      pdfDoc.on('data', resolve);
-      pdfDoc.on('end', () => resolve(pdfDoc.output));
-      pdfDoc.on('error', reject);
+    const pdfDoc = new PDFDocument({
+      autoFirstPage: false // Disable automatic page creation
+    });
+
+    const tempPdfPath = path.join(os.tmpdir(), `converted_pdf_${Date.now()}.pdf`);
+    const writeStream = fs.createWriteStream(tempPdfPath);
+    pdfDoc.pipe(writeStream);
+
+    const pdfGenerationPromise = new Promise((resolve, reject) => {
+      writeStream.on('finish', resolve);
+      pdfDoc.on('error', (err) => {
+        console.error('PDFKit error during generation:', err);
+        reject(err);
+      });
     });
 
     for (const file of req.files) {
-      const imageBuffer = file.buffer;
+      let tempImagePath = '';
+      try {
+        const imageBuffer = file.buffer;
 
-      const image = sharp(imageBuffer);
-      const metadata = await image.metadata();
+        const image = sharp(imageBuffer);
+        const metadata = await image.metadata();
+        const pngBuffer = await image.png().toBuffer(); // Convert to PNG
 
-      pdfDoc.addPage({ size: [metadata.width, metadata.height] });
-      pdfDoc.image(imageBuffer, 0, 0, { width: metadata.width, height: metadata.height });
+        tempImagePath = path.join(os.tmpdir(), `temp_image_${Date.now()}.png`);
+        await fsp.writeFile(tempImagePath, pngBuffer);
+
+        const A4_WIDTH = 595.28;
+        const A4_HEIGHT = 841.89;
+
+        const imgWidth = metadata.width;
+        const imgHeight = metadata.height;
+
+        const scaleX = A4_WIDTH / imgWidth;
+        const scaleY = A4_HEIGHT / imgHeight;
+        const scale = Math.min(scaleX, scaleY);
+
+        const finalWidth = imgWidth * scale;
+        const finalHeight = imgHeight * scale;
+
+        const x = (A4_WIDTH - finalWidth) / 2;
+        const y = (A4_HEIGHT - finalHeight) / 2;
+
+        pdfDoc.addPage({ size: 'A4' });
+        pdfDoc.image(tempImagePath, x, y, { width: finalWidth, height: finalHeight });
+      } catch (imageErr) {
+        console.error(`Error processing image ${file.originalname}:`, imageErr);
+      } finally {
+        if (tempImagePath) {
+          try {
+            await fsp.unlink(tempImagePath);
+          } catch (unlinkErr) {
+            console.error(`Error deleting temp image file ${tempImagePath}:`, unlinkErr);
+          }
+        }
+      }
     }
 
     pdfDoc.end();
+    await pdfGenerationPromise; // Wait for PDF to finish writing to file
 
-    const pdfBuffer = await pdfBufferPromise;
-
-    const fileName = `converted-${Date.now()}.pdf`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('utilityhub')
-      .upload(fileName, pdfBuffer, {
-        contentType: 'application/pdf',
-      });
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('utilityhub')
-      .getPublicUrl(fileName);
-
-    res.json({ path: publicUrlData.publicUrl });
+    // For testing, return the local path. In production, you'd upload this to Supabase.
+    res.json({ path: tempPdfPath, originalname: path.basename(tempPdfPath) });
 
   } catch (err) {
     console.error(err);
@@ -138,37 +173,35 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
 router.post('/resize-image', upload.array('images'), async (req, res) => {
   try {
     const { width, height } = req.body;
-    const convertedFiles = [];
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Sets the compression level.
+    });
 
-    for (const file of req.files) {
-      const imageBuffer = file.buffer;
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
 
-      const resizedBuffer = await sharp(imageBuffer)
-        .resize(parseInt(width), parseInt(height))
-        .toBuffer();
+      for (const file of req.files) {
+        const imageBuffer = file.buffer;
+        const originalname = file.originalname;
+        const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
 
-      const fileName = `resized-${Date.now()}.jpg`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('utilityhub')
-        .upload(fileName, resizedBuffer, {
-          contentType: 'image/jpeg',
-        });
+        const resizedBuffer = await sharp(imageBuffer)
+          .resize(parseInt(width), parseInt(height))
+          .toBuffer();
 
-      if (uploadError) {
-        throw uploadError;
+        archive.append(resizedBuffer, { name: `${nameWithoutExt}_resized.jpg` });
       }
+      archive.finalize();
+    });
 
-      const { data: publicUrlData } = supabase.storage
-        .from('utilityhub')
-        .getPublicUrl(fileName);
+    const zipFileName = `resized_images_${Date.now()}.zip`;
+    const tempZipPath = path.join(os.tmpdir(), zipFileName);
+    await fsp.writeFile(tempZipPath, archiveBuffer);
 
-      convertedFiles.push({
-        originalname: fileName,
-        path: publicUrlData.publicUrl
-      });
-    }
-
-    res.json(convertedFiles);
+    res.json({ path: tempZipPath, originalname: zipFileName });
 
   } catch (err) {
     console.error(err);
@@ -208,21 +241,10 @@ router.post('/compress-image', upload.array('images'), async (req, res) => {
     });
 
     const zipFileName = `compressed_images_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('utilityhub')
-      .upload(zipFileName, archiveBuffer, {
-        contentType: 'application/zip',
-      });
+    const tempZipPath = path.join(os.tmpdir(), zipFileName);
+    await fsp.writeFile(tempZipPath, archiveBuffer);
 
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('utilityhub')
-      .getPublicUrl(zipFileName);
-
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
+    res.json({ path: tempZipPath, originalname: zipFileName });
 
   } catch (err) {
     console.error(err);
@@ -262,21 +284,10 @@ router.post('/convert-image-format', upload.array('images'), async (req, res) =>
     });
 
     const zipFileName = `converted_images_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('utilityhub')
-      .upload(zipFileName, archiveBuffer, {
-        contentType: 'application/zip',
-      });
+    const tempZipPath = path.join(os.tmpdir(), zipFileName);
+    await fsp.writeFile(tempZipPath, archiveBuffer);
 
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('utilityhub')
-      .getPublicUrl(zipFileName);
-
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
+    res.json({ path: tempZipPath, originalname: zipFileName });
 
   } catch (err) {
     console.error(err);
@@ -299,21 +310,10 @@ router.post('/base64-image', upload.single('image'), async (req, res) => {
     } else if (type === 'decode' && base64String) {
       const buffer = Buffer.from(base64String, 'base64');
       const fileName = `decoded-${Date.now()}.png`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('utilityhub')
-        .upload(fileName, buffer, {
-          contentType: 'image/png',
-        });
+      const tempFilePath = path.join(os.tmpdir(), fileName);
+      await fsp.writeFile(tempFilePath, buffer);
 
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data: publicUrlData } = supabase.storage
-        .from('utilityhub')
-        .getPublicUrl(fileName);
-
-      res.json({ path: publicUrlData.publicUrl });
+      res.json({ path: tempFilePath, originalname: fileName });
     } else {
       res.status(400).send('Invalid request');
     }

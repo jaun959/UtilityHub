@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -24,8 +24,8 @@ const Login = () => {
       const user = { email, password };
       const res = await axios.post('http://localhost:5000/api/auth/login', user);
       dispatch({ type: 'LOGIN', payload: res.data.token });
-              localStorage.setItem('token', res.data.token);
-        setAuthToken(res.data.token);
+      localStorage.setItem('token', res.data.token);
+      setAuthToken(res.data.token);
       navigate('/');
     } catch (err) {
       setError(err.response.data.msg || 'Server Error');

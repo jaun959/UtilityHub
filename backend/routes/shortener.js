@@ -7,7 +7,6 @@ router.post('/', async (req, res) => {
   const { originalUrl } = req.body;
   const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
 
-  // Check if the long url is valid
   if (!originalUrl.startsWith('http')) {
     return res.status(400).json('Invalid URL');
   }

@@ -1,10 +1,6 @@
-
 const router = require('express').Router();
 const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const path = require('path');
 const cloudinary = require('cloudinary').v2;
-
 
 // @route   POST /api/convert/text-to-pdf
 // @desc    Convert text to PDF

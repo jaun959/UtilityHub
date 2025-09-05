@@ -1,6 +1,3 @@
-
-const auth = require('../middleware/auth');
-const authorize = require('../middleware/authorize');
 const router = require('express').Router();
 const axios = require('axios');
 const multer = require('multer');
@@ -13,10 +10,6 @@ const { PDFDocument } = require('pdf-lib');
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-
-
-
-
 const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/pdf-to-image
@@ -26,11 +19,9 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
   try {
     const file = req.file;
 
-    // Download PDF from Cloudinary
     const response = await axios.get(file.path, { responseType: 'arraybuffer' });
     const pdfBuffer = Buffer.from(response.data);
 
-    // Save to a temporary local file for pdf-poppler
     const tempPdfPath = path.join(__dirname, '../uploads', `temp-${Date.now()}.pdf`);
     fs.writeFileSync(tempPdfPath, pdfBuffer);
 
@@ -69,10 +60,10 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
         originalname: f,
         path: publicUrlData.publicUrl
       });
-      fs.unlinkSync(imagePath); // Clean up temporary image file
+      fs.unlinkSync(imagePath);
     }
 
-    fs.unlinkSync(tempPdfPath); // Clean up temporary PDF file
+    fs.unlinkSync(tempPdfPath);
 
     res.json(convertedFiles);
 
