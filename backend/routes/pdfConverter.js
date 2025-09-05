@@ -4,34 +4,23 @@ const authorize = require('../middleware/authorize');
 const router = require('express').Router();
 const axios = require('axios');
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
 const path = require('path');
 const fs = require('fs');
 const { poppler } = require('pdf-poppler');
 const { PDFDocument } = require('pdf-lib');
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'utilityhub',
-    format: async (req, file) => 'pdf', // supports promises as well
-    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
-  },
-});
 
-const upload = multer({ storage: storage });
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/pdf-to-image
 // @desc    Convert PDF to images
 // @access  Public
-router.post('/pdf-to-image', auth, authorize(['premium']), upload.single('pdf'), async (req, res) => {
+router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
   try {
     const file = req.file;
 
@@ -59,14 +48,24 @@ router.post('/pdf-to-image', auth, authorize(['premium']), upload.single('pdf'),
       const imagePath = path.join(opts.out_dir, f);
       const imageBuffer = fs.readFileSync(imagePath);
 
-      const uploadResult = await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBuffer.toString('base64')}`, {
-        folder: 'utilityhub',
-        resource_type: 'image'
-      });
+      const fileName = `converted-${Date.now()}-${f}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('utilityhub')
+        .upload(fileName, imageBuffer, {
+          contentType: 'image/jpeg',
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('utilityhub')
+        .getPublicUrl(fileName);
 
       convertedFiles.push({
         originalname: f,
-        path: uploadResult.secure_url
+        path: publicUrlData.publicUrl
       });
       fs.unlinkSync(imagePath); // Clean up temporary image file
     }
@@ -86,7 +85,7 @@ module.exports = router;
 // @route   POST /api/convert/merge-pdfs
 // @desc    Merge multiple PDFs into one
 // @access  Public
-router.post('/merge-pdfs', auth, authorize(['premium']), upload.array('pdfs'), async (req, res) => {
+router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
   try {
     const PDFMerger = (await import('pdf-merger-js')).default;
     const merger = new PDFMerger();
@@ -98,12 +97,22 @@ router.post('/merge-pdfs', auth, authorize(['premium']), upload.array('pdfs'), a
 
     const mergedPdfBuffer = await merger.saveAsBuffer();
 
-    const uploadResult = await cloudinary.uploader.upload(`data:application/pdf;base64,${mergedPdfBuffer.toString('base64')}`, {
-      folder: 'utilityhub',
-      resource_type: 'raw'
-    });
+    const fileName = `merged-${Date.now()}.pdf`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(fileName, mergedPdfBuffer, {
+        contentType: 'application/pdf',
+      });
 
-    res.json({ path: uploadResult.secure_url });
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(fileName);
+
+    res.json({ path: publicUrlData.publicUrl });
 
   } catch (err) {
     console.error(err.message);
@@ -114,7 +123,7 @@ router.post('/merge-pdfs', auth, authorize(['premium']), upload.array('pdfs'), a
 // @route   POST /api/convert/split-pdf
 // @desc    Split a PDF into multiple pages
 // @access  Public
-router.post('/split-pdf', auth, authorize(['premium']), upload.single('pdf'), async (req, res) => {
+router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
   try {
     const { ranges } = req.body; // e.g. "1, 3-5, 8"
     const file = req.file;
@@ -142,12 +151,22 @@ router.post('/split-pdf', auth, authorize(['premium']), upload.single('pdf'), as
 
     const newPdfBytes = await newPdfDoc.save();
 
-    const uploadResult = await cloudinary.uploader.upload(`data:application/pdf;base64,${newPdfBytes.toString('base64')}`, {
-      folder: 'utilityhub',
-      resource_type: 'raw'
-    });
+    const fileName = `split-${Date.now()}.pdf`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(fileName, newPdfBytes, {
+        contentType: 'application/pdf',
+      });
 
-    res.json({ path: uploadResult.secure_url });
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(fileName);
+
+    res.json({ path: publicUrlData.publicUrl });
 
   } catch (err) {
     console.error(err.message);

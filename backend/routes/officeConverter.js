@@ -4,35 +4,21 @@ const authorize = require('../middleware/authorize');
 const router = require('express').Router();
 const axios = require('axios');
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
 const path = require('path');
 const fs = require('fs');
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'utilityhub',
-    format: async (req, file) => {
-      const ext = path.extname(file.originalname).substring(1);
-      return ext === 'doc' || ext === 'docx' ? 'docx' : ext; // Handle docx for docx-pdf
-    },
-    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
-  },
-});
 
-const upload = multer({ storage: storage });
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/word-to-pdf
 // @desc    Convert Word to PDF
 // @access  Public
-router.post('/word-to-pdf', auth, authorize(['premium']), upload.single('doc'), async (req, res) => {
+router.post('/word-to-pdf', upload.single('doc'), async (req, res) => {
   try {
     const file = req.file;
     // Placeholder for Word to PDF conversion
@@ -49,7 +35,7 @@ module.exports = router;
 // @route   POST /api/convert/pdf-to-word
 // @desc    Convert PDF to Word (Placeholder)
 // @access  Public
-router.post('/pdf-to-word', auth, authorize(['premium']), upload.single('pdf'), async (req, res) => {
+router.post('/pdf-to-word', upload.single('pdf'), async (req, res) => {
   try {
     const file = req.file;
     // Placeholder for PDF to Word conversion
@@ -65,7 +51,7 @@ router.post('/pdf-to-word', auth, authorize(['premium']), upload.single('pdf'), 
 // @route   POST /api/convert/excel-to-pdf
 // @desc    Convert Excel to PDF (Placeholder)
 // @access  Public
-router.post('/excel-to-pdf', auth, authorize(['premium']), upload.single('excel'), async (req, res) => {
+router.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
   try {
     const file = req.file;
     // Placeholder for Excel to PDF conversion
@@ -80,7 +66,7 @@ router.post('/excel-to-pdf', auth, authorize(['premium']), upload.single('excel'
 // @route   POST /api/convert/pdf-to-excel
 // @desc    Convert PDF to Excel (Placeholder)
 // @access  Public
-router.post('/pdf-to-excel', auth, authorize(['premium']), upload.single('pdf'), async (req, res) => {
+router.post('/pdf-to-excel', upload.single('pdf'), async (req, res) => {
   try {
     const file = req.file;
     // Placeholder for PDF to Excel conversion

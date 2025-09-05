@@ -5,33 +5,22 @@ const PDFDocument = require('pdfkit');
 const router = require('express').Router();
 const axios = require('axios');
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'utilityhub',
-    format: async (req, file) => 'png', // supports promises as well
-    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
-  },
-});
 
-const upload = multer({ storage: storage });
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/png-to-jpg
 // @desc    Convert PNG images to JPG
 // @access  Public
-router.post('/png-to-jpg', auth, authorize(['premium']), upload.array('images'), async (req, res) => {
+router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
   try {
     const convertedFiles = [];
     for (const file of req.files) {
@@ -42,21 +31,32 @@ router.post('/png-to-jpg', auth, authorize(['premium']), upload.array('images'),
       // Process with sharp
       const jpgBuffer = await sharp(imageBuffer).jpeg().toBuffer();
 
-      // Upload to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload(`data:image/jpeg;base64,${jpgBuffer.toString('base64')}`, {
-        folder: 'utilityhub',
-        resource_type: 'image'
-      });
+      // Upload to Supabase Storage
+      const fileName = `converted-${Date.now()}.jpg`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('utilityhub')
+        .upload(fileName, jpgBuffer, {
+          contentType: 'image/jpeg',
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('utilityhub')
+        .getPublicUrl(fileName);
 
       convertedFiles.push({
-        originalname: uploadResult.original_filename + '.jpg',
-        path: uploadResult.secure_url
+        originalname: fileName,
+        path: publicUrlData.publicUrl
       });
     }
     res.json(convertedFiles);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err);
+    console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).send(err.message);
   }
 });
 
@@ -65,7 +65,7 @@ module.exports = router;
 // @route   POST /api/convert/image-to-pdf
 // @desc    Convert images to PDF
 // @access  Public
-router.post('/image-to-pdf', auth, authorize(['premium']), upload.array('images'), async (req, res) => {
+router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
   try {
     const pdfDoc = new PDFDocument();
     const pdfBufferPromise = new Promise((resolve, reject) => {
@@ -89,23 +89,34 @@ router.post('/image-to-pdf', auth, authorize(['premium']), upload.array('images'
 
     const pdfBuffer = await pdfBufferPromise;
 
-    const uploadResult = await cloudinary.uploader.upload(`data:application/pdf;base64,${pdfBuffer.toString('base64')}`, {
-      folder: 'utilityhub',
-      resource_type: 'raw'
-    });
+    const fileName = `converted-${Date.now()}.pdf`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(fileName, pdfBuffer, {
+        contentType: 'application/pdf',
+      });
 
-    res.json({ path: uploadResult.secure_url });
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(fileName);
+
+    res.json({ path: publicUrlData.publicUrl });
 
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err);
+    console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).send(err.message);
   }
 });
 
 // @route   POST /api/convert/resize-image
 // @desc    Resize images
 // @access  Public
-router.post('/resize-image', auth, authorize(['premium']), upload.array('images'), async (req, res) => {
+router.post('/resize-image', upload.array('images'), async (req, res) => {
   try {
     const { width, height } = req.body;
     const convertedFiles = [];
@@ -118,29 +129,40 @@ router.post('/resize-image', auth, authorize(['premium']), upload.array('images'
         .resize(parseInt(width), parseInt(height))
         .toBuffer();
 
-      const uploadResult = await cloudinary.uploader.upload(`data:image/jpeg;base64,${resizedBuffer.toString('base64')}`, {
-        folder: 'utilityhub',
-        resource_type: 'image'
-      });
+      const fileName = `resized-${Date.now()}.jpg`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('utilityhub')
+        .upload(fileName, resizedBuffer, {
+          contentType: 'image/jpeg',
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('utilityhub')
+        .getPublicUrl(fileName);
 
       convertedFiles.push({
-        originalname: uploadResult.original_filename + '.jpg',
-        path: uploadResult.secure_url
+        originalname: fileName,
+        path: publicUrlData.publicUrl
       });
     }
 
     res.json(convertedFiles);
 
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err);
+    console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).send(err.message);
   }
 });
 
 // @route   POST /api/convert/compress-image
 // @desc    Compress images
 // @access  Public
-router.post('/compress-image', auth, authorize(['premium']), upload.array('images'), async (req, res) => {
+router.post('/compress-image', upload.array('images'), async (req, res) => {
   try {
     const { quality } = req.body;
     const convertedFiles = [];
@@ -153,29 +175,40 @@ router.post('/compress-image', auth, authorize(['premium']), upload.array('image
         .jpeg({ quality: parseInt(quality) })
         .toBuffer();
 
-      const uploadResult = await cloudinary.uploader.upload(`data:image/jpeg;base64,${compressedBuffer.toString('base64')}`, {
-        folder: 'utilityhub',
-        resource_type: 'image'
-      });
+      const fileName = `compressed-${Date.now()}.jpg`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('utilityhub')
+        .upload(fileName, compressedBuffer, {
+          contentType: 'image/jpeg',
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('utilityhub')
+        .getPublicUrl(fileName);
 
       convertedFiles.push({
-        originalname: uploadResult.original_filename + '.jpg',
-        path: uploadResult.secure_url
+        originalname: fileName,
+        path: publicUrlData.publicUrl
       });
     }
 
     res.json(convertedFiles);
 
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err);
+    console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).send(err.message);
   }
 });
 
 // @route   POST /api/convert/convert-image-format
 // @desc    Convert image format
 // @access  Public
-router.post('/convert-image-format', auth, authorize(['premium']), upload.array('images'), async (req, res) => {
+router.post('/convert-image-format', upload.array('images'), async (req, res) => {
   try {
     const { format } = req.body;
     const convertedFiles = [];
@@ -188,29 +221,40 @@ router.post('/convert-image-format', auth, authorize(['premium']), upload.array(
         .toFormat(format)
         .toBuffer();
 
-      const uploadResult = await cloudinary.uploader.upload(`data:image/${format};base64,${convertedBuffer.toString('base64')}`, {
-        folder: 'utilityhub',
-        resource_type: 'image'
-      });
+      const fileName = `converted-${Date.now()}.${format}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('utilityhub')
+        .upload(fileName, convertedBuffer, {
+          contentType: `image/${format}`,
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('utilityhub')
+        .getPublicUrl(fileName);
 
       convertedFiles.push({
-        originalname: uploadResult.original_filename + '.' + format,
-        path: uploadResult.secure_url
+        originalname: fileName,
+        path: publicUrlData.publicUrl
       });
     }
 
     res.json(convertedFiles);
 
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err);
+    console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).send(err.message);
   }
 });
 
 // @route   POST /api/convert/base64-image
 // @desc    Encode/Decode image to/from Base64
 // @access  Public
-router.post('/base64-image', auth, upload.single('image'), async (req, res) => {
+router.post('/base64-image', upload.single('image'), async (req, res) => {
   try {
     const { type, base64String } = req.body;
 
@@ -221,16 +265,28 @@ router.post('/base64-image', auth, upload.single('image'), async (req, res) => {
       res.json({ base64 });
     } else if (type === 'decode' && base64String) {
       const buffer = Buffer.from(base64String, 'base64');
-      const uploadResult = await cloudinary.uploader.upload(`data:image/png;base64,${buffer.toString('base64')}`, {
-        folder: 'utilityhub',
-        resource_type: 'image'
-      });
-      res.json({ path: uploadResult.secure_url });
+      const fileName = `decoded-${Date.now()}.png`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('utilityhub')
+        .upload(fileName, buffer, {
+          contentType: 'image/png',
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('utilityhub')
+        .getPublicUrl(fileName);
+
+      res.json({ path: publicUrlData.publicUrl });
     } else {
       res.status(400).send('Invalid request');
     }
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error(err);
+    console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).send(err.message);
   }
 });
