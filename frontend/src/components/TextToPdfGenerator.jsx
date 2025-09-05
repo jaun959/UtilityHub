@@ -39,7 +39,7 @@ const TextToPdfGenerator = () => {
       {convertedFile && (
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">Converted File:</h3>
-          <a href={`http://localhost:5000/${convertedFile.path}`} download className="text-blue-500 hover:underline">Download PDF</a>
+          <a href={convertedFile.path} download className="text-blue-500 hover:underline">Download PDF</a>
         </div>
       )}
     </div>

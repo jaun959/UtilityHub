@@ -33,7 +33,7 @@ const PasswordGenerator = () => {
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Password Generator</h2>
       <div className="mb-4">
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password Length:</label>
+        <label className="block mb-2 text-sm font-medium text-gray-900 text-black">Password Length:</label>
         <input
           type="number"
           className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -46,25 +46,25 @@ const PasswordGenerator = () => {
       <div className="mb-4">
         <label className="inline-flex items-center">
           <input type="checkbox" className="form-checkbox" checked={includeUppercase} onChange={() => setIncludeUppercase(!includeUppercase)} />
-          <span className="ml-2 text-gray-900 dark:text-white">Include Uppercase Letters</span>
+          <span className="ml-2 text-gray-900 text-black">Include Uppercase Letters</span>
         </label>
       </div>
       <div className="mb-4">
         <label className="inline-flex items-center">
           <input type="checkbox" className="form-checkbox" checked={includeLowercase} onChange={() => setIncludeLowercase(!includeLowercase)} />
-          <span className="ml-2 text-gray-900 dark:text-white">Include Lowercase Letters</span>
+          <span className="ml-2 text-gray-900 text-black">Include Lowercase Letters</span>
         </label>
       </div>
       <div className="mb-4">
         <label className="inline-flex items-center">
           <input type="checkbox" className="form-checkbox" checked={includeNumbers} onChange={() => setIncludeNumbers(!includeNumbers)} />
-          <span className="ml-2 text-gray-900 dark:text-white">Include Numbers</span>
+          <span className="ml-2 text-gray-900 text-black">Include Numbers</span>
         </label>
       </div>
       <div className="mb-4">
         <label className="inline-flex items-center">
           <input type="checkbox" className="form-checkbox" checked={includeSymbols} onChange={() => setIncludeSymbols(!includeSymbols)} />
-          <span className="ml-2 text-gray-900 dark:text-white">Include Symbols</span>
+          <span className="ml-2 text-gray-900 text-black">Include Symbols</span>
         </label>
       </div>
       <button onClick={generatePassword} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Generate Password</button>

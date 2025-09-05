@@ -46,7 +46,7 @@ const CsvToJsonConverter = () => {
       <h2 className="text-2xl font-bold mb-4">CSV &lt;-&gt; JSON Converter</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CSV Input</label>
+          <label className="block mb-2 text-sm font-medium text-gray-900 text-black">CSV Input</label>
           <textarea
             className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             rows="10"
@@ -57,7 +57,7 @@ const CsvToJsonConverter = () => {
           <button onClick={convertCsvToJson} className="mt-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">CSV to JSON</button>
         </div>
         <div>
-          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">JSON Input</label>
+          <label className="block mb-2 text-sm font-medium text-gray-900 text-black">JSON Input</label>
           <textarea
             className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             rows="10"

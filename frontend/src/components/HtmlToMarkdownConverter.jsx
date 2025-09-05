@@ -18,7 +18,7 @@ const HtmlToMarkdownConverter = () => {
       <h2 className="text-2xl font-bold mb-4">HTML to Markdown Converter</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">HTML Input</label>
+          <label className="block mb-2 text-sm font-medium text-gray-900 text-black">HTML Input</label>
           <textarea
             className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             rows="10"
@@ -28,7 +28,7 @@ const HtmlToMarkdownConverter = () => {
           ></textarea>
         </div>
         <div>
-          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Markdown Output</label>
+          <label className="block mb-2 text-sm font-medium text-gray-900 text-black">Markdown Output</label>
           <textarea
             className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             rows="10"

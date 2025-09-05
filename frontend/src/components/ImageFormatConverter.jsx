@@ -39,17 +39,23 @@ const ImageFormatConverter = () => {
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Image Format Converter</h2>
       <form onSubmit={onSubmit}>
-        <div className="mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50">
+        <div className="mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="multiple_files">Upload image files (any format)</label>
-          <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="multiple_files" type="file" multiple onChange={onFileChange} /* Re-applied styling */ />
+          <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} /* Re-applied styling */ />
         </div>
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="format">Target Format</label>
-          <select id="format" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={format} onChange={onFormatChange}>
-            <option value="jpeg">JPG</option>
+          <select id="format" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" value={format} onChange={onFormatChange}>
+            <option value="avif">AVIF</option>
+            <option value="jpeg">JPEG</option>
+            <option value="jpg">JPG</option>
+            <option value="jpe">JPE</option>
             <option value="png">PNG</option>
-            <option value="webp">WebP</option>
+            <option value="raw">RAW</option>
             <option value="tiff">TIFF</option>
+            <option value="tif">TIF</option>
+            <option value="webp">WebP</option>
+            <option value="gif">GIF</option>
           </select>
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Convert Format</button>
@@ -62,7 +68,7 @@ const ImageFormatConverter = () => {
             {convertedFiles.map((file, index) => (
               <div key={index} className="bg-white p-2 rounded-lg shadow">
                 <img src={file.path} alt={file.originalname} className="w-full h-auto" />
-                <a href={file.path} download={file.originalname} className="text-blue-500 hover:underline">Download</a>
+                <a href={`http://localhost:5000/api/convert/download-image/${file.originalname}`} download={file.originalname} className="text-blue-500 hover:underline">Download</a>
               </div>
             ))}
           </div>

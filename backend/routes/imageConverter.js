@@ -56,7 +56,30 @@ router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
   }
 });
 
+
+// @route   GET /api/convert/download-image/:filename
+// @desc    Download a converted image
+// @access  Public
+router.get('/download-image/:filename', async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    const { data, error } = await supabase.storage.from('utilityhub').download(filename);
+
+    if (error) {
+      throw error;
+    }
+
+    res.set('Content-Type', data.type);
+    res.set('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
 module.exports = router;
+
 
 // @route   POST /api/convert/image-to-pdf
 // @desc    Convert images to PDF

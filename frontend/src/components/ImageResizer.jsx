@@ -45,8 +45,8 @@ const ImageResizer = () => {
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Image Resizer</h2>
       <form onSubmit={onSubmit}>
-        <div className="mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50">
-          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="multiple_files">Upload multiple image files</label>
+        <div className="mb-4 p-4">
+          <label className="block mb-2 text-sm font-medium text-gray-900" htmlFor="multiple_files">Upload multiple image files</label>
           <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} />
         </div>
         <div className="mb-4 flex space-x-4">
