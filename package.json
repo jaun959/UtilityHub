@@ -1,5 +1,5 @@
 {
-  "name": "utilityhub-root",
+  "name": "UtilityHub",
   "version": "1.0.0",
   "description": "Root package for Utility Hub",
   "main": "index.js",
@@ -7,9 +7,6 @@
     "start": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\""
   },
   "keywords": [],
-  "author": "",
+  "author": "gaureshpai",
   "license": "ISC",
-  "devDependencies": {
-    "concurrently": "^8.2.2"
-  }
 }

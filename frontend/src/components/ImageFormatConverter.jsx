@@ -6,7 +6,7 @@ const ImageFormatConverter = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [error, setError] = useState('');
   const [format, setFormat] = useState('jpeg');
-  const [convertedFiles, setConvertedFiles] = useState([]);
+  const [convertedZipFile, setConvertedZipFile] = useState(null);
 
   const onFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -51,7 +51,7 @@ const ImageFormatConverter = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setConvertedFiles(res.data);
+      setConvertedZipFile(res.data);
     } catch (err) {
       console.error(err);
     }
@@ -84,16 +84,11 @@ const ImageFormatConverter = () => {
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Convert Format</button>
       </form>
 
-      {convertedFiles.length > 0 && (
+      {convertedZipFile && (
         <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Converted Images:</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {convertedFiles.map((file, index) => (
-              <div key={index} className="bg-white p-2 rounded-lg shadow">
-                <img src={file.path} alt={file.originalname} className="w-full h-auto" />
-                <a href={`http://localhost:5000/api/convert/download-image/${file.originalname}`} download={file.originalname} className="text-blue-500 hover:underline">Download</a>
-              </div>
-            ))}
+          <h3 className="text-xl font-bold mb-2">Converted Images (ZIP):</h3>
+          <div className="bg-white p-2 rounded-lg shadow">
+            <a href={convertedZipFile.path} download={convertedZipFile.originalname} className="text-blue-500 hover:underline">Download All Converted Images</a>
           </div>
         </div>
       )}
