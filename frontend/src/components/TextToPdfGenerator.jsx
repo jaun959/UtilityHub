@@ -1,0 +1,49 @@
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const TextToPdfGenerator = () => {
+  const [text, setText] = useState('');
+  const [convertedFile, setConvertedFile] = useState(null);
+
+  const onChange = (e) => {
+    setText(e.target.value);
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('http://localhost:5000/api/convert/text-to-pdf', { text });
+      setConvertedFile(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">Text to PDF Generator</h2>
+      <form onSubmit={onSubmit}>
+        <div className="mb-4">
+          <textarea
+            className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            rows="10"
+            placeholder="Enter text here..."
+            value={text}
+            onChange={onChange}
+          ></textarea>
+        </div>
+        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Generate PDF</button>
+      </form>
+
+      {convertedFile && (
+        <div className="mt-4">
+          <h3 className="text-xl font-bold mb-2">Converted File:</h3>
+          <a href={`http://localhost:5000/${convertedFile.path}`} download className="text-blue-500 hover:underline">Download PDF</a>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TextToPdfGenerator;
