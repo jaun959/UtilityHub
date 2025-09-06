@@ -49,9 +49,19 @@ router.post('/', async (req, res) => {
     if (isProduction) {
       // Dynamically import puppeteer-core and chromium only in production
       const router = require('express').Router();
+const puppeteer = require('puppeteer');
 const archiver = require('archiver');
 const cheerio = require('cheerio');
 const { createClient } = require('@supabase/supabase-js');
+
+let puppeteerCore;
+let chromium;
+
+if (process.platform === 'linux') {
+  // Only require these modules on Linux environments
+  puppeteerCore = require('puppeteer-core');
+  chromium = require('@sparticuz/chromium');
+}
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -95,11 +105,8 @@ router.post('/', async (req, res) => {
     // Determine which Puppeteer to use based on environment
     const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 
-    if (isProduction) {
-      // Dynamically import puppeteer-core and chromium only in production
-      const puppeteerCore = (await import('puppeteer-core')).default;
-      const chromium = (await import('@sparticuz/chromium')).default;
-
+    if (isProduction && puppeteerCore && chromium) {
+      // Production mode: Use puppeteer-core with @sparticuz/chromium
       browser = await puppeteerCore.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
@@ -108,7 +115,6 @@ router.post('/', async (req, res) => {
       });
     } else {
       // Local development: Use standard puppeteer
-      const puppeteer = (await import('puppeteer')).default;
       browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         headless: true
