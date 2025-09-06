@@ -1,16 +1,14 @@
 const router = require('express').Router();
 const axios = require('axios');
 const multer = require('multer');
-
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const poppler = require('pdf-poppler');
-const { PDFDocument } = require('pdf-lib');
+const { PDFDocument, degrees } = require('pdf-lib');
 
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-
 const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/pdf-to-image
@@ -34,45 +32,50 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
     await poppler.convert(tempPdfPath, opts);
 
     const files = fs.readdirSync(opts.out_dir).filter(f => f.startsWith(opts.out_prefix) && f.endsWith('.jpg'));
-    const convertedFiles = [];
 
-    for (const f of files) {
-      const imagePath = path.join(opts.out_dir, f);
-      const imageBuffer = fs.readFileSync(imagePath);
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
 
-      const fileName = `converted-${Date.now()}-${f}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('utilityhub')
-        .upload(fileName, imageBuffer, {
-          contentType: 'image/jpeg',
-        });
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
 
-      if (uploadError) {
-        throw uploadError;
+      for (const f of files) {
+        const imagePath = path.join(opts.out_dir, f);
+        const imageBuffer = fs.readFileSync(imagePath);
+        archive.append(imageBuffer, { name: f });
+        fs.unlinkSync(imagePath); // Clean up individual image files
       }
+      archive.finalize();
+    });
 
-      const { data: publicUrlData } = supabase.storage
-        .from('utilityhub')
-        .getPublicUrl(fileName);
+    fs.unlinkSync(tempPdfPath); // Clean up temp PDF
 
-      convertedFiles.push({
-        originalname: f,
-        path: publicUrlData.publicUrl
+    const zipFileName = `converted_images_${Date.now()}.zip`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
       });
-      fs.unlinkSync(imagePath);
+
+    if (uploadError) {
+      throw uploadError;
     }
 
-    fs.unlinkSync(tempPdfPath);
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
 
-    res.json(convertedFiles);
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
 
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 });
-
-module.exports = router;
 
 // @route   POST /api/convert/merge-pdfs
 // @desc    Merge multiple PDFs into one
@@ -89,11 +92,25 @@ router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
 
     const mergedPdfBuffer = await merger.saveAsBuffer();
 
-    const fileName = `merged-${Date.now()}.pdf`;
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(mergedPdfBuffer, { name: `merged-${Date.now()}.pdf` });
+      archive.finalize();
+    });
+
+    const zipFileName = `merged_pdf_${Date.now()}.zip`;
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('utilityhub')
-      .upload(fileName, mergedPdfBuffer, {
-        contentType: 'application/pdf',
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
       });
 
     if (uploadError) {
@@ -102,9 +119,9 @@ router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
 
     const { data: publicUrlData } = supabase.storage
       .from('utilityhub')
-      .getPublicUrl(fileName);
+      .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl });
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
 
   } catch (err) {
     console.error(err.message);
@@ -117,7 +134,7 @@ router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
 // @access  Public
 router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
   try {
-    const { ranges } = req.body; 
+    const { ranges } = req.body;
     const file = req.file;
 
     const response = await axios.get(file.path, { responseType: 'arraybuffer' });
@@ -143,11 +160,25 @@ router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
 
     const newPdfBytes = await newPdfDoc.save();
 
-    const fileName = `split-${Date.now()}.pdf`;
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(newPdfBytes, { name: `split-${Date.now()}.pdf` });
+      archive.finalize();
+    });
+
+    const zipFileName = `split_pdf_${Date.now()}.zip`;
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('utilityhub')
-      .upload(fileName, newPdfBytes, {
-        contentType: 'application/pdf',
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
       });
 
     if (uploadError) {
@@ -156,12 +187,98 @@ router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
 
     const { data: publicUrlData } = supabase.storage
       .from('utilityhub')
-      .getPublicUrl(fileName);
+      .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl });
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
 
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 });
+
+// @route   POST /api/convert/pdf-to-text
+// @desc    Convert PDF to text
+// @access  Public
+router.post('/pdf-to-text', upload.single('pdf'), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ msg: 'No PDF file uploaded.' });
+    }
+
+    const pdfBuffer = file.buffer;
+    const pdfParse = require('pdf-parse'); // Import here to avoid circular dependency issues
+    const data = await pdfParse(pdfBuffer);
+    const extractedText = data.text;
+
+    res.send(extractedText);
+
+  } catch (err) {
+    console.error('Error during PDF to text conversion:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   POST /api/convert/pdf-rotate
+// @desc    Rotate pages in a PDF
+// @access  Public
+router.post('/pdf-rotate', upload.single('pdf'), async (req, res) => {
+  try {
+    const file = req.file;
+    const { angle } = req.body; // angle in degrees (90, 180, 270)
+
+    if (!file) {
+      return res.status(400).json({ msg: 'No PDF file uploaded.' });
+    }
+    if (!angle || ![90, 180, 270].includes(Number(angle))) {
+      return res.status(400).json({ msg: 'Invalid rotation angle. Must be 90, 180, or 270.' });
+    }
+
+    const pdfBuffer = file.buffer;
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+    for (const page of pdfDoc.getPages()) {
+      page.setRotation(degrees(Number(angle)));
+    }
+
+    const modifiedPdfBytes = await pdfDoc.save();
+
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(modifiedPdfBytes, { name: `rotated-${Date.now()}.pdf` });
+      archive.finalize();
+    });
+
+    const zipFileName = `rotated_pdf_${Date.now()}.zip`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
+
+  } catch (err) {
+    console.error('Error during PDF rotation:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+module.exports = router;
