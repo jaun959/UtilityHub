@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify';
 
 const PdfToExcelConverter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [convertedFile, setConvertedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const onFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -13,6 +14,7 @@ const PdfToExcelConverter = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData();
     formData.append('pdf', selectedFile);
 
@@ -27,6 +29,8 @@ const PdfToExcelConverter = () => {
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Failed to convert PDF to Excel. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,7 +42,7 @@ const PdfToExcelConverter = () => {
           <label className="block mb-2 text-sm font-medium text-gray-900" htmlFor="single_file">Upload a PDF file</label>
           <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="single_file" type="file" onChange={onFileChange} />
         </div>
-        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Convert to Excel</button>
+        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'Convert to Excel'}</button>
       </form>
 
       {convertedFile && convertedFile.path && (
