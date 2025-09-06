@@ -11,6 +11,8 @@ const ImageResizer = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    const maxSize = 5 * 1024 * 1024;
+
     if (!file) {
       setOriginalImage(null);
       setResizedImageSrc(null);
@@ -19,16 +21,24 @@ const ImageResizer = () => {
     }
 
     if (!file.type.startsWith('image/')) {
-      setError('Please upload an image file (e.g., JPEG, PNG, GIF).');
+      toast.error('Invalid file type. Please upload an image file (e.g., JPEG, PNG, GIF).');
       setOriginalImage(null);
       setResizedImageSrc(null);
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > maxSize) {
+      toast.error(`File too large: ${file.name}. Maximum size is 5MB.`);
+      setOriginalImage(null);
+      setResizedImageSrc(null);
+      e.target.value = '';
       return;
     }
 
     setError('');
     setOriginalImage(file);
 
-    // Read original dimensions
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
@@ -102,7 +112,7 @@ const ImageResizer = () => {
           accept="image/*"
           onChange={handleFileChange}
         />
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        
       </div>
 
       {originalImage && (
