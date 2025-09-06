@@ -1,5 +1,11 @@
 const router = require('express').Router();
 const PDFDocument = require('pdfkit');
+const archiver = require('archiver');
+const { createClient } = require('@supabase/supabase-js');
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabase_anon_key = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabase_anon_key);
 
 // @route   POST /api/convert/text-to-pdf
 // @desc    Convert text to PDF and send for direct download
@@ -36,21 +42,11 @@ router.post('/text-to-pdf', async (req, res) => {
     });
 
     const zipFileName = `text_to_pdf_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('utilityhub')
-      .upload(zipFileName, archiveBuffer, {
-        contentType: 'application/zip',
-      });
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('utilityhub')
-      .getPublicUrl(zipFileName);
-
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
+    res.writeHead(200, {
+      'Content-Type': 'application/zip',
+      'Content-Disposition': `attachment; filename="${zipFileName}"`,
+    });
+    res.end(archiveBuffer);
 
   } catch (err) {
     console.error(err.message);
