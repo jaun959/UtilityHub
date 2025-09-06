@@ -16,17 +16,7 @@ if (!process.env.MONGO_URI) {
   process.exit(1);
 }
 
-// Initialize Supabase client and Mongoose connection after checks
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-
-mongoose.connect(process.env.MONGO_URI);
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-  console.log('MongoDB connected!');
-  testSupabaseConnection();
-});
 
 const testSupabaseConnection = async () => {
   try {
@@ -37,6 +27,16 @@ const testSupabaseConnection = async () => {
     console.error('Supabase Storage connection failed:', error.message);
   }
 };
+
+mongoose.connect(process.env.MONGO_URI);
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+  console.log('MongoDB connected!');
+  testSupabaseConnection();
+});
+
 
 const express = require('express');
 const cors = require('cors');
