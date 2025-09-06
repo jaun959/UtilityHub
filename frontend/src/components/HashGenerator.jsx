@@ -6,6 +6,7 @@ const HashGenerator = () => {
   const [text, setText] = useState('');
   const [hashMd5, setHashMd5] = useState('');
   const [hashSha256, setHashSha256] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleTextChange = (e) => {
     setText(e.target.value);
@@ -14,18 +15,25 @@ const HashGenerator = () => {
   };
 
   const generateHash = async (algorithm) => {
+    setLoading(true);
     const textEncoder = new TextEncoder();
     const data = textEncoder.encode(text);
 
-    let hashBuffer;
-    if (algorithm === 'MD5') {
-      setHashMd5(md5(text));
-      return;
-    } else if (algorithm === 'SHA-256') {
-      hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hexHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      setHashSha256(hexHash);
+    try {
+      let hashBuffer;
+      if (algorithm === 'MD5') {
+        setHashMd5(md5(text));
+      } else if (algorithm === 'SHA-256') {
+        hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hexHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        setHashSha256(hexHash);
+      }
+    } catch (error) {
+      console.error('Error generating hash:', error);
+      toast.error('Failed to generate hash.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,8 +55,12 @@ const HashGenerator = () => {
         ></textarea>
       </div>
       <div className="mb-4">
-        <button onClick={() => generateHash('MD5')} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Generate MD5</button>
-        <button onClick={() => generateHash('SHA-256')} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Generate SHA256</button>
+        <button onClick={() => generateHash('MD5')} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>
+          {loading ? 'Generating...' : 'Generate MD5'}
+        </button>
+        <button onClick={() => generateHash('SHA-256')} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>
+          {loading ? 'Generating...' : 'Generate SHA256'}
+        </button>
       </div>
 
       {hashMd5 && (
