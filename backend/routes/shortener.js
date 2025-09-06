@@ -5,7 +5,7 @@ const Url = require('../models/Url');
 
 router.post('/', async (req, res) => {
   const { originalUrl } = req.body;
-  const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+  const baseUrl = process.env.BASE_URL;
 
   const urlRegex = /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|[a-zA-Z0-9]+\.[^\s]{2,})$/;
 
@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
 
       while (!isUnique) {
         urlCode = shortid.generate();
-        shortUrl = `${baseUrl}/${urlCode}`;
+        shortUrl = `${baseUrl}/shorten/${urlCode}`;
         const existingUrl = await Url.findOne({ urlCode });
         if (!existingUrl) {
           isUnique = true;
