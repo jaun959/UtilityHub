@@ -31,7 +31,7 @@ const PngToJpgConverter = () => {
 
     setSelectedFiles(validFiles);
     if (hasInvalidFile) {
-      e.target.value = ''; 
+      e.target.value = '';
     }
   };
 
@@ -49,10 +49,12 @@ const PngToJpgConverter = () => {
         }
       });
       setConvertedZipFile(res.data);
+      toast.success('PNGs converted to JPG successfully!');
     } catch (err) {
       console.error(err);
-    }
-  };
+      toast.error(err.response?.data?.msg || 'Error converting PNG to JPG. Please try again.');
+    };
+  }
 
   return (
     <div className="container mx-auto p-4">
