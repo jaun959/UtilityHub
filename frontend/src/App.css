@@ -42,3 +42,9 @@ button,
 input[type="file"] {
   cursor: pointer;
 }
+
+input{
+  background-color: white;
+  border-radius: 5px;
+  font-size: 16px;
+}
