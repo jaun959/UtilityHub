@@ -55,10 +55,12 @@ const ImageFormatConverter = () => {
         }
       });
       setConvertedZipFile(res.data);
+      toast.success('Image format converted successfully!');
     } catch (err) {
       console.error(err);
-    }
-  };
+      toast.error(err.response?.data?.msg || 'Error converting image format. Please try again.');
+    };
+  }
 
   return (
     <div className="container mx-auto p-4">
