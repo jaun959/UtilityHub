@@ -55,6 +55,9 @@ app.use('/api/convert', textConverter);
 const auth = require('./routes/auth');
 app.use('/api/auth', auth);
 
+const keepAlive = require('./routes/keepAlive');
+app.use('/api/keep-alive', keepAlive);
+
 app.get('/', (req, res) => {
   res.send('Hello from Utility Hub Backend!');
 });
