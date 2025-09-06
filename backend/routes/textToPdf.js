@@ -1,11 +1,6 @@
 const router = require('express').Router();
 const PDFDocument = require('pdfkit');
 const archiver = require('archiver');
-const { createClient } = require('@supabase/supabase-js');
-
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabase_anon_key = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabase_anon_key);
 
 // @route   POST /api/convert/text-to-pdf
 // @desc    Convert text to PDF and send for direct download
