@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const TextToPdfGenerator = () => {
   const [text, setText] = useState('');
@@ -14,33 +15,33 @@ const TextToPdfGenerator = () => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5000/api/convert/text-to-pdf', { text }, {
-        responseType: 'blob' 
+        responseType: 'blob'
       });
 
-      
+
       const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
 
-      
+
       const url = window.URL.createObjectURL(pdfBlob);
 
-      
+
       const a = document.createElement('a');
       a.href = url;
-      a.download = `converted-text-${Date.now()}.pdf`; 
-      document.body.appendChild(a); 
-      a.click(); 
-      a.remove(); 
-      window.URL.revokeObjectURL(url); 
+      a.download = `converted-text-${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
 
-      
+
       setConvertedFile(null);
+      toast.success('PDF generated successfully!');
 
     } catch (err) {
       console.error(err);
-      
-      
-    }
-  };
+      toast.error(err.response?.data?.msg || 'Error generating PDF from text. Please try again.');
+    };
+  }
 
   return (
     <div className="container mx-auto p-4">
