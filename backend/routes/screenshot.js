@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const puppeteer = require('puppeteer'); // Always require standard puppeteer
 const archiver = require('archiver');
 const cheerio = require('cheerio');
 const { createClient } = require('@supabase/supabase-js');
@@ -64,8 +63,8 @@ router.post('/', async (req, res) => {
         headless: chromium.headless,
       });
     } else {
-      // Local development: Use standard puppeteer
-      browser = await puppeteer.launch({
+      // Local development: Use puppeteer-core
+      browser = await puppeteerCore.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         headless: true
       });
