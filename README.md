@@ -13,7 +13,7 @@ This application uses environment variables for configuration. You need to creat
 Create a file named `.env` in the `backend` directory with the following content:
 
 ```
-PORT=5000
+PORT=YOUR_BACKEND_PORT
 MONGO_URI=mongodb://localhost:27017/utilityhub
 JWT_SECRET=your_jwt_secret_key
 BASE_URL=http://localhost:5000
