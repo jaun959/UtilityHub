@@ -32,7 +32,7 @@ const extractInternalLinks = (html, baseUrl) => {
 // @desc    Generate screenshots of a given URL and its internal links (up to 5) and upload to Supabase as a ZIP
 // @access  Public
 router.post('/', async (req, res) => {
-  const { url, productionMode } = req.body; // Get productionMode from request
+  const { url } = req.body;
 
   if (!url) {
     return res.status(400).json({ msg: 'URL is required' });
@@ -45,8 +45,11 @@ router.post('/', async (req, res) => {
   const MAX_PAGES = 5;
 
   try {
-    if (productionMode) {
-      // Production mode: Use puppeteer-core with @sparticuz/chromium
+    // Determine which Puppeteer to use based on environment
+    // Use @sparticuz/chromium in production (e.g., Vercel, Netlify) or if explicitly set
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+
+    if (isProduction) {
       browser = await puppeteerCore.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
@@ -54,7 +57,7 @@ router.post('/', async (req, res) => {
         headless: chromium.headless,
       });
     } else {
-      // Development mode: Use standard puppeteer
+      // Local development: Use standard puppeteer
       browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         headless: true
