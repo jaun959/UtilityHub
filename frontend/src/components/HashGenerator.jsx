@@ -18,9 +18,6 @@ const HashGenerator = () => {
 
     let hashBuffer;
     if (algorithm === 'MD5') {
-      // MD5 is not directly supported by Web Crypto API for security reasons.
-      // For demonstration, we'll use a simple non-cryptographic hash or note this limitation.
-      // In a real app, you'd use a library or backend for MD5.
       setHashMd5('MD5 not directly supported by Web Crypto API. Use a library or backend.');
       return;
     } else if (algorithm === 'SHA-256') {
