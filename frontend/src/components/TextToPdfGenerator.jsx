@@ -49,7 +49,7 @@ const TextToPdfGenerator = () => {
       <form onSubmit={onSubmit}>
         <div className="mb-4">
           <textarea
-            className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
             rows="10"
             placeholder="Enter text here..."
             value={text}
