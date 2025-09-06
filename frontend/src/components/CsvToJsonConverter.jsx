@@ -7,6 +7,7 @@ const CsvToJsonConverter = () => {
   const [csvInput, setCsvInput] = useState('');
   const [jsonInput, setJsonInput] = useState('');
   const [convertedOutput, setConvertedOutput] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleCsvChange = (e) => {
     setCsvInput(e.target.value);
@@ -26,18 +27,22 @@ const CsvToJsonConverter = () => {
   };
 
   const convertCsvToJson = () => {
+    setLoading(true);
     Papa.parse(csvInput, {
       header: true,
       complete: (results) => {
         setConvertedOutput(JSON.stringify(results.data, null, 2));
+        setLoading(false);
       },
       error: (err) => {
         setConvertedOutput(`Error parsing CSV: ${err.message}`);
+        setLoading(false);
       },
     });
   };
 
   const convertJsonToCsv = () => {
+    setLoading(true);
     try {
       const jsonData = JSON.parse(jsonInput);
       const csv = Papa.unparse(jsonData);
@@ -45,6 +50,7 @@ const CsvToJsonConverter = () => {
     } catch (e) {
       setConvertedOutput(`Error parsing JSON: ${e.message}`);
     }
+    setLoading(false);
   };
 
   return (
@@ -60,7 +66,7 @@ const CsvToJsonConverter = () => {
             value={csvInput}
             onChange={handleCsvChange}
           ></textarea>
-          <button onClick={convertCsvToJson} className="mt-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">CSV to JSON</button>
+          <button onClick={convertCsvToJson} className="mt-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'CSV to JSON'}</button>
         </div>
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-900 text-black">JSON Input</label>
@@ -71,7 +77,7 @@ const CsvToJsonConverter = () => {
             value={jsonInput}
             onChange={handleJsonChange}
           ></textarea>
-          <button onClick={convertJsonToCsv} className="mt-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">JSON to CSV</button>
+          <button onClick={convertJsonToCsv} className="mt-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'JSON to CSV'}</button>
         </div>
       </div>
 
