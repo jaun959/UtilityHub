@@ -6,6 +6,8 @@ import PdfToWordConverter from '../components/PdfToWordConverter.jsx';
 import PdfToExcelConverter from '../components/PdfToExcelConverter.jsx';
 import TextToPdfGenerator from '../components/TextToPdfGenerator.jsx';
 import ExcelToPdfConverter from '../components/ExcelToPdfConverter.jsx';
+import PdfToTextConverter from '../components/PdfToTextConverter.jsx';
+import PdfRotator from '../components/PdfRotator.jsx';
 
 const PdfToolsPage = () => {
   return (
@@ -32,6 +34,12 @@ const PdfToolsPage = () => {
         </ToolCard>
         <ToolCard title="Excel to PDF Converter" description="Convert Excel spreadsheets to PDF format.">
           <ExcelToPdfConverter />
+        </ToolCard>
+        <ToolCard title="PDF to Text Converter" description="Extract text content from PDF documents.">
+          <PdfToTextConverter />
+        </ToolCard>
+        <ToolCard title="PDF Rotator" description="Rotate pages within a PDF document.">
+          <PdfRotator />
         </ToolCard>
       </div>
     </main>
