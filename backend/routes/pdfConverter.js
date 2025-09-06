@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const poppler = require('pdf-poppler');
+// const poppler = require('pdf-poppler');
 const { PDFDocument, degrees } = require('pdf-lib');
 const archiver = require('archiver');
 
@@ -30,7 +30,7 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
       page: null
     }
 
-    await poppler.convert(tempPdfPath, opts);
+    // await poppler.convert(tempPdfPath, opts);
 
     const files = fs.readdirSync(opts.out_dir).filter(f => f.startsWith(opts.out_prefix) && f.endsWith('.jpg'));
     console.log(`Found ${files.length} image files for zipping.`);
