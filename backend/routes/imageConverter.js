@@ -2,7 +2,6 @@ const PDFDocument = require('pdfkit');
 const router = require('express').Router();
 const multer = require('multer');
 const archiver = require('archiver');
-
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
@@ -11,7 +10,6 @@ const fsp = require('fs').promises;
 
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-
 const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/png-to-jpg
@@ -20,7 +18,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
   try {
     const archive = archiver('zip', {
-      zlib: { level: 9 } // Sets the compression level.
+      zlib: { level: 9 }
     });
 
     const archiveBuffer = await new Promise(async (resolve, reject) => {
@@ -65,7 +63,6 @@ router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
   }
 });
 
-
 // @route   GET /api/convert/download-image/:filename
 // @desc    Download a converted image
 // @access  Public
@@ -86,9 +83,6 @@ router.get('/download-image/:filename', async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
-module.exports = router;
-
 
 // @route   POST /api/convert/image-to-pdf
 // @desc    Convert images to PDF
@@ -155,7 +149,7 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
     }
 
     pdfDoc.end();
-    await pdfGenerationPromise; 
+    await pdfGenerationPromise;
 
     res.json({ path: tempPdfPath, originalname: path.basename(tempPdfPath) });
 
@@ -189,6 +183,7 @@ router.post('/resize-image', upload.array('images'), async (req, res) => {
 
         const resizedBuffer = await sharp(imageBuffer)
           .resize(parseInt(width), parseInt(height))
+          .jpeg()
           .toBuffer();
 
         archive.append(resizedBuffer, { name: `${nameWithoutExt}_resized.jpg` });
@@ -197,10 +192,21 @@ router.post('/resize-image', upload.array('images'), async (req, res) => {
     });
 
     const zipFileName = `resized_images_${Date.now()}.zip`;
-    const tempZipPath = path.join(os.tmpdir(), zipFileName);
-    await fsp.writeFile(tempZipPath, archiveBuffer);
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
+      });
 
-    res.json({ path: tempZipPath, originalname: zipFileName });
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
 
   } catch (err) {
     console.error(err);
@@ -240,10 +246,21 @@ router.post('/compress-image', upload.array('images'), async (req, res) => {
     });
 
     const zipFileName = `compressed_images_${Date.now()}.zip`;
-    const tempZipPath = path.join(os.tmpdir(), zipFileName);
-    await fsp.writeFile(tempZipPath, archiveBuffer);
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
+      });
 
-    res.json({ path: tempZipPath, originalname: zipFileName });
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
 
   } catch (err) {
     console.error(err);
@@ -283,10 +300,21 @@ router.post('/convert-image-format', upload.array('images'), async (req, res) =>
     });
 
     const zipFileName = `converted_images_${Date.now()}.zip`;
-    const tempZipPath = path.join(os.tmpdir(), zipFileName);
-    await fsp.writeFile(tempZipPath, archiveBuffer);
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
+      });
 
-    res.json({ path: tempZipPath, originalname: zipFileName });
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
 
   } catch (err) {
     console.error(err);
@@ -308,11 +336,38 @@ router.post('/base64-image', upload.single('image'), async (req, res) => {
       res.json({ base64 });
     } else if (type === 'decode' && base64String) {
       const buffer = Buffer.from(base64String, 'base64');
-      const fileName = `decoded-${Date.now()}.png`;
-      const tempFilePath = path.join(os.tmpdir(), fileName);
-      await fsp.writeFile(tempFilePath, buffer);
+      const outputFileName = `decoded-${Date.now()}.png`;
 
-      res.json({ path: tempFilePath, originalname: fileName });
+      const archive = archiver('zip', {
+        zlib: { level: 9 }
+      });
+
+      const archiveBuffer = await new Promise(async (resolve, reject) => {
+        const buffers = [];
+        archive.on('data', (data) => buffers.push(data));
+        archive.on('end', () => resolve(Buffer.concat(buffers)));
+        archive.on('error', (err) => reject(err));
+
+        archive.append(buffer, { name: outputFileName });
+        archive.finalize();
+      });
+
+      const zipFileName = `decoded_image_${Date.now()}.zip`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('utilityhub')
+        .upload(zipFileName, archiveBuffer, {
+          contentType: 'application/zip',
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('utilityhub')
+        .getPublicUrl(zipFileName);
+
+      res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
     } else {
       res.status(400).send('Invalid request');
     }
@@ -322,3 +377,139 @@ router.post('/base64-image', upload.single('image'), async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
+// @route   POST /api/convert/image-flip
+// @desc    Flip an image horizontally or vertically
+// @access  Public
+router.post('/image-flip', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ msg: 'No image file uploaded.' });
+    }
+
+    const imageBuffer = req.file.buffer;
+    const originalname = req.file.originalname;
+    const { direction } = req.body;
+
+    let flippedBuffer;
+    if (direction === 'horizontal') {
+      flippedBuffer = await sharp(imageBuffer).flop().jpeg().toBuffer();
+    } else if (direction === 'vertical') {
+      flippedBuffer = await sharp(imageBuffer).flip().jpeg().toBuffer();
+    } else {
+      return res.status(400).json({ msg: "Invalid flip direction. Must be 'horizontal' or 'vertical'." });
+    }
+
+    const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
+    const outputFileName = `flipped-${nameWithoutExt}.jpg`;
+
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(flippedBuffer, { name: outputFileName });
+      archive.finalize();
+    });
+
+    const zipFileName = `flipped_image_${Date.now()}.zip`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
+// @route   POST /api/convert/image-to-base64
+// @desc    Convert image to Base64 string
+// @access  Public
+router.post('/image-to-base64', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ msg: 'No image file uploaded.' });
+    }
+
+    const imageBuffer = req.file.buffer;
+    const base64 = imageBuffer.toString('base64');
+    res.json({ base64 });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
+// @route   POST /api/convert/image-grayscale
+// @desc    Convert image to grayscale
+// @access  Public
+router.post('/image-grayscale', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ msg: 'No image file uploaded.' });
+    }
+
+    const imageBuffer = req.file.buffer;
+    const originalname = req.file.originalname;
+
+    const grayscaleBuffer = await sharp(imageBuffer).grayscale().jpeg().toBuffer();
+
+    const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
+    const outputFileName = `grayscale-${nameWithoutExt}.jpg`;
+
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(grayscaleBuffer, { name: outputFileName });
+      archive.finalize();
+    });
+
+    const zipFileName = `grayscale_image_${Date.now()}.zip`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
+module.exports = router;
