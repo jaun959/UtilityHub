@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 
 const ImageCropper = () => {
@@ -10,25 +10,36 @@ const ImageCropper = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
     if (!file) {
       setImageSrc(null);
       setCroppedImageSrc(null);
-      setError('');
+      setError(''); // Keep setError for other errors if needed, but not for file validation
       return;
     }
 
     if (!file.type.startsWith('image/')) {
-      setError('Please upload an image file (e.g., JPEG, PNG, GIF).');
+      toast.error('Invalid file type. Please upload an image file (e.g., JPEG, PNG, GIF).');
       setImageSrc(null);
       setCroppedImageSrc(null);
+      e.target.value = ''; // Clear the input
       return;
     }
 
-    setError('');
+    if (file.size > maxSize) {
+      toast.error(`File too large: ${file.name}. Maximum size is 5MB.`);
+      setImageSrc(null);
+      setCroppedImageSrc(null);
+      e.target.value = ''; // Clear the input
+      return;
+    }
+
+    setError(''); // Clear any previous errors
     const reader = new FileReader();
     reader.onload = (event) => {
       setImageSrc(event.target.result);
-      setCroppedImageSrc(null); // Clear previous cropped image
+      setCroppedImageSrc(null);
     };
     reader.readAsDataURL(file);
   };
@@ -43,8 +54,6 @@ const ImageCropper = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
-    // For simplicity, let's assume a fixed crop area for now (e.g., center 50% of the image)
-    // In a real application, you'd use a library or more complex logic for user-defined crop areas.
     const cropX = image.naturalWidth * 0.25;
     const cropY = image.naturalHeight * 0.25;
     const cropWidth = image.naturalWidth * 0.5;
@@ -62,7 +71,7 @@ const ImageCropper = () => {
     if (croppedImageSrc) {
       const link = document.createElement('a');
       link.href = croppedImageSrc;
-      link.download = `cropped-image-${Date.now()}.png`; // Default to PNG for download
+      link.download = `cropped-image-${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -85,7 +94,7 @@ const ImageCropper = () => {
           accept="image/*"
           onChange={handleFileChange}
         />
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        
       </div>
 
       {imageSrc && (
