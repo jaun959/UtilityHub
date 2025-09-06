@@ -1,6 +1,21 @@
 
 const mongoose = require('mongoose');
 const { createClient } = require('@supabase/supabase-js');
+
+// Check for critical environment variables
+if (!process.env.SUPABASE_URL) {
+  console.error('Error: SUPABASE_URL environment variable is not set.');
+  process.exit(1);
+}
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('Error: SUPABASE_SERVICE_ROLE_KEY environment variable is not set.');
+  process.exit(1);
+}
+if (!process.env.MONGO_URI) {
+  console.error('Error: MONGO_URI environment variable is not set.');
+  process.exit(1);
+}
+
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 const testSupabaseConnection = async () => {
