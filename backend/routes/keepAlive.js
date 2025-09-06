@@ -1,0 +1,44 @@
+const router = require('express').Router();
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+const generateRandomString = (sizeInBytes) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < sizeInBytes; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
+// @route   POST /api/keep-alive
+// @desc    Generate and upload a 1KB text file to Supabase to keep the account alive
+// @access  Private (intended for CI/CD or internal use)
+router.post('/', async (req, res) => {
+  try {
+    const fileSizeInBytes = 1024;
+    const randomText = generateRandomString(fileSizeInBytes);
+    const fileName = `keep-alive-${Date.now()}.txt`;
+
+    const { data, error } = await supabase.storage
+      .from('utilityhub')
+      .upload(`keep-alive/${fileName}`, randomText, {
+        contentType: 'text/plain',
+        upsert: true
+      });
+
+    if (error) {
+      console.error('Supabase upload error:', error);
+      return res.status(500).json({ msg: 'Failed to upload file to Supabase', error: error.message });
+    }
+
+    res.status(200).json({ msg: 'Keep-alive file uploaded successfully', path: data.path });
+  } catch (err) {
+    console.error('Server error in keep-alive endpoint:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+module.exports = router;
