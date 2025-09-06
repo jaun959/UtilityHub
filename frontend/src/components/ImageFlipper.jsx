@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 const ImageFlipper = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [flipDirection, setFlipDirection] = useState('horizontal');
+  const [loading, setLoading] = useState(false);
 
   const onFileChange = (e) => {
     const file = e.target.files[0];
@@ -24,6 +25,7 @@ const ImageFlipper = () => {
       return;
     }
 
+    setLoading(true);
     const formData = new FormData();
     formData.append('image', selectedFile);
     formData.append('direction', flipDirection);
@@ -49,6 +51,8 @@ const ImageFlipper = () => {
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error flipping image. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,7 +75,7 @@ const ImageFlipper = () => {
             <option value="vertical">Vertical</option>
           </select>
         </div>
-        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Flip Image</button>
+        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Flipping...' : 'Flip Image'}</button>
       </form>
     </div>
   );
