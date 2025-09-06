@@ -52,8 +52,10 @@ const PdfMerger = () => {
         }
       });
       setConvertedFile(res.data);
+      toast.success('PDFs merged successfully!');
     } catch (err) {
       console.error(err);
+      toast.error(err.response?.data?.msg || 'Error merging PDFs. Please try again.');
     }
   };
 
