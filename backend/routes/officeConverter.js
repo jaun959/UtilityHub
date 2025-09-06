@@ -3,8 +3,6 @@ const multer = require('multer');
 const pdf = require('pdf-parse');
 const { Document, Packer, Paragraph, TextRun, ImageRun } = require('docx');
 const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
-
-const axios = require('axios');
 const XLSX = require('xlsx');
 const libre = require('libreoffice-convert');
 const util = require('util');
@@ -12,7 +10,6 @@ libre.convertAsync = util.promisify(libre.convert);
 
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-
 const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/pdf-to-word
@@ -32,7 +29,6 @@ router.post('/pdf-to-word', upload.single('pdf'), async (req, res) => {
     const data = await pdf(pdfBuffer);
     let extractedText = data.text;
 
-    // Process text: replace '.' with '.' and clean up extra newlines/spaces
     extractedText = extractedText.replace(/\./g, '.\n');
     extractedText = extractedText.replace(/\n\s*\n/g, '\n');
     extractedText = extractedText.replace(/\. \n/g, '.\n');
@@ -142,7 +138,6 @@ router.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
     const rowHeight = fontSize + 5;
     const cellPadding = 2;
 
-    // Calculate column widths dynamically based on content
     const columnWidths = jsonData[0].map((_, colIndex) => {
       let maxWidth = 0;
       jsonData.forEach(row => {
@@ -152,17 +147,16 @@ router.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
           maxWidth = textWidth;
         }
       });
-      return maxWidth + cellPadding * 2; // Add padding
+      return maxWidth + cellPadding * 2;
     });
 
     const totalTableWidth = columnWidths.reduce((sum, width) => sum + width, 0);
     let x = margin;
 
     const filterNonAscii = (text) => {
-  return text.replace(/[^\x00-\x7F]/g, '');
-};
+      return text.replace(/[^\x00-\x7F]/g, '');
+    };
 
-// Draw table headers
     for (let i = 0; i < jsonData[0].length; i++) {
       const headerText = filterNonAscii(String(jsonData[0][i] || ''));
       page.drawText(headerText, {
@@ -176,16 +170,14 @@ router.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
     }
     y -= rowHeight;
 
-    // Draw header underline
     page.drawLine({
       start: { x: margin, y: y },
       end: { x: margin + totalTableWidth, y: y },
       color: rgb(0, 0, 0),
       thickness: 1,
     });
-    y -= 5; // Space after header
+    y -= 5;
 
-    // Draw table rows
     for (let rowIndex = 1; rowIndex < jsonData.length; rowIndex++) {
       x = margin;
       for (let colIndex = 0; colIndex < jsonData[rowIndex].length; colIndex++) {
@@ -201,7 +193,6 @@ router.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
       }
       y -= rowHeight;
 
-      // Add new page if content exceeds current page height
       if (y < margin) {
         page = pdfDoc.addPage();
         y = height - margin;
