@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 const LinkShortener = () => {
   const [originalUrl, setOriginalUrl] = useState('');
   const [shortUrl, setShortUrl] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const onChange = (e) => {
     setOriginalUrl(e.target.value);
@@ -13,12 +14,15 @@ const LinkShortener = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/shorten`, { originalUrl });
       setShortUrl(res.data.shortUrl);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error shortening URL. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,7 +44,7 @@ const LinkShortener = () => {
             onChange={onChange}
           />
         </div>
-        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Shorten</button>
+        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Shortening...' : 'Shorten'}</button>
       </form>
 
       {shortUrl && (
