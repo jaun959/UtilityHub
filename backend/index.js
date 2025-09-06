@@ -31,6 +31,9 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const apiActivityTracker = require('./middleware/apiActivityTracker');
+app.use(apiActivityTracker);
+
 const shortener = require('./routes/shortener');
 app.use('/shorten', shortener);
 
