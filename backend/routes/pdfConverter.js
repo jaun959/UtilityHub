@@ -271,7 +271,7 @@ router.post('/pdf-rotate', upload.single('pdf'), async (req, res) => {
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      archive.append(modifiedPdfBytes, { name: `rotated-${Date.now()}.pdf` });
+      archive.append(Buffer.from(modifiedPdfBytes), { name: `rotated-${Date.now()}.pdf` });
       archive.finalize();
     });
 
