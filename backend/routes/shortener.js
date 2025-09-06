@@ -7,8 +7,10 @@ router.post('/', async (req, res) => {
   const { originalUrl } = req.body;
   const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
 
-  if (!originalUrl.startsWith('http')) {
-    return res.status(400).json('Invalid URL');
+  const urlRegex = /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|[a-zA-Z0-9]+\.[^\s]{2,})$/;
+
+  if (!urlRegex.test(originalUrl)) {
+    return res.status(400).json({ msg: 'Please enter a valid URL.' });
   }
 
   try {
@@ -17,8 +19,18 @@ router.post('/', async (req, res) => {
     if (url) {
       res.json(url);
     } else {
-      const urlCode = shortid.generate();
-      const shortUrl = `${baseUrl}/${urlCode}`;
+      let urlCode;
+      let shortUrl;
+      let isUnique = false;
+
+      while (!isUnique) {
+        urlCode = shortid.generate();
+        shortUrl = `${baseUrl}/${urlCode}`;
+        const existingUrl = await Url.findOne({ urlCode });
+        if (!existingUrl) {
+          isUnique = true;
+        }
+      }
 
       url = new Url({
         originalUrl,
@@ -32,7 +44,7 @@ router.post('/', async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: 'Server error during URL shortening.' });
   }
 });
 
@@ -50,7 +62,7 @@ router.get('/:code', async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: 'Server error during URL redirection.' });
   }
 });
 
