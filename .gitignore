@@ -43,3 +43,4 @@ frontend/build/
 # Untracked files
 error.txt
 req.md
+"netlify.txt" 
