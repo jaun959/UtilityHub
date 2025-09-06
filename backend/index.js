@@ -32,7 +32,7 @@ app.use(cors());
 app.use(express.json());
 
 const shortener = require('./routes/shortener');
-app.use('/', shortener);
+app.use('/shorten', shortener);
 
 const imageConverter = require('./routes/imageConverter');
 app.use('/api/convert', imageConverter);
