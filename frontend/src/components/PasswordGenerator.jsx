@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const PasswordGenerator = () => {
   const [password, setPassword] = useState('');
@@ -27,6 +28,11 @@ const PasswordGenerator = () => {
       newPassword += charset.charAt(Math.floor(Math.random() * charset.length));
     }
     setPassword(newPassword);
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(password);
+    toast.success('Copied to clipboard!');
   };
 
   return (
@@ -71,8 +77,20 @@ const PasswordGenerator = () => {
 
       {password && (
         <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Generated Password:</h3>
-          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600">{password}</p>
+          <h3 className="text-xl font-bold mb-2">Generated Password:
+            <button onClick={copyToClipboard} className="ml-2 text-sm text-blue-500 hover:underline">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+              </svg>
+            </button>
+          </h3>
+          <textarea
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 text-sm dark:border-gray-600 h-max"
+            rows="1"
+            readOnly
+            value={password}
+          ></textarea>
         </div>
       )}
     </div>
