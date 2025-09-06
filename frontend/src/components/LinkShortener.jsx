@@ -22,6 +22,11 @@ const LinkShortener = () => {
     }
   };
 
+  const copyToClipboard = (textToCopy) => {
+    navigator.clipboard.writeText(textToCopy);
+    toast.success('Copied to clipboard!');
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Link Shortener</h2>
@@ -39,8 +44,15 @@ const LinkShortener = () => {
       </form>
 
       {shortUrl && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Shortened URL:</h3>
+        <div className="mt-4 bg-white p-4 rounded-lg shadow">
+          <h3 className="text-xl font-bold mb-2">Shortened URL:
+            <button onClick={() => copyToClipboard(shortUrl)} className="ml-2 text-sm text-blue-500 hover:underline">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+              </svg>
+            </button>
+          </h3>
           <a href={shortUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{shortUrl}</a>
         </div>
       )}
