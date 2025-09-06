@@ -5,21 +5,30 @@ import { toast } from 'react-toastify';
 const Base64TextConverter = () => {
   const [text, setText] = useState('');
   const [convertedText, setConvertedText] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleTextChange = (e) => {
     setText(e.target.value);
   };
 
   const encodeBase64 = () => {
-    setConvertedText(btoa(text));
+    setLoading(true);
+    setTimeout(() => {
+      setConvertedText(btoa(text));
+      setLoading(false);
+    }, 500);
   };
 
   const decodeBase64 = () => {
-    try {
-      setConvertedText(atob(text));
-    } catch (e) {
-      setConvertedText('Invalid Base64 string');
-    }
+    setLoading(true);
+    setTimeout(() => {
+      try {
+        setConvertedText(atob(text));
+      } catch (e) {
+        setConvertedText('Invalid Base64 string');
+      }
+      setLoading(false);
+    }, 500);
   };
 
   const copyToClipboard = () => {
@@ -40,8 +49,8 @@ const Base64TextConverter = () => {
         ></textarea>
       </div>
       <div className="mb-4">
-        <button onClick={encodeBase64} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Encode Base64</button>
-        <button onClick={decodeBase64} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Decode Base64</button>
+        <button onClick={encodeBase64} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Encoding...' : 'Encode Base64'}</button>
+        <button onClick={decodeBase64} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Decoding...' : 'Decode Base64'}</button>
       </div>
       {convertedText && (
         <div className="mt-4">
