@@ -5,23 +5,36 @@ import { toast } from 'react-toastify';
 const TextCaseConverter = () => {
   const [text, setText] = useState('');
   const [convertedText, setConvertedText] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleTextChange = (e) => {
     setText(e.target.value);
   };
 
   const toUpperCase = () => {
-    setConvertedText(text.toUpperCase());
+    setLoading(true);
+    setTimeout(() => {
+      setConvertedText(text.toUpperCase());
+      setLoading(false);
+    }, 500);
   };
 
   const toLowerCase = () => {
-    setConvertedText(text.toLowerCase());
+    setLoading(true);
+    setTimeout(() => {
+      setConvertedText(text.toLowerCase());
+      setLoading(false);
+    }, 500);
   };
 
   const toTitleCase = () => {
-    setConvertedText(text.replace(/\w\S*/g, (txt) => {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    }));
+    setLoading(true);
+    setTimeout(() => {
+      setConvertedText(text.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }));
+      setLoading(false);
+    }, 500);
   };
 
   const copyToClipboard = () => {
@@ -42,9 +55,9 @@ const TextCaseConverter = () => {
         ></textarea>
       </div>
       <div className="mb-4">
-        <button onClick={toUpperCase} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">UPPERCASE</button>
-        <button onClick={toLowerCase} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">lowercase</button>
-        <button onClick={toTitleCase} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Title Case</button>
+        <button onClick={toUpperCase} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'UPPERCASE'}</button>
+        <button onClick={toLowerCase} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'lowercase'}</button>
+        <button onClick={toTitleCase} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'Title Case'}</button>
       </div>
       {convertedText && (
         <div className="mt-4">
