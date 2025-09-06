@@ -5,7 +5,6 @@ import PdfToImageConverter from '../components/PdfToImageConverter.jsx';
 import PdfToWordConverter from '../components/PdfToWordConverter.jsx';
 import PdfToExcelConverter from '../components/PdfToExcelConverter.jsx';
 import TextToPdfGenerator from '../components/TextToPdfGenerator.jsx';
-import WordToPdfConverter from '../components/WordToPdfConverter.jsx';
 import ExcelToPdfConverter from '../components/ExcelToPdfConverter.jsx';
 
 const PdfToolsPage = () => {
@@ -30,9 +29,6 @@ const PdfToolsPage = () => {
         </ToolCard>
         <ToolCard title="Text to PDF Generator" description="Convert plain text into a PDF document.">
           <TextToPdfGenerator />
-        </ToolCard>
-        <ToolCard title="Word to PDF Converter" description="Convert Word documents to PDF format.">
-          <WordToPdfConverter />
         </ToolCard>
         <ToolCard title="Excel to PDF Converter" description="Convert Excel spreadsheets to PDF format.">
           <ExcelToPdfConverter />
