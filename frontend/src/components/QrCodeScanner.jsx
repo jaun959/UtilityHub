@@ -68,7 +68,7 @@ const QrCodeScanner = () => {
       <h2 className="text-2xl font-bold mb-4">QR Code Scanner</h2>
       <div className="mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50">
         <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="qr_image">Upload QR Code Image</label>
-        <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="qr_image" type="file" accept="image/*" onChange={handleImageUpload} />
+        <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="qr_image" type="file" accept="image/*" onChange={handleImageUpload} />
       </div>
 
       {qrData && (
