@@ -27,7 +27,7 @@ const Register = () => {
     } else {
       try {
         const newUser = { username, email, password };
-        const res = await axios.post('http://localhost:5000/api/auth/register', newUser);
+        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/register`, newUser);
         dispatch({ type: 'LOGIN', payload: res.data.token });
         localStorage.setItem('token', res.data.token);
         setAuthToken(res.data.token);

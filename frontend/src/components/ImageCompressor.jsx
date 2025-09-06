@@ -49,7 +49,7 @@ const ImageCompressor = () => {
     formData.append('quality', quality);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/convert/compress-image', formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/compress-image`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

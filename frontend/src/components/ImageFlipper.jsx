@@ -29,7 +29,7 @@ const ImageFlipper = () => {
     formData.append('direction', flipDirection);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/convert/image-flip', formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/image-flip`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },

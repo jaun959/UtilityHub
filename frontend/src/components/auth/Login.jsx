@@ -22,7 +22,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const user = { email, password };
-      const res = await axios.post('http://localhost:5000/api/auth/login', user);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, user);
       dispatch({ type: 'LOGIN', payload: res.data.token });
       localStorage.setItem('token', res.data.token);
       setAuthToken(res.data.token);

@@ -43,7 +43,7 @@ const ImageToPdfConverter = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/convert/image-to-pdf', formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/image-to-pdf`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

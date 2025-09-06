@@ -14,7 +14,7 @@ const LinkShortener = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/shorten', { originalUrl });
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/shorten`, { originalUrl });
       setShortUrl(res.data.shortUrl);
     } catch (err) {
       console.error(err);

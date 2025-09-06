@@ -14,7 +14,7 @@ const TextToPdfGenerator = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/convert/text-to-pdf', { text }, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/text-to-pdf`, { text }, {
         responseType: 'blob'
       });
 

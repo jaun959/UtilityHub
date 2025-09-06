@@ -114,7 +114,7 @@ const PdfSplitter = () => {
     formData.append('ranges', ranges);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/convert/split-pdf', formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/split-pdf`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

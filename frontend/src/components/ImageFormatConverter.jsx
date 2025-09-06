@@ -49,7 +49,7 @@ const ImageFormatConverter = () => {
     formData.append('format', format);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/convert/convert-image-format', formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/convert-image-format`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

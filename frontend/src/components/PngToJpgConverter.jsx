@@ -43,7 +43,7 @@ const PngToJpgConverter = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/convert/png-to-jpg', formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/png-to-jpg`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
