@@ -43,9 +43,9 @@ const JsonFormatterValidator = () => {
     const file = new Blob([formattedJson], { type: 'application/json' });
     element.href = URL.createObjectURL(file);
     element.download = 'formatted.json';
-    document.body.appendChild(element); // Required for Firefox
+    document.body.appendChild(element);
     element.click();
-    document.body.removeChild(element); // Clean up
+    document.body.removeChild(element);
     toast.success('JSON downloaded!');
   };
 
