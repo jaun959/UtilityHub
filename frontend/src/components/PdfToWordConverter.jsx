@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const PdfToWordConverter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -22,10 +22,12 @@ const PdfToWordConverter = () => {
         }
       });
       setConvertedFile(res.data);
+      toast.success('PDF converted to Word successfully!');
     } catch (err) {
       console.error(err);
-    }
-  };
+      toast.error(err.response?.data?.msg || 'Error converting PDF to Word. Please try again.');
+    };
+  }
 
   return (
     <div className="container mx-auto p-4">
