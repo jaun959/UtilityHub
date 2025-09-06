@@ -34,43 +34,44 @@ const HomePage = () => {
     <>
       <Helmet>
         <title>Utility Hub - Your One-Stop Solution for Everyday Tools</title>
-        <meta name="description" content="Utility Hub offers a comprehensive suite of online tools for image, PDF, text, and web-related tasks. Simplify your daily conversions and productivity needs."/>
-        <meta property="og:title" content="Utility Hub - Your One-Stop Solution for Everyday Tools"/>
-        <meta property="og:description" content="Utility Hub offers a comprehensive suite of online tools for image, PDF, text, and web-related tasks. Simplify your daily conversions and productivity needs."/>
-        <meta property="og:image" content="/logo.png"/>
-        <meta property="og:url" content={window.location.href}/>
+        <meta name="description" content="Utility Hub offers a comprehensive suite of online tools for image, PDF, text, and web-related tasks. Simplify your daily conversions and productivity needs." />
+        <meta property="og:title" content="Utility Hub - Your One-Stop Solution for Everyday Tools" />
+        <meta property="og:description" content="Utility Hub offers a comprehensive suite of online tools for image, PDF, text, and web-related tasks. Simplify your daily conversions and productivity needs." />
+        <meta property="og:image" content="/logo.png" />
+        <meta property="og:url" content={window.location.href} />
       </Helmet>
       <main className="container mx-auto p-8">
-      <h2 className="text-4xl font-extrabold text-center text-gray-900 mb-10">Welcome to Utility Hub!</h2>
-      <p className="text-xl text-center text-gray-600 mb-12">Your one-stop solution for everyday utility conversions and tools.</p>
+        <h2 className="text-4xl font-extrabold text-center text-gray-900 mb-10">Welcome to Utility Hub!</h2>
+        <p className="text-xl text-center text-gray-600 mb-12">Your one-stop solution for everyday utility conversions and tools.</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {categories.map((category, index) => (
-          <Link to={category.link} key={index} className="block">
-            <div className="relative rounded-xl border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out h-full flex flex-col justify-between p-6">
-              <div>
-                <h3 className="text-2xl font-semibold leading-none tracking-tight text-gray-900 mb-3">{category.title}</h3>
-                <p className="text-sm text-muted-foreground text-gray-700 mb-4">{category.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {category.tools.map((tool, i) => (
-                    <span key={i} className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                      {tool}
-                    </span>
-                  ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {categories.map((category, index) => (
+            <Link to={category.link} key={index} className="block">
+              <div className="relative rounded-xl border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out h-full flex flex-col justify-between p-6">
+                <div>
+                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-gray-900 mb-3">{category.title}</h3>
+                  <p className="text-sm text-muted-foreground text-gray-700 mb-4">{category.description}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {category.tools.map((tool, i) => (
+                      <span key={i} className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-6 text-right">
+                  <span className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
+                    Explore <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
                 </div>
               </div>
-              <div className="mt-6 text-right">
-                <span className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
-                  Explore <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </main>
+            </Link>
+          ))}
+        </div>
+      </main>
+    </>
   );
 };
 

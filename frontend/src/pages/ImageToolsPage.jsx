@@ -53,6 +53,7 @@ const ImageToolsPage = () => {
         </ToolCard>
       </div>
     </main>
+  </>
   );
 };
 
