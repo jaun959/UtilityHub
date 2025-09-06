@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { PDFDocument } from 'pdf-lib'; // New import
+import { PDFDocument } from 'pdf-lib'; 
 
 const PdfSplitter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -11,13 +11,13 @@ const PdfSplitter = () => {
   const [error, setError] = useState('');
   const [totalPages, setTotalPages] = useState(0);
 
-  const onFileChange = async (e) => { // Make it async
+  const onFileChange = async (e) => { 
     const file = e.target.files[0];
-    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    const maxFileSize = 10 * 1024 * 1024; 
 
     if (!file) {
       setSelectedFile(null);
-      setTotalPages(0); // Reset total pages
+      setTotalPages(0); 
       setError('');
       return;
     }
@@ -25,16 +25,16 @@ const PdfSplitter = () => {
     if (file.type !== 'application/pdf') {
       toast.error(`Invalid file type: ${file.name}. Only PDF files are allowed.`);
       setSelectedFile(null);
-      setTotalPages(0); // Reset total pages
-      e.target.value = ''; // Clear the input
+      setTotalPages(0); 
+      e.target.value = ''; 
       setError('Invalid file type.');
       return;
     }
     if (file.size > maxFileSize) {
       toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
       setSelectedFile(null);
-      setTotalPages(0); // Reset total pages
-      e.target.value = ''; // Clear the input
+      setTotalPages(0); 
+      e.target.value = ''; 
       setError('File too large.');
       return;
     }
@@ -42,7 +42,7 @@ const PdfSplitter = () => {
     setError('');
     setSelectedFile(file);
 
-    // Get total pages
+    
     try {
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
@@ -73,7 +73,7 @@ const PdfSplitter = () => {
       return;
     }
 
-    // Validate ranges against total pages
+    
     if (totalPages > 0) {
       const parsedRanges = [];
       const parts = ranges.split(',').map(p => p.trim());
