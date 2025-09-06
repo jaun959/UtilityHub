@@ -19,15 +19,15 @@ const TextToPdfGenerator = () => {
       });
 
 
-      const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+      const zipBlob = new Blob([res.data], { type: 'application/zip' });
 
 
-      const url = window.URL.createObjectURL(pdfBlob);
+      const url = window.URL.createObjectURL(zipBlob);
 
 
       const a = document.createElement('a');
       a.href = url;
-      a.download = `converted-text-${Date.now()}.pdf`;
+      a.download = `converted-text-${Date.now()}.zip`;
       document.body.appendChild(a);
       a.click();
       a.remove();
