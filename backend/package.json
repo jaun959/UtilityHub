@@ -43,7 +43,7 @@
     "cors": "^2.8.5",
     "docx": "^8.5.0",
     "docx-pdf": "^0.0.1",
-    "dotenv": "^17.2.2",
+    
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "libreoffice-convert": "^1.6.1",
