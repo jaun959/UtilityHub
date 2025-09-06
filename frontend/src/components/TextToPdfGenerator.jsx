@@ -13,10 +13,32 @@ const TextToPdfGenerator = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/convert/text-to-pdf', { text });
-      setConvertedFile(res.data);
+      const res = await axios.post('http://localhost:5000/api/convert/text-to-pdf', { text }, {
+        responseType: 'blob' 
+      });
+
+      
+      const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+
+      
+      const url = window.URL.createObjectURL(pdfBlob);
+
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `converted-text-${Date.now()}.pdf`; 
+      document.body.appendChild(a); 
+      a.click(); 
+      a.remove(); 
+      window.URL.revokeObjectURL(url); 
+
+      
+      setConvertedFile(null);
+
     } catch (err) {
       console.error(err);
+      
+      
     }
   };
 
