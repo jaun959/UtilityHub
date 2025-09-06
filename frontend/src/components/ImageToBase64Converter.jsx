@@ -52,6 +52,19 @@ const ImageToBase64Converter = () => {
     toast.success('Copied to clipboard!');
   };
 
+  const downloadAsTxt = () => {
+    const blob = new Blob([base64String], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `image-base64-${Date.now()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Base64 string downloaded as TXT!');
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Image to Base64 Converter</h2>
@@ -71,6 +84,9 @@ const ImageToBase64Converter = () => {
                 <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
                 <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
               </svg>
+            </button>
+            <button onClick={downloadAsTxt} className="ml-2 text-sm text-blue-500 hover:underline">
+              Download TXT
             </button>
           </h3>
           <textarea

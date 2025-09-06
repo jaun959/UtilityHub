@@ -78,7 +78,7 @@ const ImageFormatConverter = () => {
       <form onSubmit={onSubmit}>
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="multiple_files">Upload image files (any format)</label>
-          <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} />
+          <input accept="image/*" className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} />
         </div>
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="format">Target Format</label>
