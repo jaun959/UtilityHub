@@ -23,7 +23,10 @@
     "qr-code",
     "password-generator",
     "hash-generator",
-    "authentication"
+    "authentication",
+    "user-management",
+    "responsive-design",
+    "open-source"
   ],
   "author": "gaureshpai",
   "license": "ISC",
