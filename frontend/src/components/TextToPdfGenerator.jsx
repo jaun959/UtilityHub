@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const TextToPdfGenerator = () => {
   const [text, setText] = useState('');
-  const [convertedFile, setConvertedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const onChange = (e) => {
     setText(e.target.value);
@@ -13,6 +13,7 @@ const TextToPdfGenerator = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/text-to-pdf`, { text }, {
         responseType: 'blob'
@@ -34,13 +35,14 @@ const TextToPdfGenerator = () => {
       window.URL.revokeObjectURL(url);
 
 
-      setConvertedFile(null);
       toast.success('PDF generated successfully!');
 
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error generating PDF from text. Please try again.');
-    };
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -56,15 +58,10 @@ const TextToPdfGenerator = () => {
             onChange={onChange}
           ></textarea>
         </div>
-        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Generate PDF</button>
+        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>
+          {loading ? 'Generating...' : 'Generate PDF'}
+        </button>
       </form>
-
-      {convertedFile && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Converted File:</h3>
-          <a href={convertedFile.path} download className="text-blue-500 hover:underline">Download PDF</a>
-        </div>
-      )}
     </div>
   );
 };
