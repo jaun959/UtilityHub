@@ -6,6 +6,7 @@ const WebsiteScreenshotGenerator = () => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [productionMode, setProductionMode] = useState(false); // New state for the toggle
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,7 +14,7 @@ const WebsiteScreenshotGenerator = () => {
     setError(null);
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/screenshot`, { url });
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/screenshot`, { url, productionMode }); // Send productionMode to backend
       const { path, originalname } = res.data;
 
       const link = document.createElement('a');
@@ -48,6 +49,16 @@ const WebsiteScreenshotGenerator = () => {
             onChange={(e) => setUrl(e.target.value)}
             required
           />
+        </div>
+        <div className="mb-4 flex items-center">
+          <input
+            type="checkbox"
+            id="productionModeToggle"
+            className="mr-2"
+            checked={productionMode}
+            onChange={(e) => setProductionMode(e.target.checked)}
+          />
+          <label htmlFor="productionModeToggle" className="text-sm font-medium text-gray-900">Use Production Mode (for Vercel/Netlify)</label>
         </div>
         <button
           type="submit"

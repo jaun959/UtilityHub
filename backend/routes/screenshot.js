@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const puppeteer = require('puppeteer');
+const puppeteerCore = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');
 const archiver = require('archiver');
 const cheerio = require('cheerio');
 const { createClient } = require('@supabase/supabase-js');
@@ -30,7 +32,7 @@ const extractInternalLinks = (html, baseUrl) => {
 // @desc    Generate screenshots of a given URL and its internal links (up to 5) and upload to Supabase as a ZIP
 // @access  Public
 router.post('/', async (req, res) => {
-  const { url } = req.body;
+  const { url, productionMode } = req.body; // Get productionMode from request
 
   if (!url) {
     return res.status(400).json({ msg: 'URL is required' });
@@ -43,10 +45,21 @@ router.post('/', async (req, res) => {
   const MAX_PAGES = 5;
 
   try {
-    browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true
-    });
+    if (productionMode) {
+      // Production mode: Use puppeteer-core with @sparticuz/chromium
+      browser = await puppeteerCore.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath,
+        headless: chromium.headless,
+      });
+    } else {
+      // Development mode: Use standard puppeteer
+      browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true
+      });
+    }
 
     while (urlsToVisit.length > 0 && visitedUrls.size < MAX_PAGES) {
       const currentUrl = urlsToVisit.shift();
