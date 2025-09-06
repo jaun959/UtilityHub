@@ -74,7 +74,7 @@ const PdfMerger = () => {
       {convertedFile && (
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">Merged File:</h3>
-          <a href={`http://localhost:5000/api/convert/download-pdf/${convertedFile.path}`} download={convertedFile.originalname} className="text-blue-500 hover:underline">Download Merged PDF</a>
+          <a href={`${convertedFile.path}`} download={convertedFile.originalname} className="text-blue-500 hover:underline">Download Merged PDF</a>
         </div>
       )}
     </div>
