@@ -9,25 +9,31 @@ const PasswordGenerator = () => {
   const [includeLowercase, setIncludeLowercase] = useState(true);
   const [includeNumbers, setIncludeNumbers] = useState(true);
   const [includeSymbols, setIncludeSymbols] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const generatePassword = () => {
-    let charset = '';
-    let newPassword = '';
+    setLoading(true);
+    setTimeout(() => {
+      let charset = '';
+      let newPassword = '';
 
-    if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-    if (includeNumbers) charset += '0123456789';
-    if (includeSymbols) charset += '!@#$%^&*()_+-=[]{};:,.<>?';
+      if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+      if (includeNumbers) charset += '0123456789';
+      if (includeSymbols) charset += '!@#$%^&*()_+-=[]{};:,.<>?';
 
-    if (charset === '') {
-      setPassword('Please select at least one option.');
-      return;
-    }
+      if (charset === '') {
+        setPassword('Please select at least one option.');
+        setLoading(false);
+        return;
+      }
 
-    for (let i = 0; i < length; i++) {
-      newPassword += charset.charAt(Math.floor(Math.random() * charset.length));
-    }
-    setPassword(newPassword);
+      for (let i = 0; i < length; i++) {
+        newPassword += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+      setPassword(newPassword);
+      setLoading(false);
+    }, 500);
   };
 
   const copyToClipboard = () => {
@@ -73,7 +79,7 @@ const PasswordGenerator = () => {
           <span className="ml-2 text-gray-900 text-black">Include Symbols</span>
         </label>
       </div>
-      <button onClick={generatePassword} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Generate Password</button>
+      <button onClick={generatePassword} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Generating...' : 'Generate Password'}</button>
 
       {password && (
         <div className="mt-4">
