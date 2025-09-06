@@ -4,6 +4,7 @@ import './App.css';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import setAuthToken from './utils/setAuthToken';
+import { ToastContainer } from 'react-toastify';
 
 import Register from './components/auth/Register.jsx';
 import Login from './components/auth/Login.jsx';
@@ -137,6 +138,7 @@ function App() {
         </Routes>
       </main>
       <Footer />
+      <ToastContainer />
     </div>
   );
 }
