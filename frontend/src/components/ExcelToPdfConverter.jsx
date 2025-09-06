@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const ExcelToPdfConverter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -14,8 +15,8 @@ const ExcelToPdfConverter = () => {
         setSelectedFile(file);
       } else {
         setSelectedFile(null);
-        alert('Only .xlsx or .csv files are allowed.');
-        e.target.value = ''; // Clear the input
+        toast.error('Only .xlsx or .csv files are allowed.');
+        e.target.value = '';
       }
     }
   };
@@ -23,7 +24,7 @@ const ExcelToPdfConverter = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!selectedFile) {
-      alert('Please select a file first.');
+      toast.error('Please select a file first.');
       return;
     }
 
@@ -35,29 +36,26 @@ const ExcelToPdfConverter = () => {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
-        responseType: 'blob' // Important for handling binary data
+        responseType: 'blob'
       });
 
-      // Create a Blob from the response data
       const blob = new Blob([res.data], { type: 'application/pdf' });
 
-      // Create a URL for the Blob
       const url = window.URL.createObjectURL(blob);
 
-      // Create a temporary link element
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `converted-${Date.now()}.pdf`); // Set the download filename
+      link.setAttribute('download', `converted-${Date.now()}.pdf`);
       document.body.appendChild(link);
-      link.click(); // Programmatically click the link to trigger download
+      link.click();
 
-      // Clean up
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      toast.success('File converted to PDF successfully!');
 
     } catch (err) {
       console.error(err);
-      alert('Error converting file. Please check the console for details.');
+      toast.error(err.response?.data?.msg || 'Error converting file. Please try again.');
     }
   };
 
