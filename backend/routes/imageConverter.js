@@ -96,7 +96,7 @@ module.exports = router;
 router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
   try {
     const pdfDoc = new PDFDocument({
-      autoFirstPage: false // Disable automatic page creation
+      autoFirstPage: false
     });
 
     const tempPdfPath = path.join(os.tmpdir(), `converted_pdf_${Date.now()}.pdf`);
@@ -118,7 +118,7 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
 
         const image = sharp(imageBuffer);
         const metadata = await image.metadata();
-        const pngBuffer = await image.png().toBuffer(); // Convert to PNG
+        const pngBuffer = await image.png().toBuffer();
 
         tempImagePath = path.join(os.tmpdir(), `temp_image_${Date.now()}.png`);
         await fsp.writeFile(tempImagePath, pngBuffer);
@@ -155,9 +155,8 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
     }
 
     pdfDoc.end();
-    await pdfGenerationPromise; // Wait for PDF to finish writing to file
+    await pdfGenerationPromise; 
 
-    // For testing, return the local path. In production, you'd upload this to Supabase.
     res.json({ path: tempPdfPath, originalname: path.basename(tempPdfPath) });
 
   } catch (err) {
@@ -174,7 +173,7 @@ router.post('/resize-image', upload.array('images'), async (req, res) => {
   try {
     const { width, height } = req.body;
     const archive = archiver('zip', {
-      zlib: { level: 9 } // Sets the compression level.
+      zlib: { level: 9 }
     });
 
     const archiveBuffer = await new Promise(async (resolve, reject) => {
@@ -217,7 +216,7 @@ router.post('/compress-image', upload.array('images'), async (req, res) => {
   try {
     const { quality } = req.body;
     const archive = archiver('zip', {
-      zlib: { level: 9 } // Sets the compression level.
+      zlib: { level: 9 }
     });
 
     const archiveBuffer = await new Promise(async (resolve, reject) => {
@@ -260,7 +259,7 @@ router.post('/convert-image-format', upload.array('images'), async (req, res) =>
   try {
     const { format } = req.body;
     const archive = archiver('zip', {
-      zlib: { level: 9 } // Sets the compression level.
+      zlib: { level: 9 }
     });
 
     const archiveBuffer = await new Promise(async (resolve, reject) => {
