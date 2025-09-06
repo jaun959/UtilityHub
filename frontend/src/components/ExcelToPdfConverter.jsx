@@ -7,11 +7,26 @@ const ExcelToPdfConverter = () => {
   const [convertedFile, setConvertedFile] = useState(null);
 
   const onFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      if (fileExtension === 'xlsx' || fileExtension === 'csv') {
+        setSelectedFile(file);
+      } else {
+        setSelectedFile(null);
+        alert('Only .xlsx or .csv files are allowed.');
+        e.target.value = ''; // Clear the input
+      }
+    }
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (!selectedFile) {
+      alert('Please select a file first.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('excel', selectedFile);
 
@@ -19,11 +34,30 @@ const ExcelToPdfConverter = () => {
       const res = await axios.post('http://localhost:5000/api/convert/excel-to-pdf', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        }
+        },
+        responseType: 'blob' // Important for handling binary data
       });
-      setConvertedFile(res.data);
+
+      // Create a Blob from the response data
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+
+      // Create a URL for the Blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary link element
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `converted-${Date.now()}.pdf`); // Set the download filename
+      document.body.appendChild(link);
+      link.click(); // Programmatically click the link to trigger download
+
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
     } catch (err) {
       console.error(err);
+      alert('Error converting file. Please check the console for details.');
     }
   };
 
@@ -37,16 +71,6 @@ const ExcelToPdfConverter = () => {
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Convert to PDF</button>
       </form>
-
-      {convertedFile && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Converted File:</h3>
-          <p>{convertedFile.message}</p>
-          {convertedFile.path && convertedFile.path !== 'placeholder.pdf' && (
-            <a href={convertedFile.path} download className="text-blue-500 hover:underline">Download PDF</a>
-          )}
-        </div>
-      )}
     </div>
   );
 };
