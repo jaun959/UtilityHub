@@ -1,35 +1,38 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const ImageCompressor = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [quality, setQuality] = useState(80);
   const [convertedZipFile, setConvertedZipFile] = useState(null);
-  const [error, setError] = useState('');
 
   const onFileChange = (e) => {
     const files = Array.from(e.target.files);
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/tiff', 'image/avif'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
 
-    const validFiles = files.filter(file => {
+    const validFiles = [];
+    let hasInvalidFile = false;
+
+    files.forEach(file => {
       if (!allowedTypes.includes(file.type)) {
-        setError(`Invalid file type: ${file.name}. Only images (JPEG, PNG, GIF, WebP, TIFF, AVIF) are allowed.`);
-        return false;
+        toast.error(`Invalid file type: ${file.name}. Only images (JPEG, PNG, GIF, WebP, TIFF, AVIF) are allowed.`);
+        hasInvalidFile = true;
+        return;
       }
       if (file.size > maxSize) {
-        setError(`File too large: ${file.name}. Maximum size is 5MB.`);
-        return false;
+        toast.error(`File too large: ${file.name}. Maximum size is 5MB.`);
+        hasInvalidFile = true;
+        return;
       }
-      return true;
+      validFiles.push(file);
     });
 
     setSelectedFiles(validFiles);
-    if (validFiles.length !== files.length) {
-      e.target.value = ''; // Clear the input if some files were invalid
-    } else {
-      setError(''); // Clear error if all files are valid
+    if (hasInvalidFile) {
+      e.target.value = '';
     }
   };
 
@@ -64,7 +67,6 @@ const ImageCompressor = () => {
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="multiple_files">Upload multiple image files</label>
           <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} />
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="quality">Quality (1-100%)</label>
