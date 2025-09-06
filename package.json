@@ -1,15 +1,33 @@
 {
   "name": "UtilityHub",
   "version": "1.0.0",
-  "description": "Root package for Utility Hub",
-  "main": "index.js",
+  "description": "A web-based platform offering a collection of utility tools, built with MERN stack (MongoDB, Express.js, React.js, Node.js) and TailwindCSS",
   "scripts": {
-    "start": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\""
+    "start": "concurrently \"npm start --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev": "npm start"
   },
-  "keywords": [],
+  "keywords": [
+    "utility",
+    "tools",
+    "web-app",
+    "mern-stack",
+    "react",
+    "node.js",
+    "express.js",
+    "mongodb",
+    "tailwind-css",
+    "image-converter",
+    "pdf-tools",
+    "text-tools",
+    "url-shortener",
+    "qr-code",
+    "password-generator",
+    "hash-generator",
+    "authentication"
+  ],
   "author": "gaureshpai",
   "license": "ISC",
-  "dependencies": {
-    "tslib": "^2.8.1"
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
