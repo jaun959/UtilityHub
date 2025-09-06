@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const LinkShortener = () => {
   const [originalUrl, setOriginalUrl] = useState('');
@@ -17,6 +18,7 @@ const LinkShortener = () => {
       setShortUrl(res.data.shortUrl);
     } catch (err) {
       console.error(err);
+      toast.error(err.response?.data?.msg || 'Error shortening URL. Please try again.');
     }
   };
 
