@@ -129,7 +129,6 @@ function App() {
           <Route path="/text" element={<TextToolsPage />} />
           <Route path="/web" element={<WebToolsPage />} />
 
-          {/* New routes */}
           <Route path="/text/base64-converter" element={<Base64TextConverter />} />
           <Route path="/images/flipper" element={<ImageFlipper />} />
           <Route path="/images/image-to-base64" element={<ImageToBase64Converter />} />
