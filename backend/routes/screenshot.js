@@ -1,7 +1,5 @@
 const router = require('express').Router();
 const puppeteer = require('puppeteer');
-const puppeteerCore = require('puppeteer-core');
-const chromium = require('@sparticuz/chromium');
 const archiver = require('archiver');
 const cheerio = require('cheerio');
 const { createClient } = require('@supabase/supabase-js');
@@ -46,10 +44,13 @@ router.post('/', async (req, res) => {
 
   try {
     // Determine which Puppeteer to use based on environment
-    // Use @sparticuz/chromium in production (e.g., Vercel, Netlify) or if explicitly set
     const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 
     if (isProduction) {
+      // Dynamically import puppeteer-core and chromium only in production
+      const puppeteerCore = require('puppeteer-core');
+      const chromium = require('@sparticuz/chromium');
+
       browser = await puppeteerCore.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
