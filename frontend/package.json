@@ -7,6 +7,7 @@
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.11.0",
     "diff-match-patch": "^1.0.5",
+    "js-md5": "^0.8.3",
     "jsqr": "^1.4.0",
     "jwt-decode": "^4.0.0",
     "marked": "^16.2.1",
