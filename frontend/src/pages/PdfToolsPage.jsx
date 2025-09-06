@@ -8,10 +8,20 @@ import TextToPdfGenerator from '../components/TextToPdfGenerator.jsx';
 import ExcelToPdfConverter from '../components/ExcelToPdfConverter.jsx';
 import PdfToTextConverter from '../components/PdfToTextConverter.jsx';
 import PdfRotator from '../components/PdfRotator.jsx';
+import { Helmet } from 'react-helmet-async';
 
 const PdfToolsPage = () => {
   return (
-    <main className="container mx-auto p-4">
+    <>
+      <Helmet>
+        <title>PDF Tools - Utility Hub</title>
+        <meta name="description" content="Comprehensive tools for managing your PDF documents: merge, split, convert to image, Word, Excel, text, and rotate pages. Also convert Excel/Text to PDF."/>
+        <meta property="og:title" content="PDF Tools - Utility Hub"/>
+        <meta property="og:description" content="Comprehensive tools for managing your PDF documents: merge, split, convert to image, Word, Excel, text, and rotate pages. Also convert Excel/Text to PDF."/>
+        <meta property="og:image" content="/logo.png"/>
+        <meta property="og:url" content={window.location.href}/>
+      </Helmet>
+      <main className="container mx-auto p-4">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">PDF Tools</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <ToolCard title="PDF Merger" description="Combine multiple PDF documents into one.">

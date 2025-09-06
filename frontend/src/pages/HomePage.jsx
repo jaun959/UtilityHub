@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const HomePage = () => {
   const categories = [
@@ -30,7 +31,16 @@ const HomePage = () => {
   ];
 
   return (
-    <main className="container mx-auto p-8">
+    <>
+      <Helmet>
+        <title>Utility Hub - Your One-Stop Solution for Everyday Tools</title>
+        <meta name="description" content="Utility Hub offers a comprehensive suite of online tools for image, PDF, text, and web-related tasks. Simplify your daily conversions and productivity needs."/>
+        <meta property="og:title" content="Utility Hub - Your One-Stop Solution for Everyday Tools"/>
+        <meta property="og:description" content="Utility Hub offers a comprehensive suite of online tools for image, PDF, text, and web-related tasks. Simplify your daily conversions and productivity needs."/>
+        <meta property="og:image" content="/logo.png"/>
+        <meta property="og:url" content={window.location.href}/>
+      </Helmet>
+      <main className="container mx-auto p-8">
       <h2 className="text-4xl font-extrabold text-center text-gray-900 mb-10">Welcome to Utility Hub!</h2>
       <p className="text-xl text-center text-gray-600 mb-12">Your one-stop solution for everyday utility conversions and tools.</p>
 

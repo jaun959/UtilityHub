@@ -8,10 +8,20 @@ import ImageCropper from '../components/ImageCropper.jsx';
 import ImageGrayscaler from '../components/ImageGrayscaler.jsx';
 import ImageFlipper from '../components/ImageFlipper.jsx';
 import ImageToBase64Converter from '../components/ImageToBase64Converter.jsx';
+import { Helmet } from 'react-helmet-async';
 
 const ImageToolsPage = () => {
   return (
-    <main className="container mx-auto p-4">
+    <>
+      <Helmet>
+        <title>Image Tools - Utility Hub</title>
+        <meta name="description" content="Comprehensive suite of online image manipulation tools: convert formats, compress, resize, crop, grayscale, flip, and convert images to Base64 or PDF."/>
+        <meta property="og:title" content="Image Tools - Utility Hub"/>
+        <meta property="og:description" content="Comprehensive suite of online image manipulation tools: convert formats, compress, resize, crop, grayscale, flip, and convert images to Base64 or PDF."/>
+        <meta property="og:image" content="/logo.png"/>
+        <meta property="og:url" content={window.location.href}/>
+      </Helmet>
+      <main className="container mx-auto p-4">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Image Tools</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <ToolCard title="Image Format Converter" description="Convert images between various formats (JPG, PNG, WebP, TIFF).">

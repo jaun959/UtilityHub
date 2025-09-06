@@ -8,11 +8,21 @@ import JsonFormatterValidator from '../components/JsonFormatterValidator.jsx';
 import HashGenerator from '../components/HashGenerator.jsx';
 import PasswordGenerator from '../components/PasswordGenerator.jsx';
 import CsvToJsonConverter from '../components/CsvToJsonConverter.jsx';
+import { Helmet } from 'react-helmet-async';
 
 
 const TextToolsPage = () => {
   return (
-    <main className="container mx-auto p-4">
+    <>
+      <Helmet>
+        <title>Text Tools - Utility Hub</title>
+        <meta name="description" content="Versatile collection of online text utilities: convert case, check differences, encode/decode Base64, convert HTML/Markdown, format JSON, generate hashes, and create strong passwords."/>
+        <meta property="og:title" content="Text Tools - Utility Hub"/>
+        <meta property="og:description" content="Versatile collection of online text utilities: convert case, check differences, encode/decode Base64, convert HTML/Markdown, format JSON, generate hashes, and create strong passwords."/>
+        <meta property="og:image" content="/logo.png"/>
+        <meta property="og:url" content={window.location.href}/>
+      </Helmet>
+      <main className="container mx-auto p-4">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Text Tools</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <ToolCard title="Text Case Converter" description="Convert text to various case formats (e.g., uppercase, lowercase, title case).">

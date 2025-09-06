@@ -9,10 +9,20 @@ import UrlRedirectChecker from '../components/UrlRedirectChecker.jsx';
 import SeoTools from '../components/SeoTools.jsx';
 import JsonXmlConverter from '../components/JsonXmlConverter.jsx';
 import PasswordStrengthChecker from '../components/PasswordStrengthChecker.jsx';
+import { Helmet } from 'react-helmet-async';
 
 const WebToolsPage = () => {
   return (
-    <main className="container mx-auto p-4">
+    <>
+      <Helmet>
+        <title>Web Tools - Utility Hub</title>
+        <meta name="description" content="Essential online tools for web-related tasks: URL shortening, QR code generation and scanning, website screenshot capture, favicon extraction, URL redirect checking, and SEO analysis."/>
+        <meta property="og:title" content="Web Tools - Utility Hub"/>
+        <meta property="og:description" content="Essential online tools for web-related tasks: URL shortening, QR code generation and scanning, website screenshot capture, favicon extraction, URL redirect checking, and SEO analysis."/>
+        <meta property="og:image" content="/logo.png"/>
+        <meta property="og:url" content={window.location.href}/>
+      </Helmet>
+      <main className="container mx-auto p-4">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Web Tools</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <ToolCard title="Link Shortener" description="Shorten long URLs for easier sharing.">
