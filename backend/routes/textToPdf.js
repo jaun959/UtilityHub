@@ -21,9 +21,36 @@ router.post('/text-to-pdf', async (req, res) => {
 
     const pdfBuffer = await pdfBufferPromise;
     
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="converted-text-${Date.now()}.pdf"`);
-    res.send(pdfBuffer);
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+
+    const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(pdfBuffer, { name: `converted-text-${Date.now()}.pdf` });
+      archive.finalize();
+    });
+
+    const zipFileName = `text_to_pdf_${Date.now()}.zip`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(zipFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
 
   } catch (err) {
     console.error(err.message);
