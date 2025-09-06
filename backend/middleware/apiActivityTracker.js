@@ -3,7 +3,6 @@ const { ServiceUsage, TotalUsage } = require('../models/ServiceUsage');
 
 const apiActivityTracker = async (req, res, next) => {
   try {
-    // Save individual API activity
     const apiActivity = new ApiActivity({
       endpoint: req.originalUrl,
       method: req.method,
@@ -12,14 +11,12 @@ const apiActivityTracker = async (req, res, next) => {
     });
     await apiActivity.save();
 
-    // Update total usage count
     await TotalUsage.findOneAndUpdate(
       {},
       { $inc: { totalCount: 1 } },
       { upsert: true, new: true }
     );
 
-    // Update individual service usage count
     await ServiceUsage.findOneAndUpdate(
       { endpoint: req.originalUrl },
       { $inc: { count: 1 } },
@@ -28,7 +25,6 @@ const apiActivityTracker = async (req, res, next) => {
 
   } catch (err) {
     console.error('Error saving API activity:', err.message);
-    // Do not block the request if activity tracking fails
   }
   next();
 };
