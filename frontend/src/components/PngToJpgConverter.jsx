@@ -31,7 +31,7 @@ const PngToJpgConverter = () => {
 
     setSelectedFiles(validFiles);
     if (hasInvalidFile) {
-      e.target.value = ''; // Clear the input if any file was invalid
+      e.target.value = ''; 
     }
   };
 
