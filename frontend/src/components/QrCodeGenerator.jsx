@@ -7,6 +7,7 @@ import * as domToImage from 'dom-to-image';
 const QrCodeGenerator = () => {
   const [text, setText] = useState('');
   const [qrValue, setQrValue] = useState('');
+  const [loading, setLoading] = useState(false);
   const qrCodeRef = useRef(null);
 
   const handleChange = (e) => {
@@ -14,7 +15,11 @@ const QrCodeGenerator = () => {
   };
 
   const generateQrCode = () => {
-    setQrValue(text);
+    setLoading(true);
+    setTimeout(() => {
+      setQrValue(text);
+      setLoading(false);
+    }, 500);
   };
 
   const downloadPng = () => {
@@ -72,7 +77,7 @@ const QrCodeGenerator = () => {
           onChange={handleChange}
         />
       </div>
-      <button onClick={generateQrCode} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Generate QR Code</button>
+      <button onClick={generateQrCode} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Generating...' : 'Generate QR Code'}</button>
 
       {qrValue && (
         <div className="mt-4 flex flex-col items-center">
