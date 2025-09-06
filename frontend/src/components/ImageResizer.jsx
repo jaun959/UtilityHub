@@ -54,7 +54,7 @@ const ImageResizer = () => {
 
   const handleResize = () => {
     if (!originalImage) {
-      setError('Please upload an image first.');
+      toast.error('Please upload an image first.');
       return;
     }
 
@@ -62,7 +62,7 @@ const ImageResizer = () => {
     const height = parseInt(newHeight);
 
     if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
-      setError('Please enter valid positive numbers for width and height.');
+      toast.error('Please enter valid positive numbers for width and height.');
       return;
     }
 
