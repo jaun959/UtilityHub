@@ -58,6 +58,9 @@ app.use('/api/auth', auth);
 const keepAlive = require('./routes/keepAlive');
 app.use('/api/keep-alive', keepAlive);
 
+const cleanSupabase = require('./routes/cleanSupabase');
+app.use('/api/clean-supabase', cleanSupabase);
+
 app.get('/', (req, res) => {
   res.send('Hello from Utility Hub Backend!');
 });
