@@ -7,21 +7,25 @@ const HomePage = () => {
       title: 'Image Tools',
       description: 'Your go-to suite for all image manipulation needs. Convert between formats like JPG, PNG, WebP, and TIFF. Compress images to save space without losing quality. Resize photos for web or print, and even convert multiple images into a single PDF document. Includes specialized tools for Base64 encoding/decoding and quick PNG to JPG conversion.',
       link: '/images',
+      tools: ['Image Converter', 'Image Compressor', 'Image Resizer', 'PNG to JPG', 'Image to Base64'],
     },
     {
       title: 'PDF Tools',
       description: 'Comprehensive tools for managing your PDF documents. Merge multiple PDFs into one, split large PDFs into smaller files, or convert PDF pages into high-quality images. Seamlessly transform PDFs into editable Word or Excel documents, and convert Word or Excel files back into PDFs. Also includes a simple text-to-PDF generator.',
       link: '/pdfs',
+      tools: ['PDF Merger', 'PDF Splitter', 'PDF to Word', 'PDF to Excel', 'PDF to Image', 'Text to PDF'],
     },
     {
       title: 'Text Tools',
       description: 'A versatile collection of text utilities. Easily convert text to different cases (uppercase, lowercase, title case). Compare two texts to find differences, encode/decode text to/from Base64, and convert between HTML and Markdown. Validate and format JSON data, generate strong passwords, and create various cryptographic hashes.',
       link: '/text',
+      tools: ['Text Case Converter', 'Text Difference Checker', 'Base64 Converter', 'HTML/Markdown Converter', 'JSON Formatter', 'Password Generator'],
     },
     {
       title: 'Web Tools',
       description: 'Essential tools for web-related tasks. Shorten long URLs for easy sharing and tracking. Generate custom QR codes for text or links, and use our scanner to quickly read QR codes from images.',
       link: '/web',
+      tools: ['URL Shortener', 'QR Code Generator', 'QR Code Scanner', 'Redirect Checker', 'Favicon Extractor'],
     },
   ];
 
@@ -30,13 +34,20 @@ const HomePage = () => {
       <h2 className="text-4xl font-extrabold text-center text-gray-900 mb-10">Welcome to Utility Hub!</h2>
       <p className="text-xl text-center text-gray-600 mb-12">Your one-stop solution for everyday utility conversions and tools.</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {categories.map((category, index) => (
-          <Link to={category.link} key={index} className={`block ${index === 0 ? 'lg:col-span-3' : ''}`}>
+          <Link to={category.link} key={index} className="block">
             <div className="relative rounded-xl border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out h-full flex flex-col justify-between p-6">
               <div>
                 <h3 className="text-2xl font-semibold leading-none tracking-tight text-gray-900 mb-3">{category.title}</h3>
-                <p className="text-sm text-muted-foreground text-gray-700">{category.description}</p>
+                <p className="text-sm text-muted-foreground text-gray-700 mb-4">{category.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {category.tools.map((tool, i) => (
+                    <span key={i} className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                      {tool}
+                    </span>
+                  ))}
+                </div>
               </div>
               <div className="mt-6 text-right">
                 <span className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
