@@ -44,7 +44,7 @@ const QrCodeScanner = () => {
       {qrData && (
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">QR Code Data:</h3>
-          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{qrData}</p>
+          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600">{qrData}</p>
         </div>
       )}
     </div>

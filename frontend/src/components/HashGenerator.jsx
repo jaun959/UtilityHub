@@ -48,14 +48,14 @@ const HashGenerator = () => {
       {hashMd5 && (
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">MD5 Hash:</h3>
-          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{hashMd5}</p>
+          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600">{hashMd5}</p>
         </div>
       )}
 
       {hashSha256 && (
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">SHA256 Hash:</h3>
-          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{hashSha256}</p>
+          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600">{hashSha256}</p>
         </div>
       )}
     </div>

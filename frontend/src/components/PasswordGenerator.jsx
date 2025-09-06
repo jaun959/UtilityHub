@@ -72,7 +72,7 @@ const PasswordGenerator = () => {
       {password && (
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">Generated Password:</h3>
-          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{password}</p>
+          <p className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600">{password}</p>
         </div>
       )}
     </div>

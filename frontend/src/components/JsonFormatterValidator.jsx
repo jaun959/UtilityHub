@@ -59,7 +59,7 @@ const JsonFormatterValidator = () => {
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">Formatted JSON:</h3>
           <textarea
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 text-sm dark:bg-gray-700 dark:border-gray-600"
             rows="10"
             readOnly
             value={formattedJson}
