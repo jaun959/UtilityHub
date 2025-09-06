@@ -5,6 +5,9 @@ import ImageResizer from '../components/ImageResizer.jsx';
 import ImageCompressor from '../components/ImageCompressor.jsx';
 import ImageFormatConverter from '../components/ImageFormatConverter.jsx';
 import ImageCropper from '../components/ImageCropper.jsx';
+import ImageGrayscaler from '../components/ImageGrayscaler.jsx';
+import ImageFlipper from '../components/ImageFlipper.jsx';
+import ImageToBase64Converter from '../components/ImageToBase64Converter.jsx';
 
 const ImageToolsPage = () => {
   return (
@@ -29,7 +32,15 @@ const ImageToolsPage = () => {
         <ToolCard title="Image Cropper" description="Crop images to a specific area.">
           <ImageCropper />
         </ToolCard>
-        
+        <ToolCard title="Image Grayscaler" description="Convert your images to grayscale.">
+          <ImageGrayscaler />
+        </ToolCard>
+        <ToolCard title="Image Flipper" description="Flip images horizontally or vertically.">
+          <ImageFlipper />
+        </ToolCard>
+        <ToolCard title="Image to Base64 Converter" description="Convert images to Base64 strings.">
+          <ImageToBase64Converter />
+        </ToolCard>
       </div>
     </main>
   );
