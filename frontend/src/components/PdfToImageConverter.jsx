@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const PdfToImageConverter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -22,20 +23,13 @@ const PdfToImageConverter = () => {
         }
       });
       setConvertedImages(res.data);
+      toast.success('PDF converted to image successfully!');
     } catch (err) {
       console.error('Error during PDF to Image conversion:', err);
-      if (err.response) {
-        console.error('Error response data:', err.response.data);
-        console.error('Error response status:', err.response.status);
-        console.error('Error response headers:', err.response.headers);
-      } else if (err.request) {
-        console.error('Error request:', err.request);
-      } else {
-        console.error('Error message:', err.message);
-      }
-    }
-  };
-
+      toast.error(err.response?.data?.msg || 'Error converting PDF to image. Please try again.');
+    };
+  }
+  
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">PDF to Image Converter</h2>
