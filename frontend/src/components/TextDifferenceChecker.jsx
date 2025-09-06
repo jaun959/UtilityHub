@@ -22,11 +22,11 @@ const TextDifferenceChecker = () => {
 
     const html = diff.map((part) => {
       const [type, text] = part;
-      if (type === 0) { // Common
+      if (type === 0) {
         return text;
-      } else if (type === 1) { // Added
+      } else if (type === 1) {
         return `<span class="bg-green-200">${text}</span>`;
-      } else if (type === -1) { // Deleted
+      } else if (type === -1) {
         return `<span class="bg-red-200">${text}</span>`;
       }
       return '';
@@ -66,7 +66,7 @@ const TextDifferenceChecker = () => {
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">Differences:</h3>
           <div
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
             dangerouslySetInnerHTML={{ __html: diffResult }}
           ></div>
         </div>
