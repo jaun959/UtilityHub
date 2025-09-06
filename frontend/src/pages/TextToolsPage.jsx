@@ -1,4 +1,3 @@
-import React from 'react';
 import ToolCard from '../components/ToolCard.jsx';
 import TextCaseConverter from '../components/TextCaseConverter.jsx';
 import TextDifferenceChecker from '../components/TextDifferenceChecker.jsx';
