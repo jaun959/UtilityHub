@@ -32,27 +32,18 @@ const ImageFlipper = () => {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/image-flip`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        },
-        responseType: 'blob' // Important for handling binary data
+        }
       });
 
-      // Create a Blob from the response data
-      const blob = new Blob([res.data], { type: res.headers['content-type'] });
+      const { path, originalname } = res.data;
 
-      // Create a URL for the Blob
-      const url = window.URL.createObjectURL(blob);
-
-      // Create a temporary link element
       const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `flipped-${selectedFile.name}`); // Set the download filename
+      link.href = path;
+      link.setAttribute('download', originalname);
       document.body.appendChild(link);
-      link.click(); // Programmatically click the link to trigger download
+      link.click();
 
-      // Clean up
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
       toast.success('Image flipped and downloaded successfully!');
 
     } catch (err) {
