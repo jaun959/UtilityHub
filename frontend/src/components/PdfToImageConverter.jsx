@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 const PdfToImageConverter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [convertedImages, setConvertedImages] = useState([]);
+  const [zipFile, setZipFile] = useState(null);
 
   const onFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -22,7 +22,7 @@ const PdfToImageConverter = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setConvertedImages(res.data);
+      setZipFile(res.data);
       toast.success('PDF converted to image successfully!');
     } catch (err) {
       console.error('Error during PDF to Image conversion:', err);
@@ -41,21 +41,19 @@ const PdfToImageConverter = () => {
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Convert</button>
       </form>
 
-      {convertedImages.length > 0 && (
+      {zipFile && (
         <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Converted Images:</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {convertedImages.map((image, index) => (
-              <div key={index} className="relative">
-                <img src={image.path} alt={`Converted page ${index + 1}`} className="w-full h-auto border border-gray-300 rounded-lg" />
-                <a href={image.path} download={image.originalname} className="absolute bottom-2 right-2 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                </a>
-              </div>
-            ))}
-          </div>
+          <h3 className="text-xl font-bold mb-2">Download Converted Images:</h3>
+          <a
+            href={zipFile.path}
+            download={zipFile.originalname}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Download Zip
+          </a>
         </div>
       )}
     </div>
