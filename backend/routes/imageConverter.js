@@ -93,16 +93,11 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
       autoFirstPage: false
     });
 
-    const tempPdfPath = path.join(os.tmpdir(), `converted_pdf_${Date.now()}.pdf`);
-    const writeStream = fs.createWriteStream(tempPdfPath);
-    pdfDoc.pipe(writeStream);
-
+    const buffers = [];
+    pdfDoc.on('data', buffers.push.bind(buffers));
     const pdfGenerationPromise = new Promise((resolve, reject) => {
-      writeStream.on('finish', resolve);
-      pdfDoc.on('error', (err) => {
-        console.error('PDFKit error during generation:', err);
-        reject(err);
-      });
+      pdfDoc.on('end', () => resolve(Buffer.concat(buffers)));
+      pdfDoc.on('error', reject);
     });
 
     for (const file of req.files) {
@@ -149,9 +144,24 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
     }
 
     pdfDoc.end();
-    await pdfGenerationPromise;
+    const pdfBuffer = await pdfGenerationPromise;
 
-    res.json({ path: tempPdfPath, originalname: path.basename(tempPdfPath) });
+    const pdfFileName = `converted_images_${Date.now()}.pdf`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(pdfFileName, pdfBuffer, {
+        contentType: 'application/pdf',
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(pdfFileName);
+
+    res.json({ path: publicUrlData.publicUrl, originalname: pdfFileName });
 
   } catch (err) {
     console.error(err);
@@ -220,6 +230,10 @@ router.post('/resize-image', upload.array('images'), async (req, res) => {
 // @access  Public
 router.post('/compress-image', upload.array('images'), async (req, res) => {
   try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ msg: 'No image files uploaded for compression.' });
+    }
+
     const { quality } = req.body;
     const archive = archiver('zip', {
       zlib: { level: 9 }

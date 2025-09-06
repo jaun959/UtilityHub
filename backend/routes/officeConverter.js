@@ -127,77 +127,31 @@ router.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
     const worksheet = workbook.Sheets[sheetName];
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
+    const { Table } = await import('pdf-lib-table');
+
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    const { width, height } = page.getSize();
+    const headers = jsonData[0].map(header => ({ title: String(header || ''), font }));
+    const rows = jsonData.slice(1).map(row => row.map(cell => String(cell || '')));
+
+    const table = new Table(pdfDoc, {
+      title: 'Excel Data',
+      headers,
+      rows,
+      fontSize: 10,
+      font,
+      borderWidth: 0.5,
+      borderColor: rgb(0, 0, 0),
+      rowHeight: 15,
+      padding: 5,
+      columns: headers.map(() => ({ width: 'auto' })),
+    });
+
+    const { width, height } = pdfDoc.getPage(0).getSize();
     const margin = 50;
-    let y = height - margin;
-    const fontSize = 10;
-    const rowHeight = fontSize + 5;
-    const cellPadding = 2;
 
-    const columnWidths = jsonData[0].map((_, colIndex) => {
-      let maxWidth = 0;
-      jsonData.forEach(row => {
-        const cellText = String(row[colIndex] || '').replace(/\n/g, ' ').replace(//g, '').replace(/[^\x00-\x7F]/g, '');
-        const textWidth = font.widthOfTextAtSize(cellText, fontSize);
-        if (textWidth > maxWidth) {
-          maxWidth = textWidth;
-        }
-      });
-      return maxWidth + cellPadding * 2;
-    });
-
-    const totalTableWidth = columnWidths.reduce((sum, width) => sum + width, 0);
-    let x = margin;
-
-    const filterNonAscii = (text) => {
-      return text.replace(/[^\x00-\x7F]/g, '');
-    };
-
-    for (let i = 0; i < jsonData[0].length; i++) {
-      const headerText = filterNonAscii(String(jsonData[0][i] || ''));
-      page.drawText(headerText, {
-        x: x + cellPadding,
-        y: y - fontSize,
-        font,
-        fontSize,
-        color: rgb(0, 0, 0),
-      });
-      x += columnWidths[i];
-    }
-    y -= rowHeight;
-
-    page.drawLine({
-      start: { x: margin, y: y },
-      end: { x: margin + totalTableWidth, y: y },
-      color: rgb(0, 0, 0),
-      thickness: 1,
-    });
-    y -= 5;
-
-    for (let rowIndex = 1; rowIndex < jsonData.length; rowIndex++) {
-      x = margin;
-      for (let colIndex = 0; colIndex < jsonData[rowIndex].length; colIndex++) {
-        const cellText = String(jsonData[rowIndex][colIndex] || '').replace(/\n/g, ' ').replace(/\u2022/g, '').replace(/[^\x00-\x7F]/g, '');
-        page.drawText(cellText, {
-          x: x + cellPadding,
-          y: y - fontSize,
-          font,
-          fontSize,
-          color: rgb(0, 0, 0),
-        });
-        x += columnWidths[colIndex];
-      }
-      y -= rowHeight;
-
-      if (y < margin) {
-        page = pdfDoc.addPage();
-        y = height - margin;
-      }
-    }
+    await table.draw(pdfDoc.addPage(), { x: margin, y: height - margin, width: width - 2 * margin });
 
     const pdfBytes = await pdfDoc.save();
 

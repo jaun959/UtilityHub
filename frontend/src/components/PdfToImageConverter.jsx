@@ -14,6 +14,12 @@ const PdfToImageConverter = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (!selectedFile) {
+      toast.error('Please select a PDF file.');
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     formData.append('pdf', selectedFile);

@@ -43,6 +43,12 @@ const ImageFormatConverter = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (selectedFiles.length === 0) {
+      toast.error('Please select at least one image file.');
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     for (const file of selectedFiles) {

@@ -38,6 +38,12 @@ const PngToJpgConverter = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (selectedFiles.length === 0) {
+      toast.error('Please select at least one PNG file.');
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     for (const file of selectedFiles) {

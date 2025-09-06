@@ -1,16 +1,8 @@
 const router = require('express').Router();
 const archiver = require('archiver');
 const cheerio = require('cheerio');
+const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
-
-let puppeteerCore;
-let chromium;
-
-// Conditionally require puppeteer-core and @sparticuz/chromium only on Linux
-if (process.platform === 'linux') {
-  puppeteerCore = require('puppeteer-core');
-  chromium = require('@sparticuz/chromium');
-}
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -44,68 +36,11 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ msg: 'URL is required' });
   }
 
-  let browser;
-  const screenshots = [];
-  const visitedUrls = new Set();
-  const urlsToVisit = [url];
-  const MAX_PAGES = 5;
-
   try {
-    // Determine which Puppeteer to use based on environment
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+    const screenshotUrl = `https://api.apiflash.com/v1/urltoimage?access_key=${process.env.API_FLASH_ACCESS_KEY}&url=${encodeURIComponent(url)}&full_page=true`;
 
-    if (isProduction && puppeteerCore && chromium) {
-      // Production mode: Use puppeteer-core with @sparticuz/chromium
-      browser = await puppeteerCore.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath,
-        headless: chromium.headless,
-      });
-    } else {
-      // Local development: Use puppeteer-core
-      browser = await puppeteerCore.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        headless: true
-      });
-    }
-
-    while (urlsToVisit.length > 0 && visitedUrls.size < MAX_PAGES) {
-      const currentUrl = urlsToVisit.shift();
-
-      if (visitedUrls.has(currentUrl)) {
-        continue;
-      }
-
-      const page = await browser.newPage();
-      try {
-        await page.goto(currentUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-        visitedUrls.add(currentUrl);
-
-        const screenshotBuffer = await page.screenshot({ fullPage: true });
-        const pageTitle = await page.title();
-        const screenshotFileName = `${pageTitle.replace(/[^a-z0-9]/gi, '_') || 'page'}-${visitedUrls.size}.png`;
-        screenshots.push({ buffer: screenshotBuffer, name: screenshotFileName });
-
-        const htmlContent = await page.content();
-        const internalLinks = extractInternalLinks(htmlContent, currentUrl);
-
-        for (const link of internalLinks) {
-          if (!visitedUrls.has(link) && urlsToVisit.length + visitedUrls.size < MAX_PAGES) {
-            urlsToVisit.push(link);
-          }
-        }
-
-      } catch (pageError) {
-        console.warn(`Could not navigate to or screenshot ${currentUrl}:`, pageError.message);
-      } finally {
-        await page.close();
-      }
-    }
-
-    if (screenshots.length === 0) {
-      return res.status(400).json({ msg: 'No screenshots could be generated for the provided URL or its internal links.' });
-    }
+    const response = await axios.get(screenshotUrl, { responseType: 'arraybuffer' });
+    const imageBuffer = Buffer.from(response.data);
 
     const archive = archiver('zip', {
       zlib: { level: 9 }
@@ -117,12 +52,10 @@ router.post('/', async (req, res) => {
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      screenshots.forEach(ss => {
-        archive.append(ss.buffer, { name: ss.name });
-      });
+      archive.append(imageBuffer, { name: `screenshot-${Date.now()}.png` });
       archive.finalize();
     });
-    
+
     const zipFileName = `screenshots-${Date.now()}.zip`;
     const { data, error } = await supabase.storage
       .from('utilityhub')
@@ -143,12 +76,8 @@ router.post('/', async (req, res) => {
     res.status(200).json({ path: publicUrlData.publicUrl, originalname: zipFileName });
 
   } catch (err) {
-    console.error('Error generating screenshots:', err);
-    res.status(500).json({ msg: 'Failed to generate screenshots. Please check the URL.', error: err.message });
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
+    console.error('Error generating screenshot:', err);
+    res.status(500).json({ msg: 'Failed to generate screenshot. Please check the URL and API key.', error: err.message });
   }
 });
 

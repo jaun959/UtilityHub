@@ -10,6 +10,7 @@ const PdfSplitter = () => {
   const [convertedFile, setConvertedFile] = useState(null);
   const [error, setError] = useState('');
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const onFileChange = async (e) => { 
     const file = e.target.files[0];
@@ -73,6 +74,7 @@ const PdfSplitter = () => {
       return;
     }
 
+    setLoading(true);
     
     if (totalPages > 0) {
       const parsedRanges = [];
@@ -124,6 +126,8 @@ const PdfSplitter = () => {
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Failed to split PDF. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -143,7 +147,7 @@ const PdfSplitter = () => {
           <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="ranges">Page Ranges (e.g. 1, 3-5, 8)</label>
                     <input type="text" id="ranges" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 1, 3-5, 8" value={ranges} onChange={onRangeChange} />
         </div>
-        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Split PDF</button>
+        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Splitting...' : 'Split PDF'}</button>
       </form>
 
       {convertedFile && (

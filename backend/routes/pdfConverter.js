@@ -1,12 +1,10 @@
 const router = require('express').Router();
 const axios = require('axios');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
-// const poppler = require('pdf-poppler');
 const { PDFDocument, degrees } = require('pdf-lib');
 const archiver = require('archiver');
+const { pdfToPng } = require('pdf-to-png-converter');
+const { createCanvas } = require('canvas');
 
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
@@ -15,25 +13,20 @@ const upload = multer({ storage: multer.memoryStorage() });
 // @route   POST /api/convert/pdf-to-image
 // @desc    Convert PDF to images
 // @access  Public
+// @route   POST /api/convert/pdf-to-image
+// @desc    Convert PDF to images
+// @access  Public
+// @route   POST /api/convert/pdf-to-image
+// @desc    Convert PDF to images
+// @access  Public
 router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
   try {
     const file = req.file;
     const pdfBuffer = file.buffer;
 
-    const tempPdfPath = path.join(os.tmpdir(), `temp-${Date.now()}.pdf`);
-    fs.writeFileSync(tempPdfPath, pdfBuffer);
-
-    const opts = {
-      format: 'jpeg',
-      out_dir: os.tmpdir(),
-      out_prefix: `converted-${Date.now()}`,
-      page: null
-    }
-
-    // await poppler.convert(tempPdfPath, opts);
-
-    const files = fs.readdirSync(opts.out_dir).filter(f => f.startsWith(opts.out_prefix) && f.endsWith('.jpg'));
-    console.log(`Found ${files.length} image files for zipping.`);
+    const pngPages = await pdfToPng(pdfBuffer, {
+      viewportScale: 2.0, // Scale for higher quality images
+    });
 
     const archive = archiver('zip', {
       zlib: { level: 9 }
@@ -42,23 +35,14 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
     const archiveBuffer = await new Promise(async (resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
-      archive.on('end', () => {
-        const resultBuffer = Buffer.concat(buffers);
-        console.log(`Archive buffer size: ${resultBuffer.length} bytes`);
-        resolve(resultBuffer);
-      });
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      for (const f of files) {
-        const imagePath = path.join(opts.out_dir, f);
-        const imageBuffer = fs.readFileSync(imagePath);
-        archive.append(imageBuffer, { name: f });
-        fs.unlinkSync(imagePath);
+      for (let i = 0; i < pngPages.length; i++) {
+        archive.append(pngPages[i].content, { name: `page-${i + 1}.png` });
       }
       archive.finalize();
     });
-
-    fs.unlinkSync(tempPdfPath);
 
     const zipFileName = `converted_images_${Date.now()}.zip`;
     const { data: uploadData, error: uploadError } = await supabase.storage
