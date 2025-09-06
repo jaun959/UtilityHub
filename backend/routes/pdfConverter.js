@@ -4,7 +4,7 @@ const multer = require('multer');
 
 const path = require('path');
 const fs = require('fs');
-const { poppler } = require('pdf-poppler');
+const poppler = require('pdf-poppler');
 const { PDFDocument } = require('pdf-lib');
 
 const { createClient } = require('@supabase/supabase-js');
@@ -18,9 +18,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
   try {
     const file = req.file;
-
-    const response = await axios.get(file.path, { responseType: 'arraybuffer' });
-    const pdfBuffer = Buffer.from(response.data);
+    const pdfBuffer = file.buffer;
 
     const tempPdfPath = path.join(__dirname, '../uploads', `temp-${Date.now()}.pdf`);
     fs.writeFileSync(tempPdfPath, pdfBuffer);
