@@ -49,10 +49,12 @@ const ImageToPdfConverter = () => {
         }
       });
       setConvertedFile(res.data);
+      toast.success('Images converted to PDF successfully!');
     } catch (err) {
       console.error(err);
-    }
-  };
+      toast.error(err.response?.data?.msg || 'Error converting images to PDF. Please try again.');
+    };
+  }
 
   return (
     <div className="container mx-auto p-4">
