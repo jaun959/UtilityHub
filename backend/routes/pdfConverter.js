@@ -4,6 +4,7 @@ const multer = require('multer');
 
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const poppler = require('pdf-poppler');
 const { PDFDocument } = require('pdf-lib');
 
@@ -20,12 +21,12 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
     const file = req.file;
     const pdfBuffer = file.buffer;
 
-    const tempPdfPath = path.join(__dirname, '../uploads', `temp-${Date.now()}.pdf`);
+    const tempPdfPath = path.join(os.tmpdir(), `temp-${Date.now()}.pdf`);
     fs.writeFileSync(tempPdfPath, pdfBuffer);
 
     const opts = {
       format: 'jpeg',
-      out_dir: path.join(__dirname, '../uploads'),
+      out_dir: os.tmpdir(),
       out_prefix: `converted-${Date.now()}`,
       page: null
     }
@@ -116,7 +117,7 @@ router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
 // @access  Public
 router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
   try {
-    const { ranges } = req.body; // e.g. "1, 3-5, 8"
+    const { ranges } = req.body; 
     const file = req.file;
 
     const response = await axios.get(file.path, { responseType: 'arraybuffer' });
