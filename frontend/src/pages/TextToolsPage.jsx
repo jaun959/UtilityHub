@@ -7,6 +7,7 @@ import MarkdownToHtmlConverter from '../components/MarkdownToHtmlConverter.jsx';
 import JsonFormatterValidator from '../components/JsonFormatterValidator.jsx';
 import HashGenerator from '../components/HashGenerator.jsx';
 import PasswordGenerator from '../components/PasswordGenerator.jsx';
+import CsvToJsonConverter from '../components/CsvToJsonConverter.jsx';
 
 const TextToolsPage = () => {
   return (
@@ -36,6 +37,9 @@ const TextToolsPage = () => {
         </ToolCard>
         <ToolCard title="Password Generator" description="Generate strong, random passwords.">
           <PasswordGenerator />
+        </ToolCard>
+        <ToolCard title="CSV to JSON Converter" description="Convert CSV (Comma Separated Values) data to JSON (JavaScript Object Notation) format.">
+          <CsvToJsonConverter />
         </ToolCard>
       </div>
     </main>
