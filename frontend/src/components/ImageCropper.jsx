@@ -10,12 +10,12 @@ const ImageCropper = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024; 
 
     if (!file) {
       setImageSrc(null);
       setCroppedImageSrc(null);
-      setError(''); // Keep setError for other errors if needed, but not for file validation
+      setError('');
       return;
     }
 
@@ -23,7 +23,7 @@ const ImageCropper = () => {
       toast.error('Invalid file type. Please upload an image file (e.g., JPEG, PNG, GIF).');
       setImageSrc(null);
       setCroppedImageSrc(null);
-      e.target.value = ''; // Clear the input
+      e.target.value = ''; 
       return;
     }
 
@@ -31,11 +31,11 @@ const ImageCropper = () => {
       toast.error(`File too large: ${file.name}. Maximum size is 5MB.`);
       setImageSrc(null);
       setCroppedImageSrc(null);
-      e.target.value = ''; // Clear the input
+      e.target.value = '';
       return;
     }
 
-    setError(''); // Clear any previous errors
+    setError('');
     const reader = new FileReader();
     reader.onload = (event) => {
       setImageSrc(event.target.result);
