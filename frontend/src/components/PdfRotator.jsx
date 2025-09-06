@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 const PdfRotator = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [rotationAngle, setRotationAngle] = useState(90);
+  const [loading, setLoading] = useState(false);
 
   const onFileChange = (e) => {
     const file = e.target.files[0];
@@ -24,6 +25,7 @@ const PdfRotator = () => {
       return;
     }
 
+    setLoading(true);
     const formData = new FormData();
     formData.append('pdf', selectedFile);
     formData.append('angle', rotationAngle);
@@ -49,6 +51,8 @@ const PdfRotator = () => {
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error rotating PDF. Please try again.');
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -72,7 +76,9 @@ const PdfRotator = () => {
             <option value={270}>270 Degrees</option>
           </select>
         </div>
-        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Rotate PDF</button>
+        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>
+          {loading ? 'Rotating...' : 'Rotate PDF'}
+        </button>
       </form>
     </div>
   );
