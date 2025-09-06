@@ -46,6 +46,9 @@ app.use('/api/convert', textToPdf);
 const officeConverter = require('./routes/officeConverter');
 app.use('/api/convert', officeConverter);
 
+const textConverter = require('./routes/textConverter');
+app.use('/api/convert', textConverter);
+
 const auth = require('./routes/auth');
 app.use('/api/auth', auth);
 
