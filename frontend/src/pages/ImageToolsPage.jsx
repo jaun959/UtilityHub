@@ -1,4 +1,3 @@
-import React from 'react';
 import ToolCard from '../components/ToolCard.jsx';
 import PngToJpgConverter from '../components/PngToJpgConverter.jsx';
 import ImageToPdfConverter from '../components/ImageToPdfConverter.jsx';
