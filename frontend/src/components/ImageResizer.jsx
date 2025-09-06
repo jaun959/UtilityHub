@@ -7,6 +7,7 @@ const ImageResizer = () => {
   const [newWidth, setNewWidth] = useState('');
   const [newHeight, setNewHeight] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [originalDimensions, setOriginalDimensions] = useState({ width: 0, height: 0 });
 
   const handleFileChange = (e) => {
@@ -66,6 +67,7 @@ const ImageResizer = () => {
       return;
     }
 
+    setLoading(true);
     setError('');
 
     const reader = new FileReader();
@@ -79,6 +81,7 @@ const ImageResizer = () => {
         ctx.drawImage(img, 0, 0, width, height);
         setResizedImageSrc(canvas.toDataURL(originalImage.type));
         toast.success('Image resized successfully!');
+        setLoading(false);
       };
       img.src = event.target.result;
     };
@@ -112,7 +115,7 @@ const ImageResizer = () => {
           accept="image/*"
           onChange={handleFileChange}
         />
-        
+
       </div>
 
       {originalImage && (
@@ -152,8 +155,9 @@ const ImageResizer = () => {
           <button
             onClick={handleResize}
             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            disabled={loading}
           >
-            Resize Image
+            {loading ? 'Resizing...' : 'Resize Image'}
           </button>
         </div>
       )}
