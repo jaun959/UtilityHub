@@ -7,6 +7,7 @@ const TextDifferenceChecker = () => {
   const [text1, setText1] = useState('');
   const [text2, setText2] = useState('');
   const [diffResult, setDiffResult] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleText1Change = (e) => {
     setText1(e.target.value);
@@ -17,23 +18,27 @@ const TextDifferenceChecker = () => {
   };
 
   const compareTexts = () => {
-    const dmp = new diff_match_patch();
-    const diff = dmp.diff_main(text1, text2);
-    dmp.diff_cleanupSemantic(diff);
+    setLoading(true);
+    setTimeout(() => {
+      const dmp = new diff_match_patch();
+      const diff = dmp.diff_main(text1, text2);
+      dmp.diff_cleanupSemantic(diff);
 
-    const html = diff.map((part) => {
-      const [type, text] = part;
-      if (type === 0) {
-        return text;
-      } else if (type === 1) {
-        return `<span class="bg-green-200">${text}</span>`;
-      } else if (type === -1) {
-        return `<span class="bg-red-200">${text}</span>`;
-      }
-      return '';
-    }).join('');
+      const html = diff.map((part) => {
+        const [type, text] = part;
+        if (type === 0) {
+          return text;
+        } else if (type === 1) {
+          return `<span class="bg-green-200">${text}</span>`;
+        } else if (type === -1) {
+          return `<span class="bg-red-200">${text}</span>`;
+        }
+        return '';
+      }).join('');
 
-    setDiffResult(html);
+      setDiffResult(html);
+      setLoading(false);
+    }, 500);
   };
 
   const copyToClipboard = () => {
@@ -68,7 +73,7 @@ const TextDifferenceChecker = () => {
           ></textarea>
         </div>
       </div>
-      <button onClick={compareTexts} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Compare Texts</button>
+      <button onClick={compareTexts} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Comparing...' : 'Compare Texts'}</button>
 
       {diffResult && (
         <div className="mt-4">
