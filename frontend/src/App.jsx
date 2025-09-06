@@ -5,11 +5,9 @@ import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import setAuthToken from './utils/setAuthToken';
 
-// Import Auth components
 import Register from './components/auth/Register.jsx';
 import Login from './components/auth/Login.jsx';
 
-// Import Page Components
 import HomePage from './pages/HomePage.jsx';
 import ImageToolsPage from './pages/ImageToolsPage.jsx';
 import PdfToolsPage from './pages/PdfToolsPage.jsx';
@@ -17,7 +15,6 @@ import TextToolsPage from './pages/TextToolsPage.jsx';
 import WebToolsPage from './pages/WebToolsPage.jsx';
 import Footer from './components/Footer.jsx';
 
-// A simple PrivateRoute component
 const PrivateRoute = ({ children }) => {
   const { state } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -43,7 +40,6 @@ function App() {
         const currentTime = Date.now() / 1000;
 
         if (decoded.exp < currentTime) {
-          // Logout user if token is expired
           setAuthToken(null);
           localStorage.removeItem('token');
           dispatch({ type: 'LOGOUT' });
@@ -52,7 +48,6 @@ function App() {
           dispatch({ type: 'LOGIN', payload: { token, user: decoded.user } });
         }
       } catch (error) {
-        // Handle invalid token (e.g., malformed JWT)
         console.error("Error decoding token:", error);
         setAuthToken(null);
         localStorage.removeItem('token');
@@ -91,7 +86,6 @@ function App() {
             </ul>
           </nav>
 
-          {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-gray-500 hover:text-gray-900 focus:outline-none focus:text-gray-900">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,7 +99,6 @@ function App() {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-white shadow-lg pb-4 p-2">
             <ul className="flex flex-col items-center space-y-2">
@@ -133,7 +126,6 @@ function App() {
           <Route path="/pdfs" element={<PdfToolsPage />} />
           <Route path="/text" element={<TextToolsPage />} />
           <Route path="/web" element={<WebToolsPage />} />
-          {/* Protected routes example */}
           <Route
             path="/protected-example"
             element={
