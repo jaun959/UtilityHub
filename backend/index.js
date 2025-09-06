@@ -61,6 +61,24 @@ app.use('/api/keep-alive', keepAlive);
 const cleanSupabase = require('./routes/cleanSupabase');
 app.use('/api/clean-supabase', cleanSupabase);
 
+const screenshot = require('./routes/screenshot');
+app.use('/api/screenshot', screenshot);
+
+const favicon = require('./routes/favicon');
+app.use('/api/favicon', favicon);
+
+const redirectChecker = require('./routes/redirectChecker');
+app.use('/api/redirect-checker', redirectChecker);
+
+const jsonXmlConverter = require('./routes/jsonXmlConverter');
+app.use('/api/convert', jsonXmlConverter);
+
+const passwordStrength = require('./routes/passwordStrength');
+app.use('/api/password-strength', passwordStrength);
+
+const seoTools = require('./routes/seoTools');
+app.use('/api/seo', seoTools);
+
 app.get('/', (req, res) => {
   res.send('Hello from Utility Hub Backend!');
 });
