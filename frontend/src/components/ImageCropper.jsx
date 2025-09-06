@@ -5,12 +5,13 @@ const ImageCropper = () => {
   const [imageSrc, setImageSrc] = useState(null);
   const [croppedImageSrc, setCroppedImageSrc] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const imageRef = useRef(null);
   const canvasRef = useRef(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    const maxSize = 5 * 1024 * 1024; 
+    const maxSize = 5 * 1024 * 1024;
 
     if (!file) {
       setImageSrc(null);
@@ -23,7 +24,7 @@ const ImageCropper = () => {
       toast.error('Invalid file type. Please upload an image file (e.g., JPEG, PNG, GIF).');
       setImageSrc(null);
       setCroppedImageSrc(null);
-      e.target.value = ''; 
+      e.target.value = '';
       return;
     }
 
@@ -50,6 +51,7 @@ const ImageCropper = () => {
       return;
     }
 
+    setLoading(true);
     const image = imageRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -65,6 +67,7 @@ const ImageCropper = () => {
     ctx.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
     setCroppedImageSrc(canvas.toDataURL(image.type));
     toast.success('Image cropped successfully!');
+    setLoading(false);
   };
 
   const handleDownloadCroppedImage = () => {
@@ -94,7 +97,7 @@ const ImageCropper = () => {
           accept="image/*"
           onChange={handleFileChange}
         />
-        
+
       </div>
 
       {imageSrc && (
@@ -104,8 +107,9 @@ const ImageCropper = () => {
           <button
             onClick={handleCrop}
             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            disabled={loading}
           >
-            Crop Image (Center 50%)
+            {loading ? 'Cropping...' : 'Crop Image (Center 50%)'}
           </button>
         </div>
       )}
