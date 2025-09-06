@@ -6,6 +6,7 @@ const JsonFormatterValidator = () => {
   const [jsonInput, setJsonInput] = useState('');
   const [formattedJson, setFormattedJson] = useState('');
   const [validationMessage, setValidationMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     setJsonInput(e.target.value);
@@ -14,6 +15,7 @@ const JsonFormatterValidator = () => {
   };
 
   const formatJson = () => {
+    setLoading(true);
     try {
       const parsedJson = JSON.parse(jsonInput);
       setFormattedJson(JSON.stringify(parsedJson, null, 2));
@@ -22,15 +24,18 @@ const JsonFormatterValidator = () => {
       setFormattedJson('');
       setValidationMessage(`Invalid JSON: ${e.message}`);
     }
+    setLoading(false);
   };
 
   const validateJson = () => {
+    setLoading(true);
     try {
       JSON.parse(jsonInput);
       setValidationMessage('Valid JSON');
     } catch (e) {
       setValidationMessage(`Invalid JSON: ${e.message}`);
     }
+    setLoading(false);
   };
 
   const copyToClipboard = (textToCopy) => {
@@ -62,8 +67,8 @@ const JsonFormatterValidator = () => {
         ></textarea>
       </div>
       <div className="mb-4">
-        <button onClick={formatJson} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Format JSON</button>
-        <button onClick={validateJson} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Validate JSON</button>
+        <button onClick={formatJson} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Formatting...' : 'Format JSON'}</button>
+        <button onClick={validateJson} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Validating...' : 'Validate JSON'}</button>
       </div>
 
       {validationMessage && (
