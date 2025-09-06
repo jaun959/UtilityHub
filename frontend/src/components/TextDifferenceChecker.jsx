@@ -37,7 +37,6 @@ const TextDifferenceChecker = () => {
   };
 
   const copyToClipboard = () => {
-    // To copy HTML content, we need to create a temporary element
     const tempElement = document.createElement('div');
     tempElement.innerHTML = diffResult;
     navigator.clipboard.writeText(tempElement.innerText);
