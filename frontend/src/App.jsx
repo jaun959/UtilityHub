@@ -1,14 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import './App.css';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import setAuthToken from './utils/setAuthToken';
 import { ToastContainer } from 'react-toastify';
-
+import Base64TextConverter from './components/Base64TextConverter.jsx';
+import ImageFlipper from './components/ImageFlipper.jsx';
+import ImageToBase64Converter from './components/ImageToBase64Converter.jsx';
 import Register from './components/auth/Register.jsx';
 import Login from './components/auth/Login.jsx';
-
 import HomePage from './pages/HomePage.jsx';
 import ImageToolsPage from './pages/ImageToolsPage.jsx';
 import PdfToolsPage from './pages/PdfToolsPage.jsx';
@@ -127,6 +128,12 @@ function App() {
           <Route path="/pdfs" element={<PdfToolsPage />} />
           <Route path="/text" element={<TextToolsPage />} />
           <Route path="/web" element={<WebToolsPage />} />
+
+          {/* New routes */}
+          <Route path="/text/base64-converter" element={<Base64TextConverter />} />
+          <Route path="/images/flipper" element={<ImageFlipper />} />
+          <Route path="/images/image-to-base64" element={<ImageToBase64Converter />} />
+
           <Route
             path="/protected-example"
             element={
