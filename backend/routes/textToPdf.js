@@ -1,9 +1,8 @@
 const router = require('express').Router();
 const PDFDocument = require('pdfkit');
-const cloudinary = require('cloudinary').v2;
 
 // @route   POST /api/convert/text-to-pdf
-// @desc    Convert text to PDF
+// @desc    Convert text to PDF and send for direct download
 // @access  Public
 router.post('/text-to-pdf', async (req, res) => {
   const { text } = req.body;
@@ -11,8 +10,9 @@ router.post('/text-to-pdf', async (req, res) => {
   try {
     const doc = new PDFDocument();
     const pdfBufferPromise = new Promise((resolve, reject) => {
-      doc.on('data', resolve);
-      doc.on('end', () => resolve(doc.output));
+      const buffers = [];
+      doc.on('data', buffers.push.bind(buffers));
+      doc.on('end', () => { resolve(Buffer.concat(buffers)); });
       doc.on('error', reject);
     });
 
@@ -20,13 +20,10 @@ router.post('/text-to-pdf', async (req, res) => {
     doc.end();
 
     const pdfBuffer = await pdfBufferPromise;
-
-    const uploadResult = await cloudinary.uploader.upload(`data:application/pdf;base64,${pdfBuffer.toString('base64')}`, {
-      folder: 'utilityhub',
-      resource_type: 'raw'
-    });
-
-    res.json({ path: uploadResult.secure_url });
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="converted-text-${Date.now()}.pdf"`);
+    res.send(pdfBuffer);
 
   } catch (err) {
     console.error(err.message);
