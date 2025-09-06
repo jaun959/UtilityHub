@@ -149,7 +149,7 @@ const PdfSplitter = () => {
       {convertedFile && (
         <div className="mt-4">
           <h3 className="text-xl font-bold mb-2">Split File:</h3>
-          <a href={`${convertedFile.path}`} download={convertedFile.originalname} className="text-blue-500 hover:underline">Download Split PDF</a>
+          <button onClick={() => window.open(convertedFile.path, '_blank')} className="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800">Download Split PDF</button>
         </div>
       )}
     </div>
