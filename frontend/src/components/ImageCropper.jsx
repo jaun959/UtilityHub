@@ -46,7 +46,7 @@ const ImageCropper = () => {
 
   const handleCrop = () => {
     if (!imageSrc) {
-      setError('Please upload an image first.');
+      toast.error('Please upload an image first.');
       return;
     }
 
