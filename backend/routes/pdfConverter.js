@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { PDFDocument, degrees, PDFSecurity } = require('pdf-lib');
+const { PDFDocument, degrees } = require('pdf-lib');
 const archiver = require('archiver');
 const { createClient } = require('@supabase/supabase-js');
 const pdfParse = require('pdf-parse');
@@ -301,9 +301,9 @@ router.post('/pdf-password', (req, res, next) => req.upload.single('pdf')(req, r
         userPassword: password,
         ownerPassword: password,
         permissions: {
-          printing: PDFSecurity.Printing.DENY,
-          modifying: PDFSecurity.Modifying.DENY,
-          copying: PDFSecurity.Copying.DENY,
+          printing: false,
+          modifying: false,
+          copying: false,
         },
       });
     } else if (action === 'remove') {
