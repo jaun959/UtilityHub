@@ -52,7 +52,7 @@ const HomePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {categories.map((category, index) => (
             <Link to={category.link} key={index} className="block">
-              <div className="relative rounded-xl border border-gray-200 bg-white text-gray-900 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out h-full flex flex-col justify-between p-6 transform hover:scale-105">
+              <div className="relative rounded-xl border border-gray-200 bg-white text-gray-900 shadow-md hover:shadow-xl h-full flex flex-col justify-between p-6">
                 <div>
                   <h3 className="text-2xl font-semibold leading-none tracking-tight text-gray-900 mb-3">{category.title}</h3>
                   <p className="text-sm text-muted-foreground text-gray-700 mb-4">{category.description}</p>
