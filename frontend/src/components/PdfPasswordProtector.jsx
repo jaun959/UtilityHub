@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 const PdfPasswordProtector = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [password, setPassword] = useState('');
-  const [action, setAction] = useState('protect'); // 'protect' or 'remove'
+  const [action, setAction] = useState('protect');
   const [loading, setLoading] = useState(false);
   const { isAuthenticated } = useContext(AuthContext);
 
@@ -55,20 +55,18 @@ const PdfPasswordProtector = () => {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
-        responseType: 'blob' // Expecting a file in return
+        responseType: 'json'
       });
 
-      const blob = new Blob([res.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
+      const { path, originalname } = res.data;
 
       const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${action}ed-${Date.now()}.pdf`);
+      link.href = path;
+      link.setAttribute('download', originalname);
       document.body.appendChild(link);
       link.click();
 
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
       toast.success(`PDF ${action}ed successfully! Starting download...`);
 
     } catch (err) {
@@ -85,7 +83,6 @@ const PdfPasswordProtector = () => {
       <form onSubmit={onSubmit}>
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-900" htmlFor="single_file">Upload a PDF file</label>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Maximum size is 10MB. Login for a higher limit (50MB).</p>
           <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="single_file" type="file" onChange={onFileChange} accept=".pdf" />
         </div>
         <div className="mb-4">

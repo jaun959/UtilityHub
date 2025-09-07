@@ -241,11 +241,25 @@ router.post('/compress-pdf', (req, res, next) => req.upload.single('pdf')(req, r
 
     const compressedPdfBytes = await pdfDoc.save();
 
-    const fileName = `compressed-${Date.now()}.pdf`;
+    const archive = archiver('zip', {
+      zlib: { level: 9 },
+    });
+
+    const archiveBuffer = await new Promise((resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(Buffer.from(compressedPdfBytes), { name: `compressed-${Date.now()}.pdf` });
+      archive.finalize();
+    });
+
+    const zipFileName = `compressed_pdf_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
-      .upload(fileName, compressedPdfBytes, {
-        contentType: 'application/pdf',
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
       });
 
     if (uploadError) {
@@ -254,9 +268,9 @@ router.post('/compress-pdf', (req, res, next) => req.upload.single('pdf')(req, r
 
     const { data: publicUrlData } = supabase.storage
       .from('utilityhub')
-      .getPublicUrl(fileName);
+      .getPublicUrl(zipFileName);
 
-    return res.json({ path: publicUrlData.publicUrl, originalname: fileName });
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error('Error during PDF compression:', err);
     return res.status(500).json({ msg: 'Server Error' });
@@ -294,11 +308,25 @@ router.post('/pdf-password', (req, res, next) => req.upload.single('pdf')(req, r
       return res.status(400).json({ msg: 'Invalid action. Must be \'protect\' or \'remove\'.' });
     }
 
-    const fileName = `${action}ed-${Date.now()}.pdf`;
+    const archive = archiver('zip', {
+      zlib: { level: 9 },
+    });
+
+    const archiveBuffer = await new Promise((resolve, reject) => {
+      const buffers = [];
+      archive.on('data', (data) => buffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(buffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(Buffer.from(modifiedPdfBytes), { name: `${action}ed-${Date.now()}.pdf` });
+      archive.finalize();
+    });
+
+    const zipFileName = `${action}ed_pdf_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
-      .upload(fileName, modifiedPdfBytes, {
-        contentType: 'application/pdf',
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
       });
 
     if (uploadError) {
@@ -307,9 +335,9 @@ router.post('/pdf-password', (req, res, next) => req.upload.single('pdf')(req, r
 
     const { data: publicUrlData } = supabase.storage
       .from('utilityhub')
-      .getPublicUrl(fileName);
+      .getPublicUrl(zipFileName);
 
-    return res.json({ path: publicUrlData.publicUrl, originalname: fileName });
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error('Error during PDF password operation:', err);
     return res.status(500).json({ msg: 'Server Error' });
