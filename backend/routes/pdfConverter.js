@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { PDFDocument, degrees } = require('pdf-lib');
+const { PDFDocument, degrees, PDFSecurity } = require('pdf-lib');
 const archiver = require('archiver');
 const { createClient } = require('@supabase/supabase-js');
 const pdfParse = require('pdf-parse');
@@ -32,7 +32,7 @@ router.post('/merge-pdfs', (req, res, next) => req.upload.array('pdfs')(req, res
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      archive.append(mergedPdfBuffer, { name: `merged-${Date.now()}.pdf` });
+      archive.append(mergedPdfBuffer, { name: `dkutils_merged-${Date.now()}.pdf` });
       archive.finalize();
     });
 
@@ -117,7 +117,7 @@ router.post('/split-pdf', (req, res, next) => req.upload.single('pdf')(req, res,
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      archive.append(Buffer.from(newPdfBytes), { name: `split-${Date.now()}.pdf` });
+      archive.append(Buffer.from(newPdfBytes), { name: `dkutils_split-${Date.now()}.pdf` });
       archive.finalize();
     });
 
@@ -200,7 +200,7 @@ router.post('/pdf-rotate', (req, res, next) => req.upload.single('pdf')(req, res
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      archive.append(Buffer.from(modifiedPdfBytes), { name: `rotated-${Date.now()}.pdf` });
+      archive.append(Buffer.from(modifiedPdfBytes), { name: `dkutils_rotated-${Date.now()}.pdf` });
       archive.finalize();
     });
 
@@ -251,7 +251,7 @@ router.post('/compress-pdf', (req, res, next) => req.upload.single('pdf')(req, r
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      archive.append(Buffer.from(compressedPdfBytes), { name: `compressed-${Date.now()}.pdf` });
+      archive.append(Buffer.from(compressedPdfBytes), { name: `dkutils_compressed-${Date.now()}.pdf` });
       archive.finalize();
     });
 
@@ -300,7 +300,11 @@ router.post('/pdf-password', (req, res, next) => req.upload.single('pdf')(req, r
       modifiedPdfBytes = await pdfDoc.save({
         userPassword: password,
         ownerPassword: password,
-        permissions: {},
+        permissions: {
+          printing: PDFSecurity.Printing.DENY,
+          modifying: PDFSecurity.Modifying.DENY,
+          copying: PDFSecurity.Copying.DENY,
+        },
       });
     } else if (action === 'remove') {
       modifiedPdfBytes = await pdfDoc.save();
@@ -318,7 +322,7 @@ router.post('/pdf-password', (req, res, next) => req.upload.single('pdf')(req, r
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      archive.append(Buffer.from(modifiedPdfBytes), { name: `${action}ed-${Date.now()}.pdf` });
+      archive.append(Buffer.from(modifiedPdfBytes), { name: `dkutils_${action}ed-${Date.now()}.pdf` });
       archive.finalize();
     });
 

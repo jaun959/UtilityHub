@@ -36,7 +36,7 @@ router.post('/png-to-jpg', (req, res, next) => req.upload.array('images')(req, r
 
         const jpgBuffer = await sharp(imageBuffer).jpeg().toBuffer();
 
-        archive.append(jpgBuffer, { name: `${nameWithoutExt}_converted.jpg` });
+        archive.append(jpgBuffer, { name: `dkutils_${nameWithoutExt}_converted.jpg` });
       });
 
       Promise.all(conversionPromises)
@@ -334,7 +334,7 @@ router.post('/convert-image-format', (req, res, next) => req.upload.array('image
     }
 
     const { format } = req.body;
-    const allowedFormats = ['jpeg', 'png', 'webp', 'tiff', 'gif', 'avif']; // Add more if sharp supports them and they are desired
+    const allowedFormats = ['jpeg', 'png', 'webp', 'tiff', 'gif', 'avif'];
     if (!format || !allowedFormats.includes(format.toLowerCase())) {
       return res.status(400).json({ msg: `Invalid format provided. Allowed formats are: ${allowedFormats.join(', ')}` });
     }
