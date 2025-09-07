@@ -16,11 +16,12 @@ const WebToolsPage = () => {
     <>
       <Helmet>
         <title>Web Tools - Utility Hub</title>
-        <meta name="description" content="Essential online tools for web-related tasks: URL shortening, QR code generation and scanning, website screenshot capture, favicon extraction, URL redirect checking, and SEO analysis." />
+        <meta name="description" content="Discover essential online tools for web-related tasks: Link Shortener, QR Code Generator, QR Code Scanner, Website Screenshot Generator, Favicon Extractor, URL Redirect Checker, Robots.txt / Sitemap.xml Viewer, JSON <-> XML Converter, and Password Strength Checker. Optimize your web presence and streamline development workflows." />
+        <meta name="keywords" content="web tools, URL shortener, QR code generator, QR code scanner, website screenshot, favicon extractor, URL redirect checker, robots.txt viewer, sitemap.xml viewer, JSON XML converter, password strength checker, online web tools, free web tools, SEO tools, web development tools, API tools" />
         <meta property="og:title" content="Web Tools - Utility Hub" />
-        <meta property="og:description" content="Essential online tools for web-related tasks: URL shortening, QR code generation and scanning, website screenshot capture, favicon extraction, URL redirect checking, and SEO analysis." />
-        <meta property="og:image" content="/logo.png" />
-        <meta property="og:url" content={window.location.href} />
+        <meta property="og:description" content="Discover essential online tools for web-related tasks: Link Shortener, QR Code Generator, QR Code Scanner, Website Screenshot Generator, Favicon Extractor, URL Redirect Checker, Robots.txt / Sitemap.xml Viewer, JSON <-> XML Converter, and Password Strength Checker. Optimize your web presence and streamline development workflows." />
+        <meta property="og:image" content="https://dkutils.vercel.app/logo.png" />
+        <meta property="og:url" content="https://dkutils.vercel.app/web" />
       </Helmet>
       <main className="container mx-auto p-4">
         <h2 className="text-3xl font-bold mb-6 text-gray-800">Web Tools</h2>

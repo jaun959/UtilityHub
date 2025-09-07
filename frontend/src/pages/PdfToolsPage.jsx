@@ -15,11 +15,12 @@ const PdfToolsPage = () => {
     <>
       <Helmet>
         <title>PDF Tools - Utility Hub</title>
-        <meta name="description" content="Comprehensive tools for managing your PDF documents: merge, split, convert to image, Word, Excel, text, and rotate pages. Also convert Excel/Text to PDF." />
+        <meta name="description" content="Comprehensive tools for managing your PDF documents: merge multiple PDFs, split PDFs by pages, compress PDF file size, protect PDFs with passwords, remove PDF passwords, convert PDF to text, rotate PDF pages, and generate PDFs from plain text. Simplify your PDF workflows with our free online tools." />
+        <meta name="keywords" content="PDF tools, PDF merger, PDF splitter, PDF compressor, PDF password protector, PDF password remover, PDF to text converter, PDF rotator, text to PDF generator, online PDF tools, free PDF tools, merge PDF, split PDF, compress PDF, protect PDF, remove PDF password, rotate PDF, convert text to PDF" />
         <meta property="og:title" content="PDF Tools - Utility Hub" />
-        <meta property="og:description" content="Comprehensive tools for managing your PDF documents: merge, split, convert to image, Word, Excel, text, and rotate pages. Also convert Excel/Text to PDF." />
-        <meta property="og:image" content="/logo.png" />
-        <meta property="og:url" content={window.location.href} />
+        <meta property="og:description" content="Comprehensive tools for managing your PDF documents: merge multiple PDFs, split PDFs by pages, compress PDF file size, protect PDFs with passwords, remove PDF passwords, convert PDF to text, rotate PDF pages, and generate PDFs from plain text. Simplify your PDF workflows with our free online tools." />
+        <meta property="og:image" content="https://dkutils.vercel.app/logo.png" />
+        <meta property="og:url" content="https://dkutils.vercel.app/pdfs" />
       </Helmet>
       <main className="container mx-auto p-4">
         <h2 className="text-3xl font-bold mb-6 text-gray-800">PDF Tools</h2>

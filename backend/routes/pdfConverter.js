@@ -298,8 +298,8 @@ router.post('/pdf-password', (req, res, next) => req.upload.single('pdf')(req, r
 
     if (action === 'protect') {
       modifiedPdfBytes = await pdfDoc.save({
-        use: [password],
-        owner: [password],
+        userPassword: password,
+        ownerPassword: password,
         permissions: {},
       });
     } else if (action === 'remove') {

@@ -15,11 +15,12 @@ const ImageToolsPage = () => {
     <>
       <Helmet>
         <title>Image Tools - Utility Hub</title>
-        <meta name="description" content="Comprehensive suite of online image manipulation tools: convert formats, compress, resize, crop, grayscale, flip, and convert images to Base64 or PDF."/>
+        <meta name="description" content="Explore our comprehensive suite of online image manipulation tools: Image Format Converter (JPG, PNG, WebP, TIFF, AVIF), Image Compressor, Image Resizer, Image to PDF Converter, PNG to JPG Converter, Image Cropper, Image Grayscaler, Image Flipper, and Image to Base64 Converter. Optimize, transform, and enhance your images with ease."/>
+        <meta name="keywords" content="image tools, image converter, image compressor, image resizer, image to PDF, PNG to JPG, image cropper, image grayscaler, image flipper, image to Base64, online image editor, photo editor, image optimization, convert image format, compress photos, resize images, crop images, grayscale image, flip image, Base64 image converter, free image tools"/>
         <meta property="og:title" content="Image Tools - Utility Hub"/>
-        <meta property="og:description" content="Comprehensive suite of online image manipulation tools: convert formats, compress, resize, crop, grayscale, flip, and convert images to Base64 or PDF."/>
-        <meta property="og:image" content="/logo.png"/>
-        <meta property="og:url" content={window.location.href}/>
+        <meta property="og:description" content="Explore our comprehensive suite of online image manipulation tools: Image Format Converter (JPG, PNG, WebP, TIFF, AVIF), Image Compressor, Image Resizer, Image to PDF Converter, PNG to JPG Converter, Image Cropper, Image Grayscaler, Image Flipper, and Image to Base64 Converter. Optimize, transform, and enhance your images with ease."/>
+        <meta property="og:image" content="https://dkutils.vercel.app/logo.png"/>
+        <meta property="og:url" content="https://dkutils.vercel.app/images"/>
       </Helmet>
       <main className="container mx-auto p-4">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Image Tools</h2>

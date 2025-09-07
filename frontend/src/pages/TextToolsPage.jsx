@@ -16,11 +16,12 @@ const TextToolsPage = () => {
     <>
       <Helmet>
         <title>Text Tools - Utility Hub</title>
-        <meta name="description" content="Versatile collection of online text utilities: convert case, check differences, encode/decode Base64, convert HTML/Markdown, format JSON, generate hashes, and create strong passwords." />
+        <meta name="description" content="Access a versatile collection of online text utilities: Text Case Converter, Text Difference Checker, Base64 Text Converter, HTML to Markdown Converter, Markdown to HTML Converter, JSON Formatter/Validator, Hash Generator, Password Generator, and CSV to JSON Converter. Manipulate, analyze, and transform text data with ease." />
+        <meta name="keywords" content="text tools, text case converter, text difference checker, Base64 text converter, HTML to Markdown, Markdown to HTML, JSON formatter, JSON validator, hash generator, password generator, CSV to JSON, online text utilities, free text tools, text manipulation, text analysis, data transformation" />
         <meta property="og:title" content="Text Tools - Utility Hub" />
-        <meta property="og:description" content="Versatile collection of online text utilities: convert case, check differences, encode/decode Base64, convert HTML/Markdown, format JSON, generate hashes, and create strong passwords." />
-        <meta property="og:image" content="/logo.png" />
-        <meta property="og:url" content={window.location.href} />
+        <meta property="og:description" content="Access a versatile collection of online text utilities: Text Case Converter, Text Difference Checker, Base64 Text Converter, HTML to Markdown Converter, Markdown to HTML Converter, JSON Formatter/Validator, Hash Generator, Password Generator, and CSV to JSON Converter. Manipulate, analyze, and transform text data with ease." />
+        <meta property="og:image" content="https://dkutils.vercel.app/logo.png" />
+        <meta property="og:url" content="https://dkutils.vercel.app/text" />
       </Helmet>
       <main className="container mx-auto p-4">
         <h2 className="text-3xl font-bold mb-6 text-gray-800">Text Tools</h2>
