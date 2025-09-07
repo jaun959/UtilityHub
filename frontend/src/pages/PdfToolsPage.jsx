@@ -2,12 +2,12 @@ import ToolCard from '../components/ToolCard.jsx';
 import PdfMerger from '../components/PdfMerger.jsx';
 import PdfSplitter from '../components/PdfSplitter.jsx';
 import PdfCompressor from '../components/PdfCompressor.jsx';
-import PdfPasswordProtector from '../components/PdfPasswordProtector.jsx';
 import PdfToWordConverter from '../components/PdfToWordConverter.jsx';
 import PdfToExcelConverter from '../components/PdfToExcelConverter.jsx';
 import TextToPdfGenerator from '../components/TextToPdfGenerator.jsx';
 import PdfToTextConverter from '../components/PdfToTextConverter.jsx';
 import PdfRotator from '../components/PdfRotator.jsx';
+import PdfPageDeleter from '../components/PdfPageDeleter.jsx';
 import { Helmet } from 'react-helmet-async';
 
 const PdfToolsPage = () => {
@@ -34,9 +34,6 @@ const PdfToolsPage = () => {
           <ToolCard title="PDF Compressor" description="Reduce the file size of your PDF documents.">
             <PdfCompressor />
           </ToolCard>
-          <ToolCard title="PDF Password Protector/Remover" description="Add or remove passwords from PDF documents.">
-            <PdfPasswordProtector />
-          </ToolCard>
           <ToolCard title="PDF to Word Converter" description="Convert PDF documents to editable Word files.">
             <PdfToWordConverter />
           </ToolCard>
@@ -51,6 +48,9 @@ const PdfToolsPage = () => {
           </ToolCard>
           <ToolCard title="PDF Rotator" description="Rotate pages within a PDF document.">
             <PdfRotator />
+          </ToolCard>
+          <ToolCard title="PDF Page Deleter" description="Delete specific pages from a PDF document.">
+            <PdfPageDeleter />
           </ToolCard>
         </div>
       </main>

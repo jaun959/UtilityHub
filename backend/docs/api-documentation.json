@@ -3,7 +3,7 @@
     "title": "API Documentation",
     "version": "1.0.0",
     "description": "Auto-generated API documentation for Express.js application",
-    "generatedAt": "2025-09-06T07:56:05.837Z"
+    "generatedAt": "2025-09-07T20:04:21.769Z"
   },
   "paths": {
     "/shorten": {
@@ -31,18 +31,6 @@
             "schema": "{url}"
           },
           {
-            "status": 200,
-            "description": "Success",
-            "contentType": "application/json",
-            "schema": "{url}"
-          },
-          {
-            "status": 200,
-            "description": "Success",
-            "contentType": "application/json",
-            "schema": "{url}"
-          },
-          {
             "status": 500,
             "description": "Internal Server Error",
             "contentType": "application/json",
@@ -54,9 +42,9 @@
         "middleware": []
       }
     },
-    "/shorten/:code": {
+    "/l/:code": {
       "get": {
-        "summary": "GET /shorten/:code",
+        "summary": "GET /l/:code",
         "responses": [
           {
             "status": 404,
@@ -81,6 +69,14 @@
         "summary": "POST /api/convert/png-to-jpg",
         "responses": [
           {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "No image files uploaded."
+            }
+          },
+          {
             "status": 200,
             "description": "Success",
             "contentType": "application/json",
@@ -92,8 +88,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -112,8 +110,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -124,19 +124,29 @@
         "summary": "POST /api/convert/image-to-pdf",
         "responses": [
           {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "No image files uploaded."
+            }
+          },
+          {
             "status": 200,
             "description": "Success",
             "contentType": "application/json",
             "schema": {
-              "path": "{tempPdfPath}",
-              "originalname": "unknown"
+              "path": "unknown",
+              "originalname": "{zipFileName}"
             }
           },
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -147,6 +157,22 @@
         "summary": "POST /api/convert/resize-image",
         "responses": [
           {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "No image files uploaded."
+            }
+          },
+          {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Invalid width or height provided. Must be positive numbers."
+            }
+          },
+          {
             "status": 200,
             "description": "Success",
             "contentType": "application/json",
@@ -158,8 +184,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -170,6 +198,22 @@
         "summary": "POST /api/convert/compress-image",
         "responses": [
           {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "No image files uploaded for compression."
+            }
+          },
+          {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Invalid quality provided. Must be a number between 0 and 100."
+            }
+          },
+          {
             "status": 200,
             "description": "Success",
             "contentType": "application/json",
@@ -181,8 +225,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -193,6 +239,22 @@
         "summary": "POST /api/convert/convert-image-format",
         "responses": [
           {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "No image files uploaded."
+            }
+          },
+          {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "unknown"
+            }
+          },
+          {
             "status": 200,
             "description": "Success",
             "contentType": "application/json",
@@ -204,8 +266,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -216,11 +280,11 @@
         "summary": "POST /api/convert/base64-image",
         "responses": [
           {
-            "status": 200,
-            "description": "Success",
+            "status": 400,
+            "description": "Bad Request",
             "contentType": "application/json",
             "schema": {
-              "base64": "{base64}"
+              "msg": "No image file uploaded for encoding."
             }
           },
           {
@@ -232,12 +296,11 @@
             }
           },
           {
-            "status": 200,
-            "description": "Success",
+            "status": 400,
+            "description": "Bad Request",
             "contentType": "application/json",
             "schema": {
-              "path": "unknown",
-              "originalname": "{zipFileName}"
+              "msg": "No base64 string provided for decoding."
             }
           },
           {
@@ -252,14 +315,18 @@
           {
             "status": 400,
             "description": "Bad Request",
-            "contentType": "text/html",
-            "schema": "Invalid request"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Invalid request type. Must be \"encode\" or \"decode\"."
+            }
           },
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -297,8 +364,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -327,8 +396,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -358,31 +429,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "{send_response}"
-          }
-        ],
-        "middleware": []
-      }
-    },
-    "/api/convert/pdf-to-image": {
-      "post": {
-        "summary": "POST /api/convert/pdf-to-image",
-        "responses": [
-          {
-            "status": 200,
-            "description": "Success",
             "contentType": "application/json",
             "schema": {
-              "path": "unknown",
-              "originalname": "{zipFileName}"
+              "msg": "Server Error"
             }
-          },
-          {
-            "status": 500,
-            "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
           }
         ],
         "middleware": []
@@ -393,6 +443,14 @@
         "summary": "POST /api/convert/merge-pdfs",
         "responses": [
           {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "No files uploaded."
+            }
+          },
+          {
             "status": 200,
             "description": "Success",
             "contentType": "application/json",
@@ -404,8 +462,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -420,7 +480,7 @@
             "description": "Bad Request",
             "contentType": "application/json",
             "schema": {
-              "message": "No PDF file uploaded."
+              "msg": "No PDF file uploaded."
             }
           },
           {
@@ -428,7 +488,7 @@
             "description": "Bad Request",
             "contentType": "application/json",
             "schema": {
-              "message": "No page ranges provided."
+              "msg": "No page ranges provided."
             }
           },
           {
@@ -443,8 +503,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -471,8 +533,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -510,8 +574,43 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
+          }
+        ],
+        "middleware": []
+      }
+    },
+    "/api/convert/compress-pdf": {
+      "post": {
+        "summary": "POST /api/convert/compress-pdf",
+        "responses": [
+          {
+            "status": 400,
+            "description": "Bad Request",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "No PDF file uploaded."
+            }
+          },
+          {
+            "status": 200,
+            "description": "Success",
+            "contentType": "application/json",
+            "schema": {
+              "path": "unknown",
+              "originalname": "{zipFileName}"
+            }
+          },
+          {
+            "status": 500,
+            "description": "Internal Server Error",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -561,75 +660,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
-          }
-        ],
-        "middleware": []
-      }
-    },
-    "/api/convert/word-to-pdf": {
-      "post": {
-        "summary": "POST /api/convert/word-to-pdf",
-        "responses": [
-          {
-            "status": 400,
-            "description": "Bad Request",
             "contentType": "application/json",
             "schema": {
-              "msg": "No Word file uploaded."
+              "msg": "Server Error"
             }
-          },
-          {
-            "status": 200,
-            "description": "Success",
-            "contentType": "application/json",
-            "schema": {
-              "path": "unknown",
-              "originalname": "{fileName}"
-            }
-          },
-          {
-            "status": 500,
-            "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
-          }
-        ],
-        "middleware": []
-      }
-    },
-    "/api/convert/excel-to-pdf": {
-      "post": {
-        "summary": "POST /api/convert/excel-to-pdf",
-        "responses": [
-          {
-            "status": 400,
-            "description": "Bad Request",
-            "contentType": "application/json",
-            "schema": {
-              "msg": "No file uploaded or incorrect field name. Expected field name: excel"
-            }
-          },
-          {
-            "status": 400,
-            "description": "Bad Request",
-            "contentType": "application/json",
-            "schema": {
-              "msg": "No Excel file uploaded."
-            }
-          },
-          {
-            "status": 200,
-            "description": "Success",
-            "contentType": "text/html",
-            "schema": "{pdfBytes}"
-          },
-          {
-            "status": 500,
-            "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
           }
         ],
         "middleware": []
@@ -659,39 +693,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
-          }
-        ],
-        "middleware": []
-      }
-    },
-    "/api/convert/excel-to-word": {
-      "post": {
-        "summary": "POST /api/convert/excel-to-word",
-        "responses": [
-          {
-            "status": 400,
-            "description": "Bad Request",
             "contentType": "application/json",
             "schema": {
-              "msg": "No Excel file uploaded."
+              "msg": "Server Error"
             }
-          },
-          {
-            "status": 200,
-            "description": "Success",
-            "contentType": "application/json",
-            "schema": {
-              "path": "unknown",
-              "originalname": "{fileName}"
-            }
-          },
-          {
-            "status": 500,
-            "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
           }
         ],
         "middleware": []
@@ -760,8 +765,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server error"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server error"
+            }
           }
         ],
         "middleware": []
@@ -798,8 +805,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server error"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server error"
+            }
           }
         ],
         "middleware": []
@@ -830,8 +839,10 @@
           {
             "status": 500,
             "description": "Internal Server Error",
-            "contentType": "text/html",
-            "schema": "Server Error"
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Server Error"
+            }
           }
         ],
         "middleware": []
@@ -840,6 +851,31 @@
     "/api/clean-supabase": {
       "post": {
         "summary": "POST /api/clean-supabase",
+        "responses": [
+          {
+            "status": 200,
+            "description": "OK",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Supabase cleanup triggered successfully."
+            }
+          },
+          {
+            "status": 500,
+            "description": "Internal Server Error",
+            "contentType": "application/json",
+            "schema": {
+              "msg": "Failed to trigger Supabase cleanup.",
+              "error": "unknown"
+            }
+          }
+        ],
+        "middleware": []
+      }
+    },
+    "/api/clean-supabase/trigger": {
+      "get": {
+        "summary": "GET /api/clean-supabase/trigger",
         "responses": [
           {
             "status": 200,
@@ -875,14 +911,6 @@
             }
           },
           {
-            "status": 400,
-            "description": "Bad Request",
-            "contentType": "application/json",
-            "schema": {
-              "msg": "No screenshots could be generated for the provided URL or its internal links."
-            }
-          },
-          {
             "status": 500,
             "description": "Internal Server Error",
             "contentType": "application/json",
@@ -905,7 +933,7 @@
             "description": "Internal Server Error",
             "contentType": "application/json",
             "schema": {
-              "msg": "Failed to generate screenshots. Please check the URL.",
+              "msg": "Failed to generate screenshot. Please check the URL and API key.",
               "error": "unknown"
             }
           }
@@ -1054,31 +1082,6 @@
         "middleware": []
       }
     },
-    "/api/password-strength": {
-      "post": {
-        "summary": "POST /api/password-strength",
-        "responses": [
-          {
-            "status": 400,
-            "description": "Bad Request",
-            "contentType": "application/json",
-            "schema": {
-              "msg": "Password is required."
-            }
-          },
-          {
-            "status": 200,
-            "description": "OK",
-            "contentType": "application/json",
-            "schema": {
-              "score": "{score}",
-              "feedback": "{feedback}"
-            }
-          }
-        ],
-        "middleware": []
-      }
-    },
     "/api/seo/robots-txt": {
       "post": {
         "summary": "POST /api/seo/robots-txt",
@@ -1153,10 +1156,10 @@
     }
   },
   "stats": {
-    "totalEndpoints": 38,
+    "totalEndpoints": 35,
     "methodCounts": {
-      "POST": 34,
-      "GET": 4
+      "POST": 30,
+      "GET": 5
     },
     "statusCodes": [
       200,
@@ -1172,8 +1175,14 @@
       "name": "shorten",
       "description": "Routes under /shorten",
       "paths": [
-        "/shorten",
-        "/shorten/:code"
+        "/shorten"
+      ]
+    },
+    "l": {
+      "name": "l",
+      "description": "Routes under /l",
+      "paths": [
+        "/l/:code"
       ]
     },
     "api": {
@@ -1190,28 +1199,25 @@
         "/api/convert/image-flip",
         "/api/convert/image-to-base64",
         "/api/convert/image-grayscale",
-        "/api/convert/pdf-to-image",
         "/api/convert/merge-pdfs",
         "/api/convert/split-pdf",
         "/api/convert/pdf-to-text",
         "/api/convert/pdf-rotate",
+        "/api/convert/compress-pdf",
         "/api/convert/text-to-pdf",
         "/api/convert/pdf-to-word",
-        "/api/convert/word-to-pdf",
-        "/api/convert/excel-to-pdf",
         "/api/convert/pdf-to-excel",
-        "/api/convert/excel-to-word",
         "/api/convert/base64-text",
         "/api/auth/register",
         "/api/auth/login",
         "/api/keep-alive",
         "/api/clean-supabase",
+        "/api/clean-supabase/trigger",
         "/api/screenshot",
         "/api/favicon",
         "/api/redirect-checker",
         "/api/convert/json-to-xml",
         "/api/convert/xml-to-json",
-        "/api/password-strength",
         "/api/seo/robots-txt",
         "/api/seo/sitemap-xml"
       ]

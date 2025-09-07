@@ -45,23 +45,23 @@ VITE_API_BASE_URL=http://localhost:5000
 1.  **Image Format Converter**: Convert images between various formats (JPG, PNG, WebP, TIFF, AVIF).
 2.  **Image Compressor**: Reduce the file size of your images while maintaining quality.
 3.  **Image Resizer**: Change the dimensions (width and height) of your images.
-4.  **Image to PDF Converter**: Combine multiple images into a single PDF document.
-5.  **PNG to JPG Converter**: Quickly convert PNG images to JPG format.
-6.  **Image Cropper**: Crop images to a specific area or aspect ratio.
-7.  **Image Grayscaler**: Convert your colored images to grayscale.
-8.  **Image Flipper**: Flip images horizontally or vertically.
-9.  **Image to Base64 Converter**: Convert images into Base64 strings for embedding or transfer.
+4.  **PNG to JPG Converter**: Quickly convert PNG images to JPG format.
+5.  **Image Cropper**: Crop images to a specific area or aspect ratio.
+6.  **Image Grayscaler**: Convert your colored images to grayscale.
+7.  **Image Flipper**: Flip images horizontally or vertically.
+8.  **Image to Base64 Converter**: Convert images into Base64 strings for embedding or transfer.
+9.  **Image to PDF Converter**: Combine multiple images into a single PDF document.
 
 ### PDF Tools
 1.  **PDF Merger**: Combine multiple PDF documents into one single PDF file.
 2.  **PDF Splitter**: Split a PDF document into multiple smaller PDF files by pages or ranges.
 3.  **PDF Compressor**: Reduce the file size of your PDF documents.
-4.  **PDF Password Protector/Remover**: Add or remove passwords from PDF documents.
-5.  **Text to PDF Generator**: Convert plain text content into a PDF document.
-6.  **PDF to Text Converter**: Extract all text content from PDF documents.
-7.  **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
-8.  **PDF to word Converter**: Convert PDF into word format.
-9.  **PDF to Excel Converter**: Convert PDF into Excel spreadsheets format.
+4.  **PDF to Word Converter**: Convert PDF into word format.
+5.  **PDF to Excel Converter**: Convert PDF into Excel spreadsheets format.
+6.  **Text to PDF Generator**: Convert plain text content into a PDF document.
+7.  **PDF to Text Converter**: Extract all text content from PDF documents.
+8.  **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
+9.  **PDF Page Deleter**: Delete specific pages from a PDF document.
 
 ### Text Tools
 1.  **Text Case Converter**: Convert text to various case formats (e.g., UPPERCASE, lowercase, Title Case).
