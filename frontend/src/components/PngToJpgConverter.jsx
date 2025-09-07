@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 
 const PngToJpgConverter = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [convertedZipFile, setConvertedZipFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const onFileChange = (e) => {
@@ -57,13 +56,24 @@ const PngToJpgConverter = () => {
         }
       });
       setConvertedZipFile(res.data);
-      toast.success('PNGs converted to JPG successfully!');
+      toast.success('PNGs converted to JPG successfully! Starting download...');
+      handleDownload(res.data.path, res.data.originalname);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error converting PNG to JPG. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Download started!');
   };
 
   return (
@@ -76,15 +86,6 @@ const PngToJpgConverter = () => {
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'Convert'}</button>
       </form>
-
-      {convertedZipFile && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Converted Files (ZIP):</h3>
-          <div className="p-2">
-            <button onClick={() => window.open(convertedZipFile.path, '_blank')} className="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800">Download All Converted Images</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

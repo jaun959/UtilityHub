@@ -2,7 +2,7 @@ const router = require('express').Router();
 const multer = require('multer');
 const { PDFDocument, degrees } = require('pdf-lib');
 const archiver = require('archiver');
-const { fromBuffer } = require('pdf2pic');
+const { pdfToPng } = require('pdf-to-png-converter');
 const { createClient } = require('@supabase/supabase-js');
 const pdfParse = require('pdf-parse');
 
@@ -20,17 +20,9 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
     }
     const pdfBuffer = file.buffer;
 
-    const options = {
-      density: 100,
-      saveFilename: 'page',
-      savePath: './',
-      format: 'png',
-      width: 768,
-      height: 1024,
-    };
-
-    const convert = fromBuffer(pdfBuffer, options);
-    const pngPages = await convert.bulk(-1, { response: 'buffer' });
+    const pngPages = await pdfToPng(pdfBuffer, {
+      viewportScale: 2.0,
+    });
 
     const archive = archiver('zip', {
       zlib: { level: 9 },
@@ -43,7 +35,7 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
       archive.on('error', (err) => reject(err));
 
       for (let i = 0; i < pngPages.length; i += 1) {
-        archive.append(pngPages[i].buffer, { name: `page-${i + 1}.png` });
+        archive.append(pngPages[i].content, { name: `page-${i + 1}.png` });
       }
       archive.finalize();
     });

@@ -45,8 +45,10 @@ const PdfToTextConverter = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setExtractedText(res.data);
-      toast.success('Text extracted successfully!');
+      const extractedTextContent = res.data;
+      setExtractedText(extractedTextContent);
+      toast.success('Text extracted successfully! Starting download...');
+      handleDownload(extractedTextContent, `extracted-text-${Date.now()}.txt`);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error extracting text from PDF.');
@@ -60,17 +62,17 @@ const PdfToTextConverter = () => {
     toast.success('Copied to clipboard!');
   };
 
-  const downloadAsTxt = () => {
-    const blob = new Blob([extractedText], { type: 'text/plain' });
+  const handleDownload = (content, fileName) => {
+    const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `extracted-text-${Date.now()}.txt`;
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success('Extracted text downloaded as TXT!');
+    toast.success('Download started!');
   };
 
   return (
@@ -83,28 +85,6 @@ const PdfToTextConverter = () => {
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Extracting...' : 'Extract Text'}</button>
       </form>
-
-      {extractedText && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Extracted Text:
-            <button onClick={copyToClipboard} className="ml-2 text-sm text-blue-500 hover:underline">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-              </svg>
-            </button>
-            <button onClick={downloadAsTxt} className="ml-2 text-sm text-blue-500 hover:underline">
-              Download TXT
-            </button>
-          </h3>
-          <textarea
-            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 text-sm dark:border-gray-600 h-max"
-            rows="10"
-            readOnly
-            value={extractedText}
-          ></textarea>
-        </div>
-      )}
     </div>
   );
 };

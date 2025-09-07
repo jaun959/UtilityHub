@@ -3,7 +3,6 @@ import { toast } from 'react-toastify';
 
 const ImageCropper = () => {
   const [imageSrc, setImageSrc] = useState(null);
-  const [croppedImageSrc, setCroppedImageSrc] = useState(null);
   const [loading, setLoading] = useState(false);
   const imageRef = useRef(null);
   const canvasRef = useRef(null);
@@ -61,23 +60,21 @@ const ImageCropper = () => {
     canvas.height = cropHeight;
 
     ctx.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-    setCroppedImageSrc(canvas.toDataURL(image.type));
-    toast.success('Image cropped successfully!');
+    const dataUrl = canvas.toDataURL(image.type);
+    setCroppedImageSrc(dataUrl);
+    toast.success('Image cropped successfully! Starting download...');
+    handleDownload(dataUrl, `cropped-image-${Date.now()}.png`);
     setLoading(false);
   };
 
-  const handleDownloadCroppedImage = () => {
-    if (croppedImageSrc) {
-      const link = document.createElement('a');
-      link.href = croppedImageSrc;
-      link.download = `cropped-image-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success('Cropped image downloaded!');
-    } else {
-      toast.info('No cropped image to download.');
-    }
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Download started!');
   };
 
   return (
@@ -106,19 +103,6 @@ const ImageCropper = () => {
             disabled={loading}
           >
             {loading ? 'Cropping...' : 'Crop Image (Center 50%)'}
-          </button>
-        </div>
-      )}
-
-      {croppedImageSrc && (
-        <div className="mt-4 p-4 border rounded-md bg-gray-50">
-          <h3 className="text-xl font-semibold mb-2">Cropped Image Preview</h3>
-          <img src={croppedImageSrc} alt="Cropped" className="max-w-full h-auto border rounded-md mb-4" />
-          <button
-            onClick={handleDownloadCroppedImage}
-            className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-500 dark:hover:bg-green-600 focus:outline-none dark:focus:ring-green-800"
-          >
-            Download Cropped Image
           </button>
         </div>
       )}

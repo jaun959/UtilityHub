@@ -7,7 +7,6 @@ import { PDFDocument } from 'pdf-lib';
 const PdfSplitter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [ranges, setRanges] = useState('');
-  const [convertedFile, setConvertedFile] = useState(null);
   const [error, setError] = useState('');
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -106,9 +105,7 @@ const PdfSplitter = () => {
         return;
       }
 
-      
     }
-
 
     const formData = new FormData();
     formData.append('pdf', selectedFile);
@@ -121,13 +118,24 @@ const PdfSplitter = () => {
         }
       });
       setConvertedFile(res.data);
-      toast.success('PDF split successfully!');
+      toast.success('PDF split successfully! Starting download...');
+      handleDownload(res.data.path, res.data.originalname);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Failed to split PDF. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Download started!');
   };
 
   return (
@@ -148,13 +156,6 @@ const PdfSplitter = () => {
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Splitting...' : 'Split PDF'}</button>
       </form>
-
-      {convertedFile && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Split File:</h3>
-          <button onClick={() => window.open(convertedFile.path, '_blank')} className="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800">Download Split PDF</button>
-        </div>
-      )}
     </div>
   );
 };

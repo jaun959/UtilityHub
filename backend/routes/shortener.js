@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
     while (!isUnique) {
       // eslint-disable-next-line no-await-in-loop
       urlCode = shortid.generate();
-      shortUrl = `${baseUrl}/shorten/${urlCode}`;
+      shortUrl = `${baseUrl}/l/${urlCode}`;
       // eslint-disable-next-line no-await-in-loop
       const existingUrl = await Url.findOne({ urlCode });
       if (!existingUrl) {
@@ -52,10 +52,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-// @route   GET /:code
+// @route   GET /l/:code
 // @desc    Redirect to long/original URL
 // @access  Public
-router.get('/:code', async (req, res) => {
+router.get('/l/:code', async (req, res) => {
   try {
     const url = await Url.findOne({ urlCode: req.params.code });
 

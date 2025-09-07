@@ -3,7 +3,6 @@ import { toast } from 'react-toastify';
 
 const ImageResizer = () => {
   const [originalImage, setOriginalImage] = useState(null);
-  const [resizedImageSrc, setResizedImageSrc] = useState(null);
   const [newWidth, setNewWidth] = useState('');
   const [newHeight, setNewHeight] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,8 +73,10 @@ const ImageResizer = () => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        setResizedImageSrc(canvas.toDataURL(originalImage.type));
-        toast.success('Image resized successfully!');
+        const dataUrl = canvas.toDataURL(originalImage.type);
+        setResizedImageSrc(dataUrl);
+        toast.success('Image resized successfully! Starting download...');
+        handleDownload(dataUrl, `resized-${originalImage ? originalImage.name : 'image'}`);
         setLoading(false);
       };
       img.src = event.target.result;
@@ -83,18 +84,14 @@ const ImageResizer = () => {
     reader.readAsDataURL(originalImage);
   };
 
-  const handleDownloadResizedImage = () => {
-    if (resizedImageSrc) {
-      const link = document.createElement('a');
-      link.href = resizedImageSrc;
-      link.download = `resized-${originalImage ? originalImage.name : 'image'}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success('Resized image downloaded!');
-    } else {
-      toast.info('No resized image to download.');
-    }
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Download started!');
   };
 
   return (
@@ -153,19 +150,6 @@ const ImageResizer = () => {
             disabled={loading}
           >
             {loading ? 'Resizing...' : 'Resize Image'}
-          </button>
-        </div>
-      )}
-
-      {resizedImageSrc && (
-        <div className="mt-4 p-4 border rounded-md bg-gray-50">
-          <h3 className="text-xl font-semibold mb-2">Resized Image Preview</h3>
-          <img src={resizedImageSrc} alt="Resized" className="max-w-full h-auto border rounded-md mb-4" />
-          <button
-            onClick={handleDownloadResizedImage}
-            className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-500 dark:hover:bg-green-600 focus:outline-none dark:focus:ring-green-800"
-          >
-            Download Resized Image
           </button>
         </div>
       )}

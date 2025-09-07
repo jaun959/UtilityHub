@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 const ImageCompressor = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [quality, setQuality] = useState(80);
-  const [convertedZipFile, setConvertedZipFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const onFileChange = (e) => {
@@ -63,13 +62,23 @@ const ImageCompressor = () => {
         }
       });
       setConvertedZipFile(res.data);
-      toast.success('Images compressed successfully!');
+      toast.success('Images compressed successfully! Starting download...');
+      handleDownload(res.data.path, res.data.originalname);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error compressing images. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -86,15 +95,6 @@ const ImageCompressor = () => {
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Compressing...' : 'Compress Images'}</button>
       </form>
-
-      {convertedZipFile && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Compressed Images (ZIP):</h3>
-          <div className="p-2">
-            <button onClick={() => window.open(convertedZipFile.path, '_blank')} className="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800">Download All Compressed Images</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

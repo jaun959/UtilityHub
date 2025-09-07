@@ -124,24 +124,11 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
           tempImagePath = path.join(os.tmpdir(), `temp_image_${Date.now()}.png`);
           await fsp.writeFile(tempImagePath, pngBuffer);
 
-          const A4_WIDTH = 595.28;
-          const A4_HEIGHT = 841.89;
-
           const imgWidth = metadata.width;
           const imgHeight = metadata.height;
 
-          const scaleX = A4_WIDTH / imgWidth;
-          const scaleY = A4_HEIGHT / imgHeight;
-          const scale = Math.min(scaleX, scaleY);
-
-          const finalWidth = imgWidth * scale;
-          const finalHeight = imgHeight * scale;
-
-          const x = (A4_WIDTH - finalWidth) / 2;
-          const y = (A4_HEIGHT - finalHeight) / 2;
-
-          pdfDoc.addPage({ size: 'A4' });
-          pdfDoc.image(tempImagePath, x, y, { width: finalWidth, height: finalHeight });
+          pdfDoc.addPage({ width: imgWidth, height: imgHeight });
+          pdfDoc.image(tempImagePath, 0, 0, { width: imgWidth, height: imgHeight });
           resolve();
         } catch (imageErr) {
           console.error(`Error processing image ${file.originalname}:`, imageErr);

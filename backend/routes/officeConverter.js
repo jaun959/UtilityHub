@@ -7,9 +7,6 @@ const {
 
 const XLSX = require('xlsx');
 const libre = require('libreoffice-convert');
-const util = require('util');
-
-libre.convertAsync = util.promisify(libre.convert);
 
 const { createClient } = require('@supabase/supabase-js');
 

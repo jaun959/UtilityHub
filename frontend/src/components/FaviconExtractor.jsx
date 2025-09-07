@@ -15,7 +15,7 @@ const FaviconExtractor = () => {
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/favicon`, { url });
       const { path, originalname } = res.data;
-      window.open(path, '_blank');
+      handleDownload(path, originalname);
       toast.success(`Favicons ZIP generated and downloaded: ${originalname}`);
     } catch (err) {
       console.error('Error extracting favicons:', err);
@@ -24,6 +24,15 @@ const FaviconExtractor = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (

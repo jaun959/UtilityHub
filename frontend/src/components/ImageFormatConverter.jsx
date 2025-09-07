@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 const ImageFormatConverter = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [format, setFormat] = useState('jpeg');
-  const [convertedZipFile, setConvertedZipFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const onFileChange = (e) => {
@@ -63,7 +62,8 @@ const ImageFormatConverter = () => {
         }
       });
       setConvertedZipFile(res.data);
-      toast.success('Image format converted successfully!');
+      toast.success('Image format converted successfully! Starting download...');
+      handleDownload(res.data.path, res.data.originalname);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error converting image format. Please try again.');
@@ -97,15 +97,6 @@ const ImageFormatConverter = () => {
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'Convert Format'}</button>
       </form>
-
-      {convertedZipFile && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Converted Images (ZIP):</h3>
-          <div className="p-2">
-            <button onClick={() => window.open(convertedZipFile.path, '_blank')} className="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800">Download All Converted Images</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

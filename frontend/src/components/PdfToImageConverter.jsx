@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 
 const PdfToImageConverter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [zipFile, setZipFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const onFileChange = (e) => {
@@ -46,13 +45,24 @@ const PdfToImageConverter = () => {
         }
       });
       setZipFile(res.data);
-      toast.success('PDF converted to image successfully!');
+      toast.success('PDF converted to image successfully! Starting download...');
+      handleDownload(res.data.path, res.data.originalname);
     } catch (err) {
       console.error('Error during PDF to Image conversion:', err);
       toast.error(err.response?.data?.msg || 'Error converting PDF to image. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Download started!');
   };
 
   return (
@@ -65,21 +75,6 @@ const PdfToImageConverter = () => {
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'Convert'}</button>
       </form>
-
-      {zipFile && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Download Converted Images:</h3>
-          <button
-            onClick={() => window.open(zipFile.path, '_blank')}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-            </svg>
-            Download Zip
-          </button>
-        </div>
-      )}
     </div>
   );
 };

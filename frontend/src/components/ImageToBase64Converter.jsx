@@ -45,8 +45,10 @@ const ImageToBase64Converter = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setBase64String(res.data.base64);
-      toast.success('Image converted to Base64 successfully!');
+      const base64 = res.data.base64;
+      setBase64String(base64);
+      toast.success('Image converted to Base64 successfully! Starting download...');
+      handleDownload(base64, `image-base64-${Date.now()}.txt`);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error converting image to Base64. Please try again.');
@@ -60,17 +62,17 @@ const ImageToBase64Converter = () => {
     toast.success('Copied to clipboard!');
   };
 
-  const downloadAsTxt = () => {
-    const blob = new Blob([base64String], { type: 'text/plain' });
+  const handleDownload = (content, fileName) => {
+    const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `image-base64-${Date.now()}.txt`;
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success('Base64 string downloaded as TXT!');
+    toast.success('Download started!');
   };
 
   return (
@@ -83,28 +85,6 @@ const ImageToBase64Converter = () => {
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'Convert to Base64'}</button>
       </form>
-
-      {base64String && (
-        <div className="mt-4">
-          <h3 className="text-xl font-bold mb-2">Base64 String:
-            <button onClick={copyToClipboard} className="ml-2 text-sm text-blue-500 hover:underline">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-              </svg>
-            </button>
-            <button onClick={downloadAsTxt} className="ml-2 text-sm text-blue-500 hover:underline">
-              Download TXT
-            </button>
-          </h3>
-          <textarea
-            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 text-sm dark:border-gray-600 h-max"
-            rows="10"
-            readOnly
-            value={base64String}
-          ></textarea>
-        </div>
-      )}
     </div>
   );
 };

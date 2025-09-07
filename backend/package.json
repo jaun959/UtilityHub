@@ -54,7 +54,7 @@
     "pdf-lib-table": "^1.1.7",
     "pdf-merger-js": "^5.1.2",
     "pdf-parse": "^1.1.1",
-    "pdf2pic": "^3.1.1",
+    "pdf-to-png-converter": "^3.7.1",
     "pdfjs-dist": "^5.4.149",
     "pdfkit": "^0.17.2",
     "puppeteer-core": "^24.19.0",
