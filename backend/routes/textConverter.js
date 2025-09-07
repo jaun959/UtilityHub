@@ -19,10 +19,10 @@ router.post('/base64-text', (req, res) => {
     } else {
       return res.status(400).json({ msg: "Invalid type. Must be 'encode' or 'decode'." });
     }
-    res.json({ result });
+    return res.json({ result });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: 'Server error during Base64 conversion.' });
+    return res.status(500).json({ msg: 'Server error during Base64 conversion.' });
   }
 });
 

@@ -17,10 +17,10 @@ router.post('/json-to-xml', (req, res) => {
   try {
     const jsonObj = JSON.parse(jsonString);
     const xmlString = jsonToXmlBuilder.buildObject(jsonObj);
-    res.status(200).json({ xmlString });
+    return res.status(200).json({ xmlString });
   } catch (err) {
     console.error('Error converting JSON to XML:', err);
-    res.status(400).json({ msg: 'Invalid JSON format or conversion error.', error: err.message });
+    return res.status(400).json({ msg: 'Invalid JSON format or conversion error.', error: err.message });
   }
 });
 
@@ -36,10 +36,10 @@ router.post('/xml-to-json', async (req, res) => {
 
   try {
     const jsonObj = await xmlToJsonParser.parseStringPromise(xmlString);
-    res.status(200).json({ jsonString: JSON.stringify(jsonObj, null, 2) });
+    return res.status(200).json({ jsonString: JSON.stringify(jsonObj, null, 2) });
   } catch (err) {
     console.error('Error converting XML to JSON:', err);
-    res.status(400).json({ msg: 'Invalid XML format or conversion error.', error: err.message });
+    return res.status(400).json({ msg: 'Invalid XML format or conversion error.', error: err.message });
   }
 });
 

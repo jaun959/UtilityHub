@@ -39,23 +39,23 @@ VITE_API_BASE_URL=http://localhost:5000
 
 - `VITE_API_BASE_URL`: The base URL of your backend API. This should match the `BASE_URL` in your backend's `.env` file.
 
-2.  **Image to PDF Converter (Bulk)**
-3.  **PDF to Image Converter (All Pages)**
+2.  **Image to PDF Converter (Bulk, supports up to 10MB files)**
+3.  **PDF to Image Converter (All Pages, improved conversion)**
 4.  **Link Shortener**
 5.  **Text to PDF Generator**
 6.  **PDF Merger**
 7.  **PDF Splitter**
 8.  **Word to PDF Converter**
-9.  **PDF to Word Converter (Placeholder)**
-10. **Excel to PDF Converter (Placeholder)**
-11. **PDF to Excel Converter (Placeholder)**
+9.  **PDF to Word Converter**
+10. **Excel to PDF Converter**
+11. **PDF to Excel Converter**
 12. **Text Case Converter (UPPERCASE, lowercase, Title Case)**
 13. **QR Code Generator (Text/Link to QR)**
-14. **QR Code Scanner (Upload image -> Extract data)**
-15. **Image Resizer (Bulk)**
-16. **Image Compressor (Bulk)**
-17. **Image Format Converter (WebP, PNG, JPG, GIF, etc.)**
-18. **Base64 Encoder/Decoder (Text or Image)**
+14. **QR Code Scanner (Upload image -> Extract data, supports up to 10MB files)**
+15. **Image Resizer (Bulk, supports up to 10MB files)**
+16. **Image Compressor (Bulk, supports up to 10MB files)**
+17. **Image Format Converter (WebP, PNG, JPG, GIF, etc., supports up to 10MB files)**
+18. **Base64 Encoder/Decoder (Text or Image, supports up to 10MB files for images)**
 19. **Markdown to HTML Converter**
 20. **HTML to Markdown Converter**
 21. **JSON Formatter & Validator**
@@ -115,4 +115,3 @@ This application includes JWT-based authentication. Some premium/bulk features a
 **4. MongoDB:**
    Ensure you have a MongoDB instance running. The application is configured to connect to `mongodb://localhost:27017/utilityhub`. If your MongoDB is running on a different port or location, update the `MONGO_URI` in `backend/.env` accordingly.
 
-**Note:** For features like "PDF to Word Converter", "Excel to PDF Converter", and "PDF to Excel Converter", placeholder implementations are in place. These would require integration with external APIs or specialized libraries for full functionality.

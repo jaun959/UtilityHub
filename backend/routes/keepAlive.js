@@ -7,7 +7,7 @@ const generateRandomString = (sizeInBytes) => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   const charactersLength = characters.length;
-  for (let i = 0; i < sizeInBytes; i++) {
+  for (let i = 0; i < sizeInBytes; i += 1) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
       .from('utilityhub')
       .upload(`keep-alive/${fileName}`, randomText, {
         contentType: 'text/plain',
-        upsert: true
+        upsert: true,
       });
 
     if (error) {
@@ -34,10 +34,10 @@ router.post('/', async (req, res) => {
       return res.status(500).json({ msg: 'Failed to upload file to Supabase', error: error.message });
     }
 
-    res.status(200).json({ msg: 'Keep-alive file uploaded successfully', path: data.path });
+    return res.status(200).json({ msg: 'Keep-alive file uploaded successfully', path: data.path });
   } catch (err) {
     console.error('Server error in keep-alive endpoint:', err);
-    res.status(500).send('Server Error');
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 

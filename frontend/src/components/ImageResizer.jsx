@@ -6,18 +6,16 @@ const ImageResizer = () => {
   const [resizedImageSrc, setResizedImageSrc] = useState(null);
   const [newWidth, setNewWidth] = useState('');
   const [newHeight, setNewHeight] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [originalDimensions, setOriginalDimensions] = useState({ width: 0, height: 0 });
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 10 * 1024 * 1024;
 
     if (!file) {
       setOriginalImage(null);
       setResizedImageSrc(null);
-      setError('');
       return;
     }
 
@@ -36,8 +34,6 @@ const ImageResizer = () => {
       e.target.value = '';
       return;
     }
-
-    setError('');
     setOriginalImage(file);
 
     const reader = new FileReader();
@@ -68,7 +64,6 @@ const ImageResizer = () => {
     }
 
     setLoading(true);
-    setError('');
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -107,7 +102,7 @@ const ImageResizer = () => {
       <h2 className="text-2xl font-bold mb-4">Image Resizer</h2>
 
       <div className="mb-4">
-        <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="image_file">Upload Image</label>
+        <label className="block mb-2 text-sm font-medium text-black" htmlFor="image_file">Upload Image</label>
         <input
           className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           id="image_file"

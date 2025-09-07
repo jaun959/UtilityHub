@@ -7,5 +7,5 @@ module.exports = (roles) => (req, res, next) => {
     return res.status(403).json({ msg: 'Forbidden: Insufficient role' });
   }
 
-  next();
+  return next();
 };

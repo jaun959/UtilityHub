@@ -11,7 +11,7 @@ const PngToJpgConverter = () => {
   const onFileChange = (e) => {
     const files = Array.from(e.target.files);
     const allowedTypes = ['image/png'];
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 10 * 1024 * 1024;
 
     const validFiles = [];
     let hasInvalidFile = false;
@@ -23,7 +23,7 @@ const PngToJpgConverter = () => {
         return;
       }
       if (file.size > maxSize) {
-        toast.error(`File too large: ${file.name}. Maximum size is 5MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
         hasInvalidFile = true;
         return;
       }
@@ -71,8 +71,8 @@ const PngToJpgConverter = () => {
       <h2 className="text-2xl font-bold mb-4">PNG to JPG Converter</h2>
       <form onSubmit={onSubmit}>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="multiple_files">Upload multiple files</label>
-          <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} />
+          <label className="block mb-2 text-sm font-medium text-black" htmlFor="multiple_files">Upload multiple files</label>
+          <input accept=".png" className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} />
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'Convert'}</button>
       </form>

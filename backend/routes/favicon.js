@@ -55,27 +55,30 @@ router.post('/', async (req, res) => {
     }
 
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const zipBuffer = await new Promise(async (resolve, reject) => {
+    const zipBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      for (const faviconUrl of faviconUrls) {
+      const downloadPromises = faviconUrls.map(async (faviconUrl) => {
         const fileData = await downloadFile(faviconUrl);
         if (fileData && fileData.buffer) {
           const fileName = `favicon-${path.basename(new URL(faviconUrl).pathname || 'default.ico')}`;
           archive.append(fileData.buffer, { name: fileName });
         }
-      }
-      archive.finalize();
+      });
+
+      Promise.all(downloadPromises)
+        .then(() => archive.finalize())
+        .catch((err) => reject(err));
     });
 
     const zipFileName = `favicons-${Date.now()}.zip`;
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('utilityhub')
       .upload(`favicons/${zipFileName}`, zipBuffer, {
         contentType: 'application/zip',
@@ -91,11 +94,10 @@ router.post('/', async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(`favicons/${zipFileName}`);
 
-    res.status(200).json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.status(200).json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error('Error extracting favicons:', err);
-    res.status(500).json({ msg: 'Failed to extract favicons. Please check the URL.', error: err.message });
+    return res.status(500).json({ msg: 'Failed to extract favicons. Please check the URL.', error: err.message });
   }
 });
 

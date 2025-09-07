@@ -21,12 +21,12 @@ router.post('/text-to-pdf', async (req, res) => {
     doc.end();
 
     const pdfBuffer = await pdfBufferPromise;
-    
+
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
@@ -42,7 +42,6 @@ router.post('/text-to-pdf', async (req, res) => {
       'Content-Disposition': `attachment; filename="${zipFileName}"`,
     });
     res.end(archiveBuffer);
-
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

@@ -1,7 +1,7 @@
 {
   "name": "UtilityHub-frontend",
   "description": "A web-based platform offering a collection of utility tools, built with MERN stack (MongoDB, Express.js, React.js, Node.js) and TailwindCSS",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -9,6 +9,7 @@
     "axios": "^1.11.0",
     "diff-match-patch": "^1.0.5",
     "dom-to-image": "^2.6.0",
+    "eslint": "^8.57.1",
     "js-md5": "^0.8.3",
     "jspdf": "^3.0.2",
     "jsqr": "^1.4.0",
@@ -20,12 +21,12 @@
     "qrcode.react": "^4.2.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-helmet-async": "^2.0.5",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.8.2",
     "react-toastify": "^11.0.5",
     "turndown": "^7.2.1",
-    "web-vitals": "^2.1.4",
-    "react-helmet-async": "^2.0.5"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "dev": "vite",
@@ -54,6 +55,9 @@
     "@tailwindcss/postcss": "^4.1.13",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.21",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.13",
     "vite": "^6.3.5"

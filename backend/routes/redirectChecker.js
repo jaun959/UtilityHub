@@ -15,32 +15,40 @@ router.post('/', async (req, res) => {
   let currentUrl = url;
 
   try {
-    for (let i = 0; i < 10; i++) {
-      const response = await axios.head(currentUrl, { 
-        maxRedirects: 0,
-        validateStatus: status => status >= 200 && status < 400
-      });
+    for (let i = 0; i < 10; i += 1) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const response = await axios.head(currentUrl, {
+          maxRedirects: 0,
+          validateStatus: (status) => status >= 200 && status < 400,
+        });
 
-      redirectChain.push({ url: currentUrl, status: response.status });
+        redirectChain.push({ url: currentUrl, status: response.status });
 
-      if (response.status >= 300 && response.status < 400 && response.headers.location) {
-        currentUrl = response.headers.location;
-        if (!currentUrl.startsWith('http')) {
-          const urlObj = new URL(response.request.res.responseUrl);
-          currentUrl = new URL(currentUrl, urlObj).href;
+        if (response.status >= 300 && response.status < 400 && response.headers.location) {
+          currentUrl = response.headers.location;
+          if (!currentUrl.startsWith('http')) {
+            const urlObj = new URL(response.request.res.responseUrl);
+            currentUrl = new URL(currentUrl, urlObj).href;
+          }
+        } else {
+          break;
         }
-      } else {
+      } catch (err) {
         break;
       }
     }
 
-    if (redirectChain.length === 0 || redirectChain[redirectChain.length - 1].url !== currentUrl) {
-        const finalResponse = await axios.get(currentUrl);
-        redirectChain.push({ url: finalResponse.request.res.responseUrl, status: finalResponse.status });
+    if (redirectChain.length === 0
+      || redirectChain[redirectChain.length - 1].url !== currentUrl) {
+      const finalResponse = await axios.get(currentUrl);
+      redirectChain.push({
+        url: finalResponse.request.res.responseUrl,
+        status: finalResponse.status,
+      });
     }
 
-    res.status(200).json({ chain: redirectChain });
-
+    return res.status(200).json({ chain: redirectChain });
   } catch (err) {
     console.error('Error checking redirects:', err);
     let errorMessage = 'Failed to check redirects.';
@@ -54,7 +62,7 @@ router.post('/', async (req, res) => {
     } else {
       errorMessage = err.message;
     }
-    res.status(500).json({ msg: errorMessage });
+    return res.status(500).json({ msg: errorMessage });
   }
 });
 

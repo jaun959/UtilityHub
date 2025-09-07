@@ -1,12 +1,11 @@
-
 const router = require('express').Router();
 const shortid = require('shortid');
 const Url = require('../models/Url');
 
 router.post('/', async (req, res) => {
   const { originalUrl } = req.body;
-  const baseUrl = process.env.BASE_URL;
-  
+  let baseUrl = process.env.BASE_URL;
+
   if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
     baseUrl = `https://${baseUrl}`;
   }
@@ -21,34 +20,35 @@ router.post('/', async (req, res) => {
     let url = await Url.findOne({ originalUrl });
 
     if (url) {
-      res.json(url);
-    } else {
-      let urlCode;
-      let shortUrl;
-      let isUnique = false;
-
-      while (!isUnique) {
-        urlCode = shortid.generate();
-        shortUrl = `${baseUrl}/shorten/${urlCode}`;
-        const existingUrl = await Url.findOne({ urlCode });
-        if (!existingUrl) {
-          isUnique = true;
-        }
-      }
-
-      url = new Url({
-        originalUrl,
-        shortUrl,
-        urlCode,
-        date: new Date()
-      });
-
-      await url.save();
-      res.json(url);
+      return res.json(url);
     }
+    let urlCode;
+    let shortUrl;
+    let isUnique = false;
+
+    while (!isUnique) {
+      // eslint-disable-next-line no-await-in-loop
+      urlCode = shortid.generate();
+      shortUrl = `${baseUrl}/shorten/${urlCode}`;
+      // eslint-disable-next-line no-await-in-loop
+      const existingUrl = await Url.findOne({ urlCode });
+      if (!existingUrl) {
+        isUnique = true;
+      }
+    }
+
+    url = new Url({
+      originalUrl,
+      shortUrl,
+      urlCode,
+      date: new Date(),
+    });
+
+    await url.save();
+    return res.json(url);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Server error during URL shortening.' });
+    return res.status(500).json({ msg: 'Server error during URL shortening.' });
   }
 });
 
@@ -61,12 +61,11 @@ router.get('/:code', async (req, res) => {
 
     if (url) {
       return res.redirect(url.originalUrl);
-    } else {
-      return res.status(404).json('No url found');
     }
+    return res.status(404).json('No url found');
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Server error during URL redirection.' });
+    return res.status(500).json({ msg: 'Server error during URL redirection.' });
   }
 });
 

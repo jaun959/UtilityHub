@@ -12,7 +12,7 @@ const ImageCompressor = () => {
   const onFileChange = (e) => {
     const files = Array.from(e.target.files);
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/tiff', 'image/avif'];
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 10 * 1024 * 1024;
 
     const validFiles = [];
     let hasInvalidFile = false;
@@ -77,11 +77,11 @@ const ImageCompressor = () => {
       <h2 className="text-2xl font-bold mb-4">Image Compressor</h2>
       <form onSubmit={onSubmit}>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="multiple_files">Upload multiple image files</label>
+          <label className="block mb-2 text-sm font-medium text-black" htmlFor="multiple_files">Upload multiple image files</label>
           <input accept="image/*" className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} />
         </div>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="quality">Quality (1-100%)</label>
+          <label className="block mb-2 text-sm font-medium text-black" htmlFor="quality">Quality (1-100%)</label>
           <input type="number" id="quality" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="80" value={quality} onChange={onQualityChange} />
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Compressing...' : 'Compress Images'}</button>

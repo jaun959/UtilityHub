@@ -8,8 +8,16 @@ const ImageGrayscaler = () => {
 
   const onFileChange = (e) => {
     const file = e.target.files[0];
+    const maxFileSize = 10 * 1024 * 1024;
+
     if (file && file.type.startsWith('image/')) {
-      setSelectedFile(file);
+      if (file.size > maxFileSize) {
+        toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
+        setSelectedFile(null);
+        e.target.value = null;
+      } else {
+        setSelectedFile(file);
+      }
     } else {
       setSelectedFile(null);
       toast.error('Please select an image file.');

@@ -8,27 +8,13 @@ This directory contains the frontend application for the Utility Hub, built with
 *   Vite (as the build tool)
 *   TailwindCSS
 *   Axios for API requests
+*   ESLint for code quality
 
-## Setup and Running
+For detailed setup and running instructions, refer to the [main project README.md](../../README.md).
 
-1.  **Install Dependencies:**
-    Navigate to this directory in your terminal and run:
-    ```bash
-    npm install
-    ```
+## File Upload Limits
 
-2.  **Environment Variables:**
-    Create a `.env` file in this directory with the following variable:
-    ```
-    VITE_API_BASE_URL=http://localhost:5000
-    ```
-    *   `VITE_API_BASE_URL`: The base URL of your backend API. This should match the `BASE_URL` in your backend's `.env` file.
-
-3.  **Run the Development Server:**
-    ```bash
-    npm run dev
-    ```
-    The frontend application will typically open in your browser at `http://localhost:5173` (or another available port).
+Many of the tools in the Utility Hub now support file uploads up to 10MB, providing greater flexibility for larger files.
 
 ## Project Structure
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -9,9 +9,17 @@ const ImageToBase64Converter = () => {
 
   const onFileChange = (e) => {
     const file = e.target.files[0];
+    const maxFileSize = 10 * 1024 * 1024;
+
     if (file && file.type.startsWith('image/')) {
-      setSelectedFile(file);
-      setBase64String('');
+      if (file.size > maxFileSize) {
+        toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
+        setSelectedFile(null);
+        e.target.value = null;
+      } else {
+        setSelectedFile(file);
+        setBase64String('');
+      }
     } else {
       setSelectedFile(null);
       setBase64String('');

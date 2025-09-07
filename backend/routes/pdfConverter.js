@@ -1,51 +1,55 @@
 const router = require('express').Router();
-const axios = require('axios');
 const multer = require('multer');
 const { PDFDocument, degrees } = require('pdf-lib');
 const archiver = require('archiver');
-const { pdfToPng } = require('pdf-to-png-converter');
-const { createCanvas } = require('canvas');
-
+const { fromBuffer } = require('pdf2pic');
 const { createClient } = require('@supabase/supabase-js');
+const pdfParse = require('pdf-parse');
+
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/pdf-to-image
 // @desc    Convert PDF to images
 // @access  Public
-// @route   POST /api/convert/pdf-to-image
-// @desc    Convert PDF to images
-// @access  Public
-// @route   POST /api/convert/pdf-to-image
-// @desc    Convert PDF to images
-// @access  Public
 router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
   try {
-    const file = req.file;
+    const { file } = req;
+    if (!file) {
+      return res.status(400).json({ msg: 'No file uploaded.' });
+    }
     const pdfBuffer = file.buffer;
 
-    const pngPages = await pdfToPng(pdfBuffer, {
-      viewportScale: 2.0, // Scale for higher quality images
-    });
+    const options = {
+      density: 100,
+      saveFilename: 'page',
+      savePath: './',
+      format: 'png',
+      width: 768,
+      height: 1024,
+    };
+
+    const convert = fromBuffer(pdfBuffer, options);
+    const pngPages = await convert.bulk(-1, { response: 'buffer' });
 
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      for (let i = 0; i < pngPages.length; i++) {
-        archive.append(pngPages[i].content, { name: `page-${i + 1}.png` });
+      for (let i = 0; i < pngPages.length; i += 1) {
+        archive.append(pngPages[i].buffer, { name: `page-${i + 1}.png` });
       }
       archive.finalize();
     });
 
     const zipFileName = `converted_images_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -59,11 +63,10 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -72,19 +75,22 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
 // @access  Public
 router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
   try {
+    const { files } = req;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ msg: 'No files uploaded.' });
+    }
+
     const PDFMerger = (await import('pdf-merger-js')).default;
     const merger = new PDFMerger();
-    for (const file of req.files) {
-      await merger.add(file.buffer);
-    }
+    await Promise.all(files.map((file) => merger.add(file.buffer)));
 
     const mergedPdfBuffer = await merger.saveAsBuffer();
 
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
@@ -95,7 +101,7 @@ router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
     });
 
     const zipFileName = `merged_pdf_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -109,13 +115,12 @@ router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error('Error in merge-pdfs route:', err);
     console.error('Error message:', err.message);
     console.error('Error stack:', err.stack);
-    res.status(500).send('Server Error');
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -125,45 +130,52 @@ router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
 router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
   try {
     const { ranges } = req.body;
-    const file = req.file;
+    const { file } = req;
 
     if (!file) {
-      console.error('Error splitting PDF: No PDF file uploaded.');
-      return res.status(400).json({ message: 'No PDF file uploaded.' });
+      return res.status(400).json({ msg: 'No PDF file uploaded.' });
     }
 
     if (!ranges) {
-      console.error('Error splitting PDF: No page ranges provided.');
-      return res.status(400).json({ message: 'No page ranges provided.' });
+      return res.status(400).json({ msg: 'No page ranges provided.' });
     }
 
     const existingPdfBytes = file.buffer;
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
+    const totalPages = pdfDoc.getPageCount();
 
     const newPdfDoc = await PDFDocument.create();
 
-    const pageRanges = ranges.split(',').map(r => r.trim());
-    for (const range of pageRanges) {
+    const pageRanges = ranges.split(',').map((r) => r.trim());
+    const pageNumbers = [];
+    pageRanges.forEach((range) => {
       if (range.includes('-')) {
-        const [start, end] = range.split('-').map(n => parseInt(n, 10));
-        for (let i = start; i <= end; i++) {
-          const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [i - 1]);
-          newPdfDoc.addPage(copiedPage);
+        const [start, end] = range.split('-').map((n) => parseInt(n, 10));
+        if (Number.isNaN(start) || Number.isNaN(end)
+        || start < 1 || end > totalPages || start > end) {
+          throw new Error(`Invalid page range: ${range}`);
+        }
+        for (let i = start; i <= end; i += 1) {
+          pageNumbers.push(i - 1);
         }
       } else {
         const pageNum = parseInt(range, 10);
-        const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [pageNum - 1]);
-        newPdfDoc.addPage(copiedPage);
+        if (Number.isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
+          throw new Error(`Invalid page number: ${pageNum}`);
+        }
+        pageNumbers.push(pageNum - 1);
       }
-    }
+    });
+    const copiedPages = await newPdfDoc.copyPages(pdfDoc, pageNumbers);
+    copiedPages.forEach((page) => newPdfDoc.addPage(page));
 
     const newPdfBytes = await newPdfDoc.save();
 
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
@@ -174,7 +186,7 @@ router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
     });
 
     const zipFileName = `split_pdf_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -188,13 +200,12 @@ router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error('Error in split-pdf route:', err);
     console.error('Error message:', err.message);
     console.error('Error stack:', err.stack);
-    res.status(500).send('Server Error');
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -203,21 +214,19 @@ router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
 // @access  Public
 router.post('/pdf-to-text', upload.single('pdf'), async (req, res) => {
   try {
-    const file = req.file;
+    const { file } = req;
     if (!file) {
       return res.status(400).json({ msg: 'No PDF file uploaded.' });
     }
 
     const pdfBuffer = file.buffer;
-    const pdfParse = require('pdf-parse');
     const data = await pdfParse(pdfBuffer);
     const extractedText = data.text;
 
-    res.send(extractedText);
-
+    return res.send(extractedText);
   } catch (err) {
     console.error('Error during PDF to text conversion:', err);
-    res.status(500).send('Server Error');
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -226,7 +235,7 @@ router.post('/pdf-to-text', upload.single('pdf'), async (req, res) => {
 // @access  Public
 router.post('/pdf-rotate', upload.single('pdf'), async (req, res) => {
   try {
-    const file = req.file;
+    const { file } = req;
     const { angle } = req.body;
 
     if (!file) {
@@ -239,17 +248,17 @@ router.post('/pdf-rotate', upload.single('pdf'), async (req, res) => {
     const pdfBuffer = file.buffer;
     const pdfDoc = await PDFDocument.load(pdfBuffer);
 
-    for (const page of pdfDoc.getPages()) {
+    pdfDoc.getPages().forEach((page) => {
       page.setRotation(degrees(Number(angle)));
-    }
+    });
 
     const modifiedPdfBytes = await pdfDoc.save();
 
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
@@ -260,7 +269,7 @@ router.post('/pdf-rotate', upload.single('pdf'), async (req, res) => {
     });
 
     const zipFileName = `rotated_pdf_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -274,11 +283,10 @@ router.post('/pdf-rotate', upload.single('pdf'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error('Error during PDF rotation:', err);
-    res.status(500).send('Server Error');
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 

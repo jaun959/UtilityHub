@@ -1,10 +1,8 @@
-
 require('dotenv').config();
 
 const mongoose = require('mongoose');
 const { createClient } = require('@supabase/supabase-js');
 
-// Check for critical environment variables
 if (!process.env.SUPABASE_URL) {
   console.error('Error: SUPABASE_URL environment variable is not set.');
   process.exit(1);
@@ -34,11 +32,10 @@ mongoose.connect(process.env.MONGO_URI);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
+db.once('open', () => {
   console.log('MongoDB connected!');
   testSupabaseConnection();
 });
-
 
 const express = require('express');
 const cors = require('cors');
@@ -50,51 +47,67 @@ app.use(cors());
 app.use(express.json());
 
 const apiActivityTracker = require('./middleware/apiActivityTracker');
+
 app.use(apiActivityTracker);
 
 const shortener = require('./routes/shortener');
+
 app.use('/shorten', shortener);
 
 const imageConverter = require('./routes/imageConverter');
+
 app.use('/api/convert', imageConverter);
 
 const pdfConverter = require('./routes/pdfConverter');
+
 app.use('/api/convert', pdfConverter);
 
 const textToPdf = require('./routes/textToPdf');
+
 app.use('/api/convert', textToPdf);
 
 const officeConverter = require('./routes/officeConverter');
+
 app.use('/api/convert', officeConverter);
 
 const textConverter = require('./routes/textConverter');
+
 app.use('/api/convert', textConverter);
 
 const auth = require('./routes/auth');
+
 app.use('/api/auth', auth);
 
 const keepAlive = require('./routes/keepAlive');
+
 app.use('/api/keep-alive', keepAlive);
 
 const cleanSupabase = require('./routes/cleanSupabase');
+
 app.use('/api/clean-supabase', cleanSupabase);
 
 const screenshot = require('./routes/screenshot');
+
 app.use('/api/screenshot', screenshot);
 
 const favicon = require('./routes/favicon');
+
 app.use('/api/favicon', favicon);
 
 const redirectChecker = require('./routes/redirectChecker');
+
 app.use('/api/redirect-checker', redirectChecker);
 
 const jsonXmlConverter = require('./routes/jsonXmlConverter');
+
 app.use('/api/convert', jsonXmlConverter);
 
 const passwordStrength = require('./routes/passwordStrength');
+
 app.use('/api/password-strength', passwordStrength);
 
 const seoTools = require('./routes/seoTools');
+
 app.use('/api/seo', seoTools);
 
 app.get('/', (req, res) => {

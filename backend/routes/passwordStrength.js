@@ -54,7 +54,7 @@ router.post('/', (req, res) => {
   }
 
   const { score, feedback } = checkPasswordStrength(password);
-  res.status(200).json({ score, feedback });
+  return res.status(200).json({ score, feedback });
 });
 
 module.exports = router;

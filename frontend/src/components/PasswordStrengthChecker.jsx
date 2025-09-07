@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+
+const debounce = (func, delay) => {
+  let timeout;
+  return function (...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), delay);
+  };
+};
 
 const PasswordStrengthChecker = () => {
   const [password, setPassword] = useState('');
   const [strengthScore, setStrengthScore] = useState(0);
   const [feedback, setFeedback] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const debounce = (func, delay) => {
-    let timeout;
-    return function(...args) {
-      const context = this;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(context, args), delay);
-    };
-  };
 
   const checkStrength = async (pwd) => {
     if (pwd.length === 0) {
@@ -39,10 +39,10 @@ const PasswordStrengthChecker = () => {
     }
   };
 
-  const debouncedCheckStrength = debounce(checkStrength, 500);
+  const debouncedCheckStrengthRef = useRef(debounce(checkStrength, 500));
 
   useEffect(() => {
-    debouncedCheckStrength(password);
+    debouncedCheckStrengthRef.current(password);
   }, [password]);
 
   const getStrengthColor = (score) => {
@@ -79,7 +79,7 @@ const PasswordStrengthChecker = () => {
 
       {password.length > 0 && (
         <div className="mt-4 p-4 border rounded-md bg-white shadow">
-          <h3 className="text-xl font-bold mb-2">Strength: 
+          <h3 className="text-xl font-bold mb-2">Strength:
             <span className={`${getStrengthColor(strengthScore)} ml-2`}>
               {getStrengthText(strengthScore)}
             </span>

@@ -3,12 +3,11 @@ const router = require('express').Router();
 const multer = require('multer');
 const archiver = require('archiver');
 const sharp = require('sharp');
-const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const fsp = require('fs').promises;
-
 const { createClient } = require('@supabase/supabase-js');
+
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -17,30 +16,38 @@ const upload = multer({ storage: multer.memoryStorage() });
 // @access  Public
 router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
   try {
+    const { files } = req;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ msg: 'No image files uploaded.' });
+    }
+
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      for (const file of req.files) {
+      const conversionPromises = files.map(async (file) => {
         const imageBuffer = file.buffer;
-        const originalname = file.originalname;
+        const { originalname } = file;
         const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
 
         const jpgBuffer = await sharp(imageBuffer).jpeg().toBuffer();
 
         archive.append(jpgBuffer, { name: `${nameWithoutExt}_converted.jpg` });
-      }
-      archive.finalize();
+      });
+
+      Promise.all(conversionPromises)
+        .then(() => archive.finalize())
+        .catch((err) => reject(err));
     });
 
     const zipFileName = `converted_png_to_jpg_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -54,12 +61,11 @@ router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error(err);
     console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -68,7 +74,7 @@ router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
 // @access  Public
 router.get('/download-image/:filename', async (req, res) => {
   try {
-    const filename = req.params.filename;
+    const { filename } = req.params;
     const { data, error } = await supabase.storage.from('utilityhub').download(filename);
 
     if (error) {
@@ -77,10 +83,10 @@ router.get('/download-image/:filename', async (req, res) => {
 
     res.set('Content-Type', data.type);
     res.set('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send(data);
+    return res.send(data);
   } catch (err) {
     console.error(err);
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -89,8 +95,13 @@ router.get('/download-image/:filename', async (req, res) => {
 // @access  Public
 router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
   try {
+    const { files } = req;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ msg: 'No image files uploaded.' });
+    }
+
     const pdfDoc = new PDFDocument({
-      autoFirstPage: false
+      autoFirstPage: false,
     });
 
     const buffers = [];
@@ -100,57 +111,78 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
       pdfDoc.on('error', reject);
     });
 
-    for (const file of req.files) {
-      let tempImagePath = '';
-      try {
-        const imageBuffer = file.buffer;
+    const imageProcessingPromises = files.map((file) => new Promise((resolve, reject) => {
+      (async () => {
+        let tempImagePath = '';
+        try {
+          const imageBuffer = file.buffer;
 
-        const image = sharp(imageBuffer);
-        const metadata = await image.metadata();
-        const pngBuffer = await image.png().toBuffer();
+          const image = sharp(imageBuffer);
+          const metadata = await image.metadata();
+          const pngBuffer = await image.png().toBuffer();
 
-        tempImagePath = path.join(os.tmpdir(), `temp_image_${Date.now()}.png`);
-        await fsp.writeFile(tempImagePath, pngBuffer);
+          tempImagePath = path.join(os.tmpdir(), `temp_image_${Date.now()}.png`);
+          await fsp.writeFile(tempImagePath, pngBuffer);
 
-        const A4_WIDTH = 595.28;
-        const A4_HEIGHT = 841.89;
+          const A4_WIDTH = 595.28;
+          const A4_HEIGHT = 841.89;
 
-        const imgWidth = metadata.width;
-        const imgHeight = metadata.height;
+          const imgWidth = metadata.width;
+          const imgHeight = metadata.height;
 
-        const scaleX = A4_WIDTH / imgWidth;
-        const scaleY = A4_HEIGHT / imgHeight;
-        const scale = Math.min(scaleX, scaleY);
+          const scaleX = A4_WIDTH / imgWidth;
+          const scaleY = A4_HEIGHT / imgHeight;
+          const scale = Math.min(scaleX, scaleY);
 
-        const finalWidth = imgWidth * scale;
-        const finalHeight = imgHeight * scale;
+          const finalWidth = imgWidth * scale;
+          const finalHeight = imgHeight * scale;
 
-        const x = (A4_WIDTH - finalWidth) / 2;
-        const y = (A4_HEIGHT - finalHeight) / 2;
+          const x = (A4_WIDTH - finalWidth) / 2;
+          const y = (A4_HEIGHT - finalHeight) / 2;
 
-        pdfDoc.addPage({ size: 'A4' });
-        pdfDoc.image(tempImagePath, x, y, { width: finalWidth, height: finalHeight });
-      } catch (imageErr) {
-        console.error(`Error processing image ${file.originalname}:`, imageErr);
-      } finally {
-        if (tempImagePath) {
-          try {
-            await fsp.unlink(tempImagePath);
-          } catch (unlinkErr) {
-            console.error(`Error deleting temp image file ${tempImagePath}:`, unlinkErr);
+          pdfDoc.addPage({ size: 'A4' });
+          pdfDoc.image(tempImagePath, x, y, { width: finalWidth, height: finalHeight });
+          resolve();
+        } catch (imageErr) {
+          console.error(`Error processing image ${file.originalname}:`, imageErr);
+          pdfDoc.end();
+          reject(new Error(`Failed to process image ${file.originalname}: ${imageErr.message}`));
+        } finally {
+          if (tempImagePath) {
+            try {
+              await fsp.unlink(tempImagePath);
+            } catch (unlinkErr) {
+              console.error(`Error deleting temp image file ${tempImagePath}:`, unlinkErr);
+            }
           }
         }
-      }
-    }
+      })();
+    }));
+
+    await Promise.all(imageProcessingPromises);
 
     pdfDoc.end();
     const pdfBuffer = await pdfGenerationPromise;
 
-    const pdfFileName = `converted_images_${Date.now()}.pdf`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const archive = archiver('zip', {
+      zlib: { level: 9 },
+    });
+
+    const archiveBuffer = await new Promise((resolve, reject) => {
+      const archiveBuffers = [];
+      archive.on('data', (data) => archiveBuffers.push(data));
+      archive.on('end', () => resolve(Buffer.concat(archiveBuffers)));
+      archive.on('error', (err) => reject(err));
+
+      archive.append(pdfBuffer, { name: `converted_images_${Date.now()}.pdf` });
+      archive.finalize();
+    });
+
+    const zipFileName = `converted_images_${Date.now()}.zip`;
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
-      .upload(pdfFileName, pdfBuffer, {
-        contentType: 'application/pdf',
+      .upload(zipFileName, archiveBuffer, {
+        contentType: 'application/zip',
       });
 
     if (uploadError) {
@@ -159,14 +191,13 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
 
     const { data: publicUrlData } = supabase.storage
       .from('utilityhub')
-      .getPublicUrl(pdfFileName);
+      .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: pdfFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error(err);
     console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -175,34 +206,50 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
 // @access  Public
 router.post('/resize-image', upload.array('images'), async (req, res) => {
   try {
+    const { files } = req;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ msg: 'No image files uploaded.' });
+    }
+
     const { width, height } = req.body;
+    const parsedWidth = parseInt(width, 10);
+    const parsedHeight = parseInt(height, 10);
+
+    if (Number.isNaN(parsedWidth) || parsedWidth <= 0
+      || Number.isNaN(parsedHeight) || parsedHeight <= 0) {
+      return res.status(400).json({ msg: 'Invalid width or height provided. Must be positive numbers.' });
+    }
+
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      for (const file of req.files) {
+      const resizePromises = files.map(async (file) => {
         const imageBuffer = file.buffer;
-        const originalname = file.originalname;
+        const { originalname } = file;
         const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
 
         const resizedBuffer = await sharp(imageBuffer)
-          .resize(parseInt(width), parseInt(height))
+          .resize(parsedWidth, parsedHeight)
           .jpeg()
           .toBuffer();
 
         archive.append(resizedBuffer, { name: `${nameWithoutExt}_resized.jpg` });
-      }
-      archive.finalize();
+      });
+
+      Promise.all(resizePromises)
+        .then(() => archive.finalize())
+        .catch((err) => reject(err));
     });
 
     const zipFileName = `resized_images_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -216,12 +263,11 @@ router.post('/resize-image', upload.array('images'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error(err);
     console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -230,37 +276,47 @@ router.post('/resize-image', upload.array('images'), async (req, res) => {
 // @access  Public
 router.post('/compress-image', upload.array('images'), async (req, res) => {
   try {
-    if (!req.files || req.files.length === 0) {
+    const { files } = req;
+    if (!files || files.length === 0) {
       return res.status(400).json({ msg: 'No image files uploaded for compression.' });
     }
 
     const { quality } = req.body;
+    const parsedQuality = parseInt(quality, 10);
+
+    if (Number.isNaN(parsedQuality) || parsedQuality < 0 || parsedQuality > 100) {
+      return res.status(400).json({ msg: 'Invalid quality provided. Must be a number between 0 and 100.' });
+    }
+
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      for (const file of req.files) {
+      const compressionPromises = files.map(async (file) => {
         const imageBuffer = file.buffer;
-        const originalname = file.originalname;
+        const { originalname } = file;
         const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
 
         const compressedBuffer = await sharp(imageBuffer)
-          .jpeg({ quality: parseInt(quality) })
+          .jpeg({ quality: parsedQuality })
           .toBuffer();
 
         archive.append(compressedBuffer, { name: `${nameWithoutExt}_compressed.jpg` });
-      }
-      archive.finalize();
+      });
+
+      Promise.all(compressionPromises)
+        .then(() => archive.finalize())
+        .catch((err) => reject(err));
     });
 
     const zipFileName = `compressed_images_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -274,12 +330,11 @@ router.post('/compress-image', upload.array('images'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error(err);
     console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -288,20 +343,30 @@ router.post('/compress-image', upload.array('images'), async (req, res) => {
 // @access  Public
 router.post('/convert-image-format', upload.array('images'), async (req, res) => {
   try {
+    const { files } = req;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ msg: 'No image files uploaded.' });
+    }
+
     const { format } = req.body;
+    const allowedFormats = ['jpeg', 'png', 'webp', 'tiff', 'gif', 'avif']; // Add more if sharp supports them and they are desired
+    if (!format || !allowedFormats.includes(format.toLowerCase())) {
+      return res.status(400).json({ msg: `Invalid format provided. Allowed formats are: ${allowedFormats.join(', ')}` });
+    }
+
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      for (const file of req.files) {
+      const conversionPromises = files.map(async (file) => {
         const imageBuffer = file.buffer;
-        const originalname = file.originalname;
+        const { originalname } = file;
         const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
 
         const convertedBuffer = await sharp(imageBuffer)
@@ -309,12 +374,15 @@ router.post('/convert-image-format', upload.array('images'), async (req, res) =>
           .toBuffer();
 
         archive.append(convertedBuffer, { name: `${nameWithoutExt}_converted.${format}` });
-      }
-      archive.finalize();
+      });
+
+      Promise.all(conversionPromises)
+        .then(() => archive.finalize())
+        .catch((err) => reject(err));
     });
 
     const zipFileName = `converted_images_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -328,12 +396,11 @@ router.post('/convert-image-format', upload.array('images'), async (req, res) =>
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error(err);
     console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -344,19 +411,27 @@ router.post('/base64-image', upload.single('image'), async (req, res) => {
   try {
     const { type, base64String } = req.body;
 
-    if (type === 'encode' && req.file) {
+    if (type === 'encode') {
+      if (!req.file) {
+        return res.status(400).json({ msg: 'No image file uploaded for encoding.' });
+      }
       const imageBuffer = req.file.buffer;
       const base64 = imageBuffer.toString('base64');
-      res.json({ base64 });
-    } else if (type === 'decode' && base64String) {
+      return res.json({ base64 });
+    }
+
+    if (type === 'decode') {
+      if (!base64String) {
+        return res.status(400).json({ msg: 'No base64 string provided for decoding.' });
+      }
       const buffer = Buffer.from(base64String, 'base64');
       const outputFileName = `decoded-${Date.now()}.png`;
 
       const archive = archiver('zip', {
-        zlib: { level: 9 }
+        zlib: { level: 9 },
       });
 
-      const archiveBuffer = await new Promise(async (resolve, reject) => {
+      const archiveBuffer = await new Promise((resolve, reject) => {
         const buffers = [];
         archive.on('data', (data) => buffers.push(data));
         archive.on('end', () => resolve(Buffer.concat(buffers)));
@@ -367,7 +442,7 @@ router.post('/base64-image', upload.single('image'), async (req, res) => {
       });
 
       const zipFileName = `decoded_image_${Date.now()}.zip`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('utilityhub')
         .upload(zipFileName, archiveBuffer, {
           contentType: 'application/zip',
@@ -381,14 +456,13 @@ router.post('/base64-image', upload.single('image'), async (req, res) => {
         .from('utilityhub')
         .getPublicUrl(zipFileName);
 
-      res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-    } else {
-      res.status(400).send('Invalid request');
+      return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
     }
+    return res.status(400).json({ msg: 'Invalid request type. Must be "encode" or "decode".' });
   } catch (err) {
     console.error(err);
     console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -402,7 +476,7 @@ router.post('/image-flip', upload.single('image'), async (req, res) => {
     }
 
     const imageBuffer = req.file.buffer;
-    const originalname = req.file.originalname;
+    const { originalname } = req.file;
     const { direction } = req.body;
 
     let flippedBuffer;
@@ -418,10 +492,10 @@ router.post('/image-flip', upload.single('image'), async (req, res) => {
     const outputFileName = `flipped-${nameWithoutExt}.jpg`;
 
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
@@ -432,7 +506,7 @@ router.post('/image-flip', upload.single('image'), async (req, res) => {
     });
 
     const zipFileName = `flipped_image_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -446,11 +520,10 @@ router.post('/image-flip', upload.single('image'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error(err);
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -465,10 +538,10 @@ router.post('/image-to-base64', upload.single('image'), async (req, res) => {
 
     const imageBuffer = req.file.buffer;
     const base64 = imageBuffer.toString('base64');
-    res.json({ base64 });
+    return res.json({ base64 });
   } catch (err) {
     console.error(err);
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -482,7 +555,7 @@ router.post('/image-grayscale', upload.single('image'), async (req, res) => {
     }
 
     const imageBuffer = req.file.buffer;
-    const originalname = req.file.originalname;
+    const { originalname } = req.file;
 
     const grayscaleBuffer = await sharp(imageBuffer).grayscale().jpeg().toBuffer();
 
@@ -490,10 +563,10 @@ router.post('/image-grayscale', upload.single('image'), async (req, res) => {
     const outputFileName = `grayscale-${nameWithoutExt}.jpg`;
 
     const archive = archiver('zip', {
-      zlib: { level: 9 }
+      zlib: { level: 9 },
     });
 
-    const archiveBuffer = await new Promise(async (resolve, reject) => {
+    const archiveBuffer = await new Promise((resolve, reject) => {
       const buffers = [];
       archive.on('data', (data) => buffers.push(data));
       archive.on('end', () => resolve(Buffer.concat(buffers)));
@@ -504,7 +577,7 @@ router.post('/image-grayscale', upload.single('image'), async (req, res) => {
     });
 
     const zipFileName = `grayscale_image_${Date.now()}.zip`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
         contentType: 'application/zip',
@@ -518,11 +591,10 @@ router.post('/image-grayscale', upload.single('image'), async (req, res) => {
       .from('utilityhub')
       .getPublicUrl(zipFileName);
 
-    res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-
+    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error(err);
-    res.status(500).send(err.message);
+    return res.status(500).json({ msg: 'Server Error' });
   }
 });
 

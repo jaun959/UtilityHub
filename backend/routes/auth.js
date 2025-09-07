@@ -18,7 +18,7 @@ router.post('/register', async (req, res) => {
     user = new User({
       username,
       email,
-      password
+      password,
     });
 
     const salt = await bcrypt.genSalt(10);
@@ -29,22 +29,25 @@ router.post('/register', async (req, res) => {
     const payload = {
       user: {
         id: user.id,
-        role: user.role
-      }
+        role: user.role,
+      },
     };
 
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+    const token = await new Promise((resolve, reject) => {
+      jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' },
+        (err, tokenValue) => {
+          if (err) reject(err);
+          resolve(tokenValue);
+        },
+      );
+    });
+    return res.json({ token });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    return res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -55,7 +58,7 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    let user = await User.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: 'Invalid Credentials' });
     }
@@ -68,22 +71,25 @@ router.post('/login', async (req, res) => {
     const payload = {
       user: {
         id: user.id,
-        role: user.role
-      }
+        role: user.role,
+      },
     };
 
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+    const token = await new Promise((resolve, reject) => {
+      jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' },
+        (err, tokenValue) => {
+          if (err) reject(err);
+          resolve(tokenValue);
+        },
+      );
+    });
+    return res.json({ token });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    return res.status(500).json({ msg: 'Server error' });
   }
 });
 

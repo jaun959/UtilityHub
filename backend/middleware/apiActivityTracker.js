@@ -14,15 +14,14 @@ const apiActivityTracker = async (req, res, next) => {
     await TotalUsage.findOneAndUpdate(
       {},
       { $inc: { totalCount: 1 } },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     await ServiceUsage.findOneAndUpdate(
       { endpoint: req.originalUrl },
       { $inc: { count: 1 } },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
-
   } catch (err) {
     console.error('Error saving API activity:', err.message);
   }

@@ -1,4 +1,3 @@
-const cron = require('node-cron');
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -14,7 +13,7 @@ const cleanSupabaseStorage = async () => {
   try {
     const { data: files, error: listError } = await supabase.storage
       .from(SUPABASE_BUCKET_NAME)
-      .list('', { 
+      .list('', {
         limit: 100,
         offset: 0,
         sortBy: { column: 'created_at', order: 'asc' },
@@ -29,10 +28,10 @@ const cleanSupabaseStorage = async () => {
       return;
     }
 
-    const filesToDelete = files.filter(file => {
-      const fileCreatedAt = new Date(file.created_at);
+    const filesToDelete = files.filter((file) => {
+      const fileCreatedAt = new Date(file.created.at);
       return fileCreatedAt < sevenDaysAgo;
-    }).map(file => file.name);
+    }).map((file) => file.name);
 
     if (filesToDelete.length > 0) {
       console.log(`Found ${filesToDelete.length} files older than ${DAYS_TO_KEEP} days to delete.`);
@@ -52,14 +51,4 @@ const cleanSupabaseStorage = async () => {
   }
 };
 
-const startSupabaseCleaner = () => {
-  cron.schedule('0 2 * * *', () => {
-    cleanSupabaseStorage();
-  }, {
-    scheduled: true,
-    timezone: "UTC"
-  });
-  console.log('Supabase storage cleaner scheduled to run daily at 2 AM UTC.');
-};
-
-module.exports = { cleanSupabaseStorage, startSupabaseCleaner };
+module.exports = { cleanSupabaseStorage };

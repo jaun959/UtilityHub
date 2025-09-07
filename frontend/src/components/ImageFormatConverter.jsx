@@ -12,7 +12,7 @@ const ImageFormatConverter = () => {
   const onFileChange = (e) => {
     const files = Array.from(e.target.files);
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/tiff', 'image/avif'];
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 10 * 1024 * 1024;
 
     const validFiles = [];
     let hasInvalidFile = false;
@@ -77,11 +77,11 @@ const ImageFormatConverter = () => {
       <h2 className="text-2xl font-bold mb-4">Image Format Converter</h2>
       <form onSubmit={onSubmit}>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="multiple_files">Upload image files (any format)</label>
+          <label className="block mb-2 text-sm font-medium text-black" htmlFor="multiple_files">Upload image files (any format)</label>
           <input accept="image/*" className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="multiple_files" type="file" multiple onChange={onFileChange} />
         </div>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="format">Target Format</label>
+          <label className="block mb-2 text-sm font-medium text-black" htmlFor="format">Target Format</label>
           <select id="format" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" value={format} onChange={onFormatChange}>
             <option value="avif">AVIF</option>
             <option value="jpeg">JPEG</option>

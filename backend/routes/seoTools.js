@@ -8,12 +8,11 @@ const fetchContent = async (url) => {
   } catch (error) {
     if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
       return { content: '', exists: false, error: 'File not found (404)' };
-    } else if (axios.isAxiosError(error) && error.code === 'ECONNABORTED') {
+    } if (axios.isAxiosError(error) && error.code === 'ECONNABORTED') {
       return { content: '', exists: false, error: 'Request timed out' };
-    } else {
-      console.error(`Error fetching ${url}:`, error.message);
-      return { content: '', exists: false, error: `Failed to fetch: ${error.message}` };
     }
+    console.error(`Error fetching ${url}:`, error.message);
+    return { content: '', exists: false, error: `Failed to fetch: ${error.message}` };
   }
 };
 
@@ -35,7 +34,7 @@ router.post('/robots-txt', async (req, res) => {
     result = await fetchContent(url);
   }
 
-  res.status(200).json(result);
+  return res.status(200).json(result);
 });
 
 // @route   POST /api/seo/sitemap-xml
@@ -56,7 +55,7 @@ router.post('/sitemap-xml', async (req, res) => {
     result = await fetchContent(url);
   }
 
-  res.status(200).json(result);
+  return res.status(200).json(result);
 });
 
 module.exports = router;

@@ -77,7 +77,6 @@ const PdfSplitter = () => {
     setLoading(true);
     
     if (totalPages > 0) {
-      const parsedRanges = [];
       const parts = ranges.split(',').map(p => p.trim());
       let isValidRange = true;
       let coveredPages = new Set();
@@ -136,15 +135,15 @@ const PdfSplitter = () => {
       <h2 className="text-2xl font-bold mb-4">PDF Splitter</h2>
       <form onSubmit={onSubmit}>
         <div className="mb-4 py-4">
-          <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="single_file">Upload a PDF file</label>
-          <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="single_file" type="file" onChange={onFileChange} /* Re-applied styling */ />
+          <label className="block mb-2 text-sm font-medium text-black" htmlFor="single_file">Upload a PDF file</label>
+          <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="single_file" type="file" onChange={onFileChange} accept=".pdf" />
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           {selectedFile && totalPages > 0 && (
             <p className="text-sm text-gray-600 mt-2">Total pages: {totalPages}</p>
           )}
         </div>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-900 text-black" htmlFor="ranges">Page Ranges (e.g. 1, 3-5, 8)</label>
+          <label className="block mb-2 text-sm font-medium text-black" htmlFor="ranges">Page Ranges (e.g. 1, 3-5, 8)</label>
                     <input type="text" id="ranges" className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 1, 3-5, 8" value={ranges} onChange={onRangeChange} />
         </div>
         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Splitting...' : 'Split PDF'}</button>
