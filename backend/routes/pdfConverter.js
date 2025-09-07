@@ -36,7 +36,7 @@ router.post('/merge-pdfs', (req, res, next) => req.upload.array('pdfs')(req, res
       archive.finalize();
     });
 
-    const zipFileName = `merged_pdf_${Date.now()}.zip`;
+    const zipFileName = `dkutils_merged_pdf_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -121,7 +121,7 @@ router.post('/split-pdf', (req, res, next) => req.upload.single('pdf')(req, res,
       archive.finalize();
     });
 
-    const zipFileName = `split_pdf_${Date.now()}.zip`;
+    const zipFileName = `dkutils_split_pdf_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -204,7 +204,7 @@ router.post('/pdf-rotate', (req, res, next) => req.upload.single('pdf')(req, res
       archive.finalize();
     });
 
-    const zipFileName = `rotated_pdf_${Date.now()}.zip`;
+    const zipFileName = `dkutils_rotated_pdf_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -255,7 +255,7 @@ router.post('/compress-pdf', (req, res, next) => req.upload.single('pdf')(req, r
       archive.finalize();
     });
 
-    const zipFileName = `compressed_pdf_${Date.now()}.zip`;
+    const zipFileName = `dkutils_compressed_pdf_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -322,7 +322,7 @@ router.post('/pdf-password', (req, res, next) => req.upload.single('pdf')(req, r
       archive.finalize();
     });
 
-    const zipFileName = `${action}ed_pdf_${Date.now()}.zip`;
+    const zipFileName = `dkutils_${action}ed_pdf_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {

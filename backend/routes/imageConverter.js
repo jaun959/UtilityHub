@@ -44,7 +44,7 @@ router.post('/png-to-jpg', (req, res, next) => req.upload.array('images')(req, r
         .catch((err) => reject(err));
     });
 
-    const zipFileName = `converted_png_to_jpg_${Date.now()}.zip`;
+    const zipFileName = `dkutils_converted_png_to_jpg_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -159,11 +159,11 @@ router.post('/image-to-pdf', (req, res, next) => req.upload.array('images')(req,
       archive.on('end', () => resolve(Buffer.concat(archiveBuffers)));
       archive.on('error', (err) => reject(err));
 
-      archive.append(pdfBuffer, { name: `converted_images_${Date.now()}.pdf` });
+      archive.append(pdfBuffer, { name: `dkutils_converted_images_${Date.now()}.pdf` });
       archive.finalize();
     });
 
-    const zipFileName = `converted_images_${Date.now()}.zip`;
+    const zipFileName = `dkutils_converted_images_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -225,7 +225,7 @@ router.post('/resize-image', (req, res, next) => req.upload.array('images')(req,
           .jpeg()
           .toBuffer();
 
-        archive.append(resizedBuffer, { name: `${nameWithoutExt}_resized.jpg` });
+        archive.append(resizedBuffer, { name: `dkutils_${nameWithoutExt}_resized.jpg` });
       });
 
       Promise.all(resizePromises)
@@ -233,7 +233,7 @@ router.post('/resize-image', (req, res, next) => req.upload.array('images')(req,
         .catch((err) => reject(err));
     });
 
-    const zipFileName = `resized_images_${Date.now()}.zip`;
+    const zipFileName = `dkutils_resized_images_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -292,7 +292,7 @@ router.post('/compress-image', (req, res, next) => req.upload.array('images')(re
           .jpeg({ quality: parsedQuality })
           .toBuffer();
 
-        archive.append(compressedBuffer, { name: `${nameWithoutExt}_compressed.jpg` });
+        archive.append(compressedBuffer, { name: `dkutils_${nameWithoutExt}_compressed.jpg` });
       });
 
       Promise.all(compressionPromises)
@@ -300,7 +300,7 @@ router.post('/compress-image', (req, res, next) => req.upload.array('images')(re
         .catch((err) => reject(err));
     });
 
-    const zipFileName = `compressed_images_${Date.now()}.zip`;
+    const zipFileName = `dkutils_compressed_images_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -358,7 +358,7 @@ router.post('/convert-image-format', (req, res, next) => req.upload.array('image
           .toFormat(format)
           .toBuffer();
 
-        archive.append(convertedBuffer, { name: `${nameWithoutExt}_converted.${format}` });
+        archive.append(convertedBuffer, { name: `dkutils_${nameWithoutExt}_converted.${format}` });
       });
 
       Promise.all(conversionPromises)
@@ -366,7 +366,7 @@ router.post('/convert-image-format', (req, res, next) => req.upload.array('image
         .catch((err) => reject(err));
     });
 
-    const zipFileName = `converted_images_${Date.now()}.zip`;
+    const zipFileName = `dkutils_converted_images_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -410,7 +410,7 @@ router.post('/base64-image', (req, res, next) => req.upload.single('image')(req,
         return res.status(400).json({ msg: 'No base64 string provided for decoding.' });
       }
       const buffer = Buffer.from(base64String, 'base64');
-      const outputFileName = `decoded-${Date.now()}.png`;
+      const outputFileName = `dkutils_decoded-${Date.now()}.png`;
 
       const archive = archiver('zip', {
         zlib: { level: 9 },
@@ -426,7 +426,7 @@ router.post('/base64-image', (req, res, next) => req.upload.single('image')(req,
         archive.finalize();
       });
 
-      const zipFileName = `decoded_image_${Date.now()}.zip`;
+      const zipFileName = `dkutils_decoded_image_${Date.now()}.zip`;
       const { error: uploadError } = await supabase.storage
         .from('utilityhub')
         .upload(zipFileName, archiveBuffer, {
@@ -474,7 +474,7 @@ router.post('/image-flip', (req, res, next) => req.upload.single('image')(req, r
     }
 
     const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
-    const outputFileName = `flipped-${nameWithoutExt}.jpg`;
+    const outputFileName = `dkutils_flipped-${nameWithoutExt}.jpg`;
 
     const archive = archiver('zip', {
       zlib: { level: 9 },
@@ -490,7 +490,7 @@ router.post('/image-flip', (req, res, next) => req.upload.single('image')(req, r
       archive.finalize();
     });
 
-    const zipFileName = `flipped_image_${Date.now()}.zip`;
+    const zipFileName = `dkutils_flipped_image_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {
@@ -545,7 +545,7 @@ router.post('/image-grayscale', (req, res, next) => req.upload.single('image')(r
     const grayscaleBuffer = await sharp(imageBuffer).grayscale().jpeg().toBuffer();
 
     const nameWithoutExt = originalname.split('.').slice(0, -1).join('.');
-    const outputFileName = `grayscale-${nameWithoutExt}.jpg`;
+    const outputFileName = `dkutils_grayscale-${nameWithoutExt}.jpg`;
 
     const archive = archiver('zip', {
       zlib: { level: 9 },
@@ -561,7 +561,7 @@ router.post('/image-grayscale', (req, res, next) => req.upload.single('image')(r
       archive.finalize();
     });
 
-    const zipFileName = `grayscale_image_${Date.now()}.zip`;
+    const zipFileName = `dkutils_grayscale_image_${Date.now()}.zip`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(zipFileName, archiveBuffer, {

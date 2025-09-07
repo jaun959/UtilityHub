@@ -67,7 +67,7 @@ function App() {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <header className="bg-white shadow">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="container mx-auto p-4 flex justify-between items-center">
           <Link to="/" className="flex items-center">
             <img src="/logo.png" alt="Utility Hub Logo" className="h-10 mr-2" />
             <span className="text-2xl font-bold text-gray-800 hidden md:block">Utility Hub</span>
@@ -102,7 +102,7 @@ function App() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white shadow-lg pb-4 p-2">
+          <div className="md:hidden bg-white shadow-lg pb-4 py-2">
             <ul className="flex flex-col items-center space-y-2">
               <li className="w-full"><Link to="/images" className="block w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-200 items-center justify-center" onClick={() => setMobileMenuOpen(false)}><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L20 16m-2-6a2 2 0 100-4 2 2 0 000 4z" /></svg>Images</Link></li>
               <li className="w-full"><Link to="/pdfs" className="block w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-200 items-center justify-center" onClick={() => setMobileMenuOpen(false)}><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>PDFs</Link></li>

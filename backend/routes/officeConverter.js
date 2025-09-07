@@ -40,7 +40,7 @@ router.post('/pdf-to-word', (req, res, next) => req.upload.single('pdf')(req, re
 
     const docxBuffer = await Packer.toBuffer(doc);
 
-    const fileName = `converted-${Date.now()}.docx`;
+    const fileName = `dkutils_converted-${Date.now()}.docx`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(fileName, docxBuffer, {
@@ -86,7 +86,7 @@ router.post('/pdf-to-excel', (req, res, next) => req.upload.single('pdf')(req, r
 
     const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 
-    const fileName = `converted-${Date.now()}.xlsx`;
+    const fileName = `dkutils_converted-${Date.now()}.xlsx`;
     const { error: uploadError } = await supabase.storage
       .from('utilityhub')
       .upload(fileName, excelBuffer, {

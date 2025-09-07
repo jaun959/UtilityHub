@@ -57,13 +57,11 @@ VITE_API_BASE_URL=http://localhost:5000
 2.  **PDF Splitter**: Split a PDF document into multiple smaller PDF files by pages or ranges.
 3.  **PDF Compressor**: Reduce the file size of your PDF documents.
 4.  **PDF Password Protector/Remover**: Add or remove passwords from PDF documents.
-
-4.  **Text to PDF Generator**: Convert plain text content into a PDF document.
-5.  **PDF to Excel Converter**: Convert PDF tables and data into Excel spreadsheets (text extraction).
-6.
-7.  **PDF to Excel Converter**: Convert PDF into Excel spreadsheets format.
-8.  **PDF to Text Converter**: Extract all text content from PDF documents.
-9. **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
+5.  **Text to PDF Generator**: Convert plain text content into a PDF document.
+6.  **PDF to Text Converter**: Extract all text content from PDF documents.
+7.  **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
+8.  **PDF to word Converter**: Convert PDF into word format.
+9.  **PDF to Excel Converter**: Convert PDF into Excel spreadsheets format.
 
 ### Text Tools
 1.  **Text Case Converter**: Convert text to various case formats (e.g., UPPERCASE, lowercase, Title Case).

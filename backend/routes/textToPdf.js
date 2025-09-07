@@ -32,11 +32,11 @@ router.post('/text-to-pdf', async (req, res) => {
       archive.on('end', () => resolve(Buffer.concat(buffers)));
       archive.on('error', (err) => reject(err));
 
-      archive.append(pdfBuffer, { name: `converted-text-${Date.now()}.pdf` });
+      archive.append(pdfBuffer, { name: `dkutils_converted-text-${Date.now()}.pdf` });
       archive.finalize();
     });
 
-    const zipFileName = `text_to_pdf_${Date.now()}.zip`;
+    const zipFileName = `dkutils_text_to_pdf_${Date.now()}.zip`;
     res.writeHead(200, {
       'Content-Type': 'application/zip',
       'Content-Disposition': `attachment; filename="${zipFileName}"`,
