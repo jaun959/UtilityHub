@@ -2,7 +2,7 @@ const router = require('express').Router();
 const shortid = require('shortid');
 const Url = require('../models/Url');
 
-router.post('/', async (req, res) => {
+router.post('/shorten', async (req, res) => {
   const { originalUrl } = req.body;
   let baseUrl = process.env.BASE_URL;
 

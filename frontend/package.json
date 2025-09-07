@@ -1,7 +1,7 @@
 {
   "name": "UtilityHub-frontend",
   "description": "A web-based platform offering a collection of utility tools, built with MERN stack (MongoDB, Express.js, React.js, Node.js) and TailwindCSS",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "dependencies": {

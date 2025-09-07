@@ -171,42 +171,6 @@ router.post('/pdf-to-excel', (req, res, next) => req.upload.single('pdf')(req, r
   }
 });
 
-// @route   POST /api/convert/excel-to-word
-// @desc    Convert Excel to Word
-// @access  Public
-router.post('/excel-to-word', (req, res, next) => req.upload.single('excel')(req, res, next), async (req, res) => {
-  try {
-    const { file } = req;
-    console.log('Excel to Word conversion requested for:', file.originalname);
 
-    if (!file) {
-      return res.status(400).json({ msg: 'No Excel file uploaded.' });
-    }
-
-    const excelBuf = file.buffer;
-
-    const wordBuf = await libre.convertAsync(excelBuf, '.docx', undefined);
-
-    const fileName = `converted-${Date.now()}.docx`;
-    const { error: uploadError } = await supabase.storage
-      .from('utilityhub')
-      .upload(fileName, wordBuf, {
-        contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      });
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('utilityhub')
-      .getPublicUrl(fileName);
-
-    return res.json({ path: publicUrlData.publicUrl, originalname: fileName });
-  } catch (err) {
-    console.error('Error during Excel to Word conversion:', err);
-    return res.status(500).json({ msg: 'Server Error' });
-  }
-});
 
 module.exports = router;

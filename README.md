@@ -61,9 +61,8 @@ VITE_API_BASE_URL=http://localhost:5000
 5.  **PDF to Excel Converter**: Convert PDF tables and data into Excel spreadsheets (text extraction).
 6.  **Text to PDF Generator**: Convert plain text content into a PDF document.
 7.  **Excel to PDF Converter**: Convert Excel spreadsheets (.xlsx, .csv) into PDF format.
-8.  **Excel to Word Converter**: Convert Excel or CSV spreadsheets to Word documents.
-9.  **PDF to Text Converter**: Extract all text content from PDF documents.
-10. **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
+8.  **PDF to Text Converter**: Extract all text content from PDF documents.
+9. **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
 
 ### Text Tools
 1.  **Text Case Converter**: Convert text to various case formats (e.g., UPPERCASE, lowercase, Title Case).
@@ -140,4 +139,3 @@ This application includes JWT-based authentication. Some premium/bulk features a
 
 **4. MongoDB:**
    Ensure you have a MongoDB instance running. The application is configured to connect to `mongodb://localhost:27017/utilityhub`. If your MongoDB is running on a different port or location, update the `MONGO_URI` in `backend/.env` accordingly.
-

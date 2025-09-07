@@ -54,7 +54,7 @@ app.use(apiActivityTracker);
 
 const shortener = require('./routes/shortener');
 
-app.use('/shorten', shortener);
+app.use(shortener);
 
 const imageConverter = require('./routes/imageConverter');
 
