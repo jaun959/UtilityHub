@@ -1,19 +1,22 @@
-import { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../context/AuthContext';
 
 const ImageToBase64Converter = () => {
+  const { state: { isAuthenticated } } = useContext(AuthContext);
   const [selectedFile, setSelectedFile] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [base64String, setBase64String] = useState('');
   const [loading, setLoading] = useState(false);
 
   const onFileChange = (e) => {
     const file = e.target.files[0];
-    const maxFileSize = 10 * 1024 * 1024;
+    const maxFileSize = isAuthenticated ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
 
     if (file && file.type.startsWith('image/')) {
       if (file.size > maxFileSize) {
-        toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is ${maxFileSize / (1024 * 1024)}MB.`);
         setSelectedFile(null);
         e.target.value = null;
       } else {
@@ -55,11 +58,6 @@ const ImageToBase64Converter = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(base64String);
-    toast.success('Copied to clipboard!');
   };
 
   const handleDownload = (content, fileName) => {

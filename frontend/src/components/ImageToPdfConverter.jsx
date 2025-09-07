@@ -1,16 +1,20 @@
 
-import { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../context/AuthContext';
 
 const ImageToPdfConverter = () => {
+  const { state: { isAuthenticated } } = useContext(AuthContext);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [convertedFile, setConvertedFile] = useState(null);
 
   const onFileChange = (e) => {
     const files = Array.from(e.target.files);
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/tiff', 'image/avif'];
-    const maxSize = 10 * 1024 * 1024;
+    const maxSize = isAuthenticated ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
 
     const validFiles = [];
     let hasInvalidFile = false;
@@ -22,7 +26,7 @@ const ImageToPdfConverter = () => {
         return;
       }
       if (file.size > maxSize) {
-        toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
         hasInvalidFile = true;
         return;
       }

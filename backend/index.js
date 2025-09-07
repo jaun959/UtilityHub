@@ -47,6 +47,8 @@ app.use(cors());
 app.use(express.json());
 
 const apiActivityTracker = require('./middleware/apiActivityTracker');
+const authMiddleware = require('./middleware/auth');
+const uploadLimiter = require('./middleware/uploadLimiter');
 
 app.use(apiActivityTracker);
 
@@ -56,19 +58,19 @@ app.use('/shorten', shortener);
 
 const imageConverter = require('./routes/imageConverter');
 
-app.use('/api/convert', imageConverter);
+app.use('/api/convert', authMiddleware, uploadLimiter, imageConverter);
 
 const pdfConverter = require('./routes/pdfConverter');
 
-app.use('/api/convert', pdfConverter);
+app.use('/api/convert', authMiddleware, uploadLimiter, pdfConverter);
 
 const textToPdf = require('./routes/textToPdf');
 
-app.use('/api/convert', textToPdf);
+app.use('/api/convert', authMiddleware, uploadLimiter, textToPdf);
 
 const officeConverter = require('./routes/officeConverter');
 
-app.use('/api/convert', officeConverter);
+app.use('/api/convert', authMiddleware, uploadLimiter, officeConverter);
 
 const textConverter = require('./routes/textConverter');
 
@@ -84,15 +86,15 @@ app.use('/api/keep-alive', keepAlive);
 
 const cleanSupabase = require('./routes/cleanSupabase');
 
-app.use('/api/clean-supabase', cleanSupabase);
+app.use('/api/clean-supabase', authMiddleware, cleanSupabase);
 
 const screenshot = require('./routes/screenshot');
 
-app.use('/api/screenshot', screenshot);
+app.use('/api/screenshot', authMiddleware, uploadLimiter, screenshot);
 
 const favicon = require('./routes/favicon');
 
-app.use('/api/favicon', favicon);
+app.use('/api/favicon', authMiddleware, uploadLimiter, favicon);
 
 const redirectChecker = require('./routes/redirectChecker');
 
@@ -101,7 +103,6 @@ app.use('/api/redirect-checker', redirectChecker);
 const jsonXmlConverter = require('./routes/jsonXmlConverter');
 
 app.use('/api/convert', jsonXmlConverter);
-
 const passwordStrength = require('./routes/passwordStrength');
 
 app.use('/api/password-strength', passwordStrength);

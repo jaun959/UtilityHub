@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import jsQR from 'jsqr';
 import { toast } from 'react-toastify';
 

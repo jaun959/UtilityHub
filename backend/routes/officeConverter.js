@@ -1,22 +1,18 @@
 const router = require('express').Router();
-const multer = require('multer');
 const pdf = require('pdf-parse');
 const {
   Document, Packer, Paragraph, TextRun,
 } = require('docx');
-
 const XLSX = require('xlsx');
 const libre = require('libreoffice-convert');
-
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/pdf-to-word
 // @desc    Convert PDF to Word (Text Extraction)
 // @access  Public
-router.post('/pdf-to-word', upload.single('pdf'), async (req, res) => {
+router.post('/pdf-to-word', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
   try {
     const { file } = req;
     console.log('PDF to Word (text extraction) conversion requested for:', file.originalname);
@@ -70,7 +66,7 @@ router.post('/pdf-to-word', upload.single('pdf'), async (req, res) => {
 // @route   POST /api/convert/word-to-pdf
 // @desc    Convert Word to PDF
 // @access  Public
-router.post('/word-to-pdf', upload.single('doc'), async (req, res) => {
+router.post('/word-to-pdf', (req, res, next) => req.upload.single('doc')(req, res, next), async (req, res) => {
   try {
     const { file } = req;
     console.log('Word to PDF conversion requested for:', file.originalname);
@@ -108,7 +104,7 @@ router.post('/word-to-pdf', upload.single('doc'), async (req, res) => {
 // @route   POST /api/convert/excel-to-pdf
 // @desc    Convert Excel to PDF
 // @access  Public
-router.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
+router.post('/excel-to-pdf', (req, res, next) => req.upload.single('excel')(req, res, next), async (req, res) => {
   try {
     const { file } = req;
     if (!file) {
@@ -132,7 +128,7 @@ router.post('/excel-to-pdf', upload.single('excel'), async (req, res) => {
 // @route   POST /api/convert/pdf-to-excel
 // @desc    Convert PDF to Excel (Text Extraction)
 // @access  Public
-router.post('/pdf-to-excel', upload.single('pdf'), async (req, res) => {
+router.post('/pdf-to-excel', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
   try {
     const { file } = req;
     console.log('PDF to Excel (text extraction) conversion requested for:', file.originalname);
@@ -178,7 +174,7 @@ router.post('/pdf-to-excel', upload.single('pdf'), async (req, res) => {
 // @route   POST /api/convert/excel-to-word
 // @desc    Convert Excel to Word
 // @access  Public
-router.post('/excel-to-word', upload.single('excel'), async (req, res) => { // Added upload.single('excel')
+router.post('/excel-to-word', (req, res, next) => req.upload.single('excel')(req, res, next), async (req, res) => {
   try {
     const { file } = req;
     console.log('Excel to Word conversion requested for:', file.originalname);

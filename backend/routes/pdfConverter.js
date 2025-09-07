@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const multer = require('multer');
 const { PDFDocument, degrees } = require('pdf-lib');
 const archiver = require('archiver');
 const { pdfToPng } = require('pdf-to-png-converter');
@@ -7,12 +6,11 @@ const { createClient } = require('@supabase/supabase-js');
 const pdfParse = require('pdf-parse');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/pdf-to-image
 // @desc    Convert PDF to images
 // @access  Public
-router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
+router.post('/pdf-to-image', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
   try {
     const { file } = req;
     if (!file) {
@@ -65,7 +63,7 @@ router.post('/pdf-to-image', upload.single('pdf'), async (req, res) => {
 // @route   POST /api/convert/merge-pdfs
 // @desc    Merge multiple PDFs into one
 // @access  Public
-router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
+router.post('/merge-pdfs', (req, res, next) => req.upload.array('pdfs')(req, res, next), async (req, res) => {
   try {
     const { files } = req;
     if (!files || files.length === 0) {
@@ -119,7 +117,7 @@ router.post('/merge-pdfs', upload.array('pdfs'), async (req, res) => {
 // @route   POST /api/convert/split-pdf
 // @desc    Split a PDF into multiple pages
 // @access  Public
-router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
+router.post('/split-pdf', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
   try {
     const { ranges } = req.body;
     const { file } = req;
@@ -204,7 +202,7 @@ router.post('/split-pdf', upload.single('pdf'), async (req, res) => {
 // @route   POST /api/convert/pdf-to-text
 // @desc    Convert PDF to text
 // @access  Public
-router.post('/pdf-to-text', upload.single('pdf'), async (req, res) => {
+router.post('/pdf-to-text', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
   try {
     const { file } = req;
     if (!file) {
@@ -225,7 +223,7 @@ router.post('/pdf-to-text', upload.single('pdf'), async (req, res) => {
 // @route   POST /api/convert/pdf-rotate
 // @desc    Rotate pages in a PDF
 // @access  Public
-router.post('/pdf-rotate', upload.single('pdf'), async (req, res) => {
+router.post('/pdf-rotate', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
   try {
     const { file } = req;
     const { angle } = req.body;

@@ -1,15 +1,19 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../context/AuthContext';
 
 const ImageCropper = () => {
+  const { state: { isAuthenticated } } = useContext(AuthContext);
   const [imageSrc, setImageSrc] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [croppedImageSrc, setCroppedImageSrc] = useState(null);
   const [loading, setLoading] = useState(false);
   const imageRef = useRef(null);
   const canvasRef = useRef(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    const maxSize = 10 * 1024 * 1024;
+    const maxSize = isAuthenticated ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
 
     if (!file) {
       setImageSrc(null);
@@ -26,7 +30,7 @@ const ImageCropper = () => {
     }
 
     if (file.size > maxSize) {
-      toast.error(`File too large: ${file.name}. Maximum size is 5MB.`);
+      toast.error(`File too large: ${file.name}. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
       setImageSrc(null);
       setCroppedImageSrc(null);
       e.target.value = '';

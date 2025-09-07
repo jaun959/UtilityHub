@@ -1,6 +1,5 @@
 const PDFDocument = require('pdfkit');
 const router = require('express').Router();
-const multer = require('multer');
 const archiver = require('archiver');
 const sharp = require('sharp');
 const path = require('path');
@@ -9,12 +8,11 @@ const fsp = require('fs').promises;
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   POST /api/convert/png-to-jpg
 // @desc    Convert PNG images to JPG
 // @access  Public
-router.post('/png-to-jpg', upload.array('images'), async (req, res) => {
+router.post('/png-to-jpg', (req, res, next) => req.upload.array('images')(req, res, next), async (req, res) => {
   try {
     const { files } = req;
     if (!files || files.length === 0) {
@@ -93,7 +91,7 @@ router.get('/download-image/:filename', async (req, res) => {
 // @route   POST /api/convert/image-to-pdf
 // @desc    Convert images to PDF
 // @access  Public
-router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
+router.post('/image-to-pdf', (req, res, next) => req.upload.array('images')(req, res, next), async (req, res) => {
   try {
     const { files } = req;
     if (!files || files.length === 0) {
@@ -191,7 +189,7 @@ router.post('/image-to-pdf', upload.array('images'), async (req, res) => {
 // @route   POST /api/convert/resize-image
 // @desc    Resize images
 // @access  Public
-router.post('/resize-image', upload.array('images'), async (req, res) => {
+router.post('/resize-image', (req, res, next) => req.upload.array('images')(req, res, next), async (req, res) => {
   try {
     const { files } = req;
     if (!files || files.length === 0) {
@@ -261,7 +259,7 @@ router.post('/resize-image', upload.array('images'), async (req, res) => {
 // @route   POST /api/convert/compress-image
 // @desc    Compress images
 // @access  Public
-router.post('/compress-image', upload.array('images'), async (req, res) => {
+router.post('/compress-image', (req, res, next) => req.upload.array('images')(req, res, next), async (req, res) => {
   try {
     const { files } = req;
     if (!files || files.length === 0) {
@@ -328,7 +326,7 @@ router.post('/compress-image', upload.array('images'), async (req, res) => {
 // @route   POST /api/convert/convert-image-format
 // @desc    Convert image format
 // @access  Public
-router.post('/convert-image-format', upload.array('images'), async (req, res) => {
+router.post('/convert-image-format', (req, res, next) => req.upload.array('images')(req, res, next), async (req, res) => {
   try {
     const { files } = req;
     if (!files || files.length === 0) {
@@ -394,7 +392,7 @@ router.post('/convert-image-format', upload.array('images'), async (req, res) =>
 // @route   POST /api/convert/base64-image
 // @desc    Encode/Decode image to/from Base64
 // @access  Public
-router.post('/base64-image', upload.single('image'), async (req, res) => {
+router.post('/base64-image', (req, res, next) => req.upload.single('image')(req, res, next), async (req, res) => {
   try {
     const { type, base64String } = req.body;
 
@@ -456,7 +454,7 @@ router.post('/base64-image', upload.single('image'), async (req, res) => {
 // @route   POST /api/convert/image-flip
 // @desc    Flip an image horizontally or vertically
 // @access  Public
-router.post('/image-flip', upload.single('image'), async (req, res) => {
+router.post('/image-flip', (req, res, next) => req.upload.single('image')(req, res, next), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ msg: 'No image file uploaded.' });
@@ -517,7 +515,7 @@ router.post('/image-flip', upload.single('image'), async (req, res) => {
 // @route   POST /api/convert/image-to-base64
 // @desc    Convert image to Base64 string
 // @access  Public
-router.post('/image-to-base64', upload.single('image'), async (req, res) => {
+router.post('/image-to-base64', (req, res, next) => req.upload.single('image')(req, res, next), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ msg: 'No image file uploaded.' });
@@ -535,7 +533,7 @@ router.post('/image-to-base64', upload.single('image'), async (req, res) => {
 // @route   POST /api/convert/image-grayscale
 // @desc    Convert image to grayscale
 // @access  Public
-router.post('/image-grayscale', upload.single('image'), async (req, res) => {
+router.post('/image-grayscale', (req, res, next) => req.upload.single('image')(req, res, next), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ msg: 'No image file uploaded.' });

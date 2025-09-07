@@ -14,7 +14,7 @@ For detailed setup and running instructions, refer to the [main project README.m
 
 ## File Upload Limits
 
-Many of the tools in the Utility Hub now support file uploads up to 10MB, providing greater flexibility for larger files.
+Many of the tools in the Utility Hub now support file uploads up to 10MB for unauthenticated users, and up to 50MB for authenticated users, providing greater flexibility for larger files.
 
 ## Project Structure
 

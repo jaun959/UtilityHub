@@ -39,30 +39,56 @@ VITE_API_BASE_URL=http://localhost:5000
 
 - `VITE_API_BASE_URL`: The base URL of your backend API. This should match the `BASE_URL` in your backend's `.env` file.
 
-2.  **Image to PDF Converter (Bulk, supports up to 10MB files)**
-3.  **PDF to Image Converter (All Pages, improved conversion)**
-4.  **Link Shortener**
-5.  **Text to PDF Generator**
-6.  **PDF Merger**
-7.  **PDF Splitter**
-8.  **Word to PDF Converter**
-9.  **PDF to Word Converter**
-10. **Excel to PDF Converter**
-11. **PDF to Excel Converter**
-12. **Text Case Converter (UPPERCASE, lowercase, Title Case)**
-13. **QR Code Generator (Text/Link to QR)**
-14. **QR Code Scanner (Upload image -> Extract data, supports up to 10MB files)**
-15. **Image Resizer (Bulk, supports up to 10MB files)**
-16. **Image Compressor (Bulk, supports up to 10MB files)**
-17. **Image Format Converter (WebP, PNG, JPG, GIF, etc., supports up to 10MB files)**
-18. **Base64 Encoder/Decoder (Text or Image, supports up to 10MB files for images)**
-19. **Markdown to HTML Converter**
-20. **HTML to Markdown Converter**
-21. **JSON Formatter & Validator**
-22. **CSV to JSON Converter (and vice versa)**
-23. **Password Generator (customizable rules)**
-24. **Hash Generator (MD5, SHA256, etc.)**
-25. **Text Difference Checker (Compare two texts)**
+### Login-Based File Limits
+*   File upload limits are dynamically adjusted based on user authentication status: 10MB for unauthenticated users and 50MB for authenticated users, providing enhanced flexibility for larger file processing.
+
+### Image Tools
+1.  **Image Format Converter**: Convert images between various formats (JPG, PNG, WebP, TIFF, AVIF).
+2.  **Image Compressor**: Reduce the file size of your images while maintaining quality.
+3.  **Image Resizer**: Change the dimensions (width and height) of your images.
+4.  **Image to PDF Converter**: Combine multiple images into a single PDF document.
+5.  **PNG to JPG Converter**: Quickly convert PNG images to JPG format.
+6.  **Image Cropper**: Crop images to a specific area or aspect ratio.
+7.  **Image Grayscaler**: Convert your colored images to grayscale.
+8.  **Image Flipper**: Flip images horizontally or vertically.
+9.  **Image to Base64 Converter**: Convert images into Base64 strings for embedding or transfer.
+
+### PDF Tools
+1.  **PDF Merger**: Combine multiple PDF documents into one single PDF file.
+2.  **PDF Splitter**: Split a PDF document into multiple smaller PDF files by pages or ranges.
+3.  **PDF to Image Converter**: Convert PDF pages into various image file formats.
+4.  **PDF to Word Converter**: Convert PDF documents to editable Word files (text extraction).
+5.  **PDF to Excel Converter**: Convert PDF tables and data into Excel spreadsheets (text extraction).
+6.  **Text to PDF Generator**: Convert plain text content into a PDF document.
+7.  **Excel to PDF Converter**: Convert Excel spreadsheets (.xlsx, .csv) into PDF format.
+8.  **Excel to Word Converter**: Convert Excel or CSV spreadsheets to Word documents.
+9.  **PDF to Text Converter**: Extract all text content from PDF documents.
+10. **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
+
+### Text Tools
+1.  **Text Case Converter**: Convert text to various case formats (e.g., UPPERCASE, lowercase, Title Case).
+2.  **Text Difference Checker**: Compare two texts and highlight the differences between them.
+3.  **Base64 Text Converter**: Encode or decode text to/from Base64 format.
+4.  **HTML to Markdown Converter**: Convert HTML content to Markdown format.
+5.  **Markdown to HTML Converter**: Convert Markdown content to HTML format.
+6.  **JSON Formatter/Validator**: Format and validate JSON data for readability and correctness.
+7.  **Hash Generator**: Generate various cryptographic hashes (e.g., MD5, SHA1, SHA256) from text.
+8.  **Password Generator**: Generate strong, random, and customizable passwords.
+9.  **CSV to JSON Converter**: Convert CSV (Comma Separated Values) data to JSON (JavaScript Object Notation) format.
+
+### Web Tools
+1.  **Link Shortener**: Shorten long URLs for easier sharing and tracking.
+2.  **QR Code Generator**: Create QR codes from text or URLs.
+3.  **QR Code Scanner**: Scan QR codes from uploaded images to extract data.
+4.  **Website Screenshot Generator**: Capture a full-page screenshot of any website.
+5.  **Favicon Extractor**: Extract favicons (website icons) from any website URL.
+6.  **URL Redirect Checker**: Trace and analyze URL redirect chains.
+7.  **Robots.txt / Sitemap.xml Viewer**: View and validate `robots.txt` and `sitemap.xml` files for SEO analysis.
+8.  **JSON <-> XML Converter**: Convert between JSON and XML data formats, essential for web service integration and API data transformation.
+9.  **Password Strength Checker**: Analyze the strength of your password and provide feedback for improvement.
+
+### General/Core Functionalities
+1.  **User Authentication**: Secure user registration and login system using JWT (JSON Web Tokens).
 
 ## Authentication:
 

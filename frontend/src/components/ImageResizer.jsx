@@ -1,16 +1,20 @@
-import { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../context/AuthContext';
 
 const ImageResizer = () => {
+  const { state: { isAuthenticated } } = useContext(AuthContext);
   const [originalImage, setOriginalImage] = useState(null);
   const [newWidth, setNewWidth] = useState('');
   const [newHeight, setNewHeight] = useState('');
   const [loading, setLoading] = useState(false);
   const [originalDimensions, setOriginalDimensions] = useState({ width: 0, height: 0 });
+  // eslint-disable-next-line no-unused-vars
+  const [resizedImageSrc, setResizedImageSrc] = useState(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    const maxSize = 10 * 1024 * 1024;
+    const maxSize = isAuthenticated ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
 
     if (!file) {
       setOriginalImage(null);
@@ -27,7 +31,7 @@ const ImageResizer = () => {
     }
 
     if (file.size > maxSize) {
-      toast.error(`File too large: ${file.name}. Maximum size is 5MB.`);
+      toast.error(`File too large: ${file.name}. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
       setOriginalImage(null);
       setResizedImageSrc(null);
       e.target.value = '';

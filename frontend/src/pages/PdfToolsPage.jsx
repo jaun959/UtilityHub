@@ -8,6 +8,7 @@ import TextToPdfGenerator from '../components/TextToPdfGenerator.jsx';
 import ExcelToPdfConverter from '../components/ExcelToPdfConverter.jsx';
 import PdfToTextConverter from '../components/PdfToTextConverter.jsx';
 import PdfRotator from '../components/PdfRotator.jsx';
+import ExcelToWordConverter from '../components/ExcelToWordConverter.jsx';
 import { Helmet } from 'react-helmet-async';
 
 const PdfToolsPage = () => {
@@ -44,6 +45,9 @@ const PdfToolsPage = () => {
           </ToolCard>
           <ToolCard title="Excel to PDF Converter" description="Convert Excel spreadsheets to PDF format.">
             <ExcelToPdfConverter />
+          </ToolCard>
+          <ToolCard title="Excel to Word Converter" description="Convert Excel or CSV spreadsheets to Word document.">
+            <ExcelToWordConverter />
           </ToolCard>
           <ToolCard title="PDF to Text Converter" description="Extract text content from PDF documents.">
             <PdfToTextConverter />

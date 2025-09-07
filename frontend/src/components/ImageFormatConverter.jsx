@@ -1,17 +1,30 @@
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../context/AuthContext';
 
 const ImageFormatConverter = () => {
+  const { state: { isAuthenticated } } = useContext(AuthContext);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [format, setFormat] = useState('jpeg');
   const [loading, setLoading] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [convertedZipFile, setConvertedZipFile] = useState(null);
+
+  const handleDownload = (fileUrl, fileName) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const onFileChange = (e) => {
     const files = Array.from(e.target.files);
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/tiff', 'image/avif'];
-    const maxSize = 10 * 1024 * 1024;
+    const maxSize = isAuthenticated ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
 
     const validFiles = [];
     let hasInvalidFile = false;
@@ -23,7 +36,7 @@ const ImageFormatConverter = () => {
         return;
       }
       if (file.size > maxSize) {
-        toast.error(`File too large: ${file.name}. Maximum size is 5MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
         hasInvalidFile = true;
         return;
       }

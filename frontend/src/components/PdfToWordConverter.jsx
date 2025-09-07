@@ -1,19 +1,22 @@
-import { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const PdfToWordConverter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [convertedFile, setConvertedFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { isAuthenticated } = useContext(AuthContext);
 
   const onFileChange = (e) => {
     const file = e.target.files[0];
-    const maxFileSize = 10 * 1024 * 1024;
+    const maxFileSize = isAuthenticated ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
 
     if (file && file.type === 'application/pdf') {
       if (file.size > maxFileSize) {
-        toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is ${maxFileSize / (1024 * 1024)}MB.`);
         setSelectedFile(null);
         e.target.value = null;
       } else {

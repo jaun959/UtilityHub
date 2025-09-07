@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const ToolCard = ({ title, description, children }) => {
   return (
@@ -12,6 +13,12 @@ const ToolCard = ({ title, description, children }) => {
       </div>
     </div>
   );
+};
+
+ToolCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  children: PropTypes.node,
 };
 
 export default ToolCard;
