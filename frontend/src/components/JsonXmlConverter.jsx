@@ -61,8 +61,7 @@ const JsonXmlConverter = () => {
           <label htmlFor="inputData" className="block mb-2 text-sm font-medium text-gray-900">Input (JSON or XML for Web Services)</label>
           <textarea
             id="inputData"
-            className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
-            rows="10"
+            className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white min-h-[200px] overflow-auto"
             placeholder="Enter JSON or XML data for web services, APIs, etc."
             value={inputData}
             onChange={handleInputChange}
@@ -97,8 +96,7 @@ const JsonXmlConverter = () => {
           </label>
           <textarea
             id="outputData"
-            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 text-sm h-max"
-            rows="10"
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 text-sm min-h-[200px] overflow-auto"
             readOnly
             value={outputData}
           ></textarea>

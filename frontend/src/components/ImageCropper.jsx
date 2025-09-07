@@ -30,7 +30,7 @@ const ImageCropper = () => {
     }
 
     if (file.size > maxSize) {
-      toast.error(`File too large: ${file.name}. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
+      toast.error(`File too large: ${file.name}. Maximum size is ${maxSize / (1024 * 1024)}MB. Login for a higher limit (50MB).`);
       setImageSrc(null);
       setCroppedImageSrc(null);
       e.target.value = '';

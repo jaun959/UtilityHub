@@ -27,7 +27,6 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 - `JWT_SECRET`: A secret key for JWT authentication.
 - `BASE_URL`: The base URL of your backend server (e.g., `http://localhost:5000` for local development).
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase credentials.
-- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: Your Cloudinary credentials.
 
 ### Frontend (`frontend/.env`)
 
@@ -56,11 +55,13 @@ VITE_API_BASE_URL=http://localhost:5000
 ### PDF Tools
 1.  **PDF Merger**: Combine multiple PDF documents into one single PDF file.
 2.  **PDF Splitter**: Split a PDF document into multiple smaller PDF files by pages or ranges.
-3.  **PDF to Image Converter**: Convert PDF pages into various image file formats.
-4.  **PDF to Word Converter**: Convert PDF documents to editable Word files (text extraction).
+3.  **PDF Compressor**: Reduce the file size of your PDF documents.
+4.  **PDF Password Protector/Remover**: Add or remove passwords from PDF documents.
+
+4.  **Text to PDF Generator**: Convert plain text content into a PDF document.
 5.  **PDF to Excel Converter**: Convert PDF tables and data into Excel spreadsheets (text extraction).
-6.  **Text to PDF Generator**: Convert plain text content into a PDF document.
-7.  **Excel to PDF Converter**: Convert Excel spreadsheets (.xlsx, .csv) into PDF format.
+6.
+7.  **PDF to Excel Converter**: Convert PDF into Excel spreadsheets format.
 8.  **PDF to Text Converter**: Extract all text content from PDF documents.
 9. **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
 

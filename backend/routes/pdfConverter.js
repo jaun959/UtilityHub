@@ -1,64 +1,10 @@
 const router = require('express').Router();
 const { PDFDocument, degrees } = require('pdf-lib');
 const archiver = require('archiver');
-const { pdfToPng } = require('pdf-to-png-converter');
 const { createClient } = require('@supabase/supabase-js');
 const pdfParse = require('pdf-parse');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-
-// @route   POST /api/convert/pdf-to-image
-// @desc    Convert PDF to images
-// @access  Public
-router.post('/pdf-to-image', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
-  try {
-    const { file } = req;
-    if (!file) {
-      return res.status(400).json({ msg: 'No file uploaded.' });
-    }
-    const pdfBuffer = file.buffer;
-
-    const pngPages = await pdfToPng(pdfBuffer, {
-      viewportScale: 2.0,
-    });
-
-    const archive = archiver('zip', {
-      zlib: { level: 9 },
-    });
-
-    const archiveBuffer = await new Promise((resolve, reject) => {
-      const buffers = [];
-      archive.on('data', (data) => buffers.push(data));
-      archive.on('end', () => resolve(Buffer.concat(buffers)));
-      archive.on('error', (err) => reject(err));
-
-      for (let i = 0; i < pngPages.length; i += 1) {
-        archive.append(pngPages[i].content, { name: `page-${i + 1}.png` });
-      }
-      archive.finalize();
-    });
-
-    const zipFileName = `converted_images_${Date.now()}.zip`;
-    const { error: uploadError } = await supabase.storage
-      .from('utilityhub')
-      .upload(zipFileName, archiveBuffer, {
-        contentType: 'application/zip',
-      });
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('utilityhub')
-      .getPublicUrl(zipFileName);
-
-    return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
-  } catch (err) {
-    console.error(err.message);
-    return res.status(500).json({ msg: 'Server Error' });
-  }
-});
 
 // @route   POST /api/convert/merge-pdfs
 // @desc    Merge multiple PDFs into one
@@ -276,6 +222,96 @@ router.post('/pdf-rotate', (req, res, next) => req.upload.single('pdf')(req, res
     return res.json({ path: publicUrlData.publicUrl, originalname: zipFileName });
   } catch (err) {
     console.error('Error during PDF rotation:', err);
+    return res.status(500).json({ msg: 'Server Error' });
+  }
+});
+
+// @route   POST /api/convert/compress-pdf
+// @desc    Compress a PDF file
+// @access  Public
+router.post('/compress-pdf', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
+  try {
+    const { file } = req;
+    if (!file) {
+      return res.status(400).json({ msg: 'No PDF file uploaded.' });
+    }
+
+    const pdfBuffer = file.buffer;
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+    const compressedPdfBytes = await pdfDoc.save();
+
+    const fileName = `compressed-${Date.now()}.pdf`;
+    const { error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(fileName, compressedPdfBytes, {
+        contentType: 'application/pdf',
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(fileName);
+
+    return res.json({ path: publicUrlData.publicUrl, originalname: fileName });
+  } catch (err) {
+    console.error('Error during PDF compression:', err);
+    return res.status(500).json({ msg: 'Server Error' });
+  }
+});
+
+// @route   POST /api/convert/pdf-password
+// @desc    Protect or unprotect a PDF with a password
+// @access  Public
+router.post('/pdf-password', (req, res, next) => req.upload.single('pdf')(req, res, next), async (req, res) => {
+  try {
+    const { file } = req;
+    const { password, action } = req.body;
+
+    if (!file) {
+      return res.status(400).json({ msg: 'No PDF file uploaded.' });
+    }
+    if (!action || (action === 'protect' && !password)) {
+      return res.status(400).json({ msg: 'Missing password or invalid action.' });
+    }
+
+    const pdfBuffer = file.buffer;
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
+    let modifiedPdfBytes;
+
+    if (action === 'protect') {
+      modifiedPdfBytes = await pdfDoc.save({
+        use: [password],
+        owner: [password],
+        permissions: {},
+      });
+    } else if (action === 'remove') {
+      modifiedPdfBytes = await pdfDoc.save();
+    } else {
+      return res.status(400).json({ msg: 'Invalid action. Must be \'protect\' or \'remove\'.' });
+    }
+
+    const fileName = `${action}ed-${Date.now()}.pdf`;
+    const { error: uploadError } = await supabase.storage
+      .from('utilityhub')
+      .upload(fileName, modifiedPdfBytes, {
+        contentType: 'application/pdf',
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('utilityhub')
+      .getPublicUrl(fileName);
+
+    return res.json({ path: publicUrlData.publicUrl, originalname: fileName });
+  } catch (err) {
+    console.error('Error during PDF password operation:', err);
     return res.status(500).json({ msg: 'Server Error' });
   }
 });

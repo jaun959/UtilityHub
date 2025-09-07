@@ -44,6 +44,10 @@ const HomePage = () => {
         <h2 className="text-4xl font-extrabold text-center text-gray-900 mb-10">Welcome to Utility Hub!</h2>
         <p className="text-xl text-center text-gray-600 mb-12">Your one-stop solution for everyday utility conversions and tools.</p>
 
+        <p className="text-md text-center text-gray-500 mb-8">
+          Note: For unauthenticated users, file uploads are limited to 10MB. Log in for an increased limit of 50MB.
+        </p>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {categories.map((category, index) => (
             <Link to={category.link} key={index} className="block">

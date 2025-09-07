@@ -36,7 +36,7 @@ const ImageFormatConverter = () => {
         return;
       }
       if (file.size > maxSize) {
-        toast.error(`File too large: ${file.name}. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is ${maxSize / (1024 * 1024)}MB. Login for a higher limit (50MB).`);
         hasInvalidFile = true;
         return;
       }

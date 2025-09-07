@@ -1,11 +1,11 @@
 import ToolCard from '../components/ToolCard.jsx';
 import PdfMerger from '../components/PdfMerger.jsx';
 import PdfSplitter from '../components/PdfSplitter.jsx';
-import PdfToImageConverter from '../components/PdfToImageConverter.jsx';
+import PdfCompressor from '../components/PdfCompressor.jsx';
+import PdfPasswordProtector from '../components/PdfPasswordProtector.jsx';
 import PdfToWordConverter from '../components/PdfToWordConverter.jsx';
 import PdfToExcelConverter from '../components/PdfToExcelConverter.jsx';
 import TextToPdfGenerator from '../components/TextToPdfGenerator.jsx';
-import ExcelToPdfConverter from '../components/ExcelToPdfConverter.jsx';
 import PdfToTextConverter from '../components/PdfToTextConverter.jsx';
 import PdfRotator from '../components/PdfRotator.jsx';
 import { Helmet } from 'react-helmet-async';
@@ -30,8 +30,11 @@ const PdfToolsPage = () => {
           <ToolCard title="PDF Splitter" description="Split a PDF document into multiple pages or ranges.">
             <PdfSplitter />
           </ToolCard>
-          <ToolCard title="PDF to Image Converter" description="Convert PDF pages into image files.">
-            <PdfToImageConverter />
+          <ToolCard title="PDF Compressor" description="Reduce the file size of your PDF documents.">
+            <PdfCompressor />
+          </ToolCard>
+          <ToolCard title="PDF Password Protector/Remover" description="Add or remove passwords from PDF documents.">
+            <PdfPasswordProtector />
           </ToolCard>
           <ToolCard title="PDF to Word Converter" description="Convert PDF documents to editable Word files.">
             <PdfToWordConverter />
@@ -41,9 +44,6 @@ const PdfToolsPage = () => {
           </ToolCard>
           <ToolCard title="Text to PDF Generator" description="Convert plain text into a PDF document.">
             <TextToPdfGenerator />
-          </ToolCard>
-          <ToolCard title="Excel to PDF Converter" description="Convert Excel spreadsheets to PDF format.">
-            <ExcelToPdfConverter />
           </ToolCard>
           <ToolCard title="PDF to Text Converter" description="Extract text content from PDF documents.">
             <PdfToTextConverter />

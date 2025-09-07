@@ -17,7 +17,7 @@ const ExcelToPdfConverter = () => {
 
       if (fileExtension === 'xlsx' || fileExtension === 'csv') {
         if (file.size > maxFileSize) {
-          toast.error(`File too large: ${file.name}. Maximum size is ${maxFileSize / (1024 * 1024)}MB.`);
+          toast.error(`File too large: ${file.name}. Maximum size is ${maxFileSize / (1024 * 1024)}MB. Login for a higher limit (50MB).`);
           setSelectedFile(null);
           e.target.value = null;
         } else {

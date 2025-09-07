@@ -1,15 +1,12 @@
-
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext.jsx';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const PdfToImageConverter = () => {
+const PdfCompressor = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const { isAuthenticated } = useContext(AuthContext);
-  // eslint-disable-next-line no-unused-vars
-  const [zipFile, setZipFile] = useState(null);
 
   const onFileChange = (e) => {
     const file = e.target.files[0];
@@ -17,7 +14,7 @@ const PdfToImageConverter = () => {
 
     if (file && file.type === 'application/pdf') {
       if (file.size > maxFileSize) {
-        toast.error(`File too large: ${file.name}. Maximum size is ${maxFileSize / (1024 * 1024)}MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is ${maxFileSize / (1024 * 1024)}MB. Login for a higher limit (50MB).`);
         setSelectedFile(null);
         e.target.value = null;
       } else {
@@ -43,44 +40,49 @@ const PdfToImageConverter = () => {
     formData.append('pdf', selectedFile);
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/pdf-to-image`, formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/convert/compress-pdf`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        }
+        },
+        responseType: 'blob' // Expecting a file in return
       });
-      setZipFile(res.data);
-      toast.success('PDF converted to image successfully! Starting download...');
-      handleDownload(res.data.path, res.data.originalname);
+
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `compressed-${Date.now()}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success('PDF compressed successfully! Starting download...');
+
     } catch (err) {
-      console.error('Error during PDF to Image conversion:', err);
-      toast.error(err.response?.data?.msg || 'Error converting PDF to image. Please try again.');
+      console.error(err);
+      toast.error(err.response?.data?.msg || 'Error compressing PDF. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDownload = (fileUrl, fileName) => {
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success('Download started!');
-  };
-
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">PDF to Image Converter</h2>
+      <h2 className="text-2xl font-bold mb-4">PDF Compressor</h2>
       <form onSubmit={onSubmit}>
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium text-gray-900" htmlFor="single_file">Upload a PDF file</label>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Maximum size is 10MB. Login for a higher limit (50MB).</p>
           <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" id="single_file" type="file" onChange={onFileChange} accept=".pdf" />
         </div>
-        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>{loading ? 'Converting...' : 'Convert'}</button>
+        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" disabled={loading}>
+          {loading ? 'Compressing...' : 'Compress PDF'}
+        </button>
       </form>
     </div>
   );
 };
 
-export default PdfToImageConverter;
+export default PdfCompressor;
