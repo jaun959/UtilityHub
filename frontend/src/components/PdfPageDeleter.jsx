@@ -1,43 +1,47 @@
 import React, { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import { toast } from 'react-toastify';
 
 const PdfPageDeleter = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [numPages, setNumPages] = useState(0);
   const [pagesToDelete, setPagesToDelete] = useState('');
-  const [modifiedPdfBytes, setModifiedPdfBytes] = useState(null);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file && file.type === 'application/pdf') {
       setPdfFile(file);
-      setError('');
-      setModifiedPdfBytes(null);
+      setPagesToDelete('');
       try {
         const arrayBuffer = await file.arrayBuffer();
         const pdfDoc = await PDFDocument.load(arrayBuffer);
         setNumPages(pdfDoc.getPageCount());
+        toast.success(`PDF loaded successfully! Total pages: ${pdfDoc.getPageCount()}`);
       } catch (err) {
-        setError('Failed to load PDF. Please ensure it is a valid PDF file.');
+        toast.error('Failed to load PDF. Please ensure it is a valid PDF file.');
         setNumPages(0);
+        setPdfFile(null);
       }
     } else {
+      toast.error('Please upload a valid PDF file.');
       setPdfFile(null);
       setNumPages(0);
-      setError('Please upload a valid PDF file.');
     }
   };
 
   const handleDeletePages = async () => {
     if (!pdfFile) {
-      setError('Please upload a PDF file first.');
+      toast.error('Please upload a PDF file first.');
       return;
     }
 
-    setError('');
-    setModifiedPdfBytes(null);
+    if (pagesToDelete.trim() === '') {
+      toast.error('Please specify pages to delete.');
+      return;
+    }
 
+    setLoading(true);
     try {
       const arrayBuffer = await pdfFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
@@ -77,31 +81,33 @@ const PdfPageDeleter = () => {
       copiedPages.forEach((page) => newPdfDoc.addPage(page));
 
       const modifiedBytes = await newPdfDoc.save();
-      setModifiedPdfBytes(modifiedBytes);
-    } catch (err) {
-      setError(`Error deleting pages: ${err.message}`);
-    }
-  };
 
-  const handleDownload = () => {
-    if (modifiedPdfBytes) {
-      const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([modifiedBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'modified.pdf';
+      a.download = `modified_${pdfFile.name}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      toast.success('Pages deleted successfully! Download started.');
+      setPdfFile(null);
+      setNumPages(0);
+      setPagesToDelete('');
+    } catch (err) {
+      toast.error(`Error deleting pages: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-4 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-semibold mb-4">PDF Page Deleter</h2>
+    <div className="container mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">PDF Page Deleter</h2>
       <div className="mb-4">
-        <label htmlFor="pdfUpload" className="block text-gray-700 text-sm font-bold mb-2">
+        <label className="block mb-2 text-sm font-medium text-black" htmlFor="pdfUpload">
           Upload PDF:
         </label>
         <input
@@ -109,14 +115,14 @@ const PdfPageDeleter = () => {
           id="pdfUpload"
           accept=".pdf"
           onChange={handleFileChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
         />
       </div>
 
       {pdfFile && numPages > 0 && (
         <div className="mb-4">
           <p className="text-gray-700">Total pages: {numPages}</p>
-          <label htmlFor="pagesToDelete" className="block text-gray-700 text-sm font-bold mb-2 mt-2">
+          <label className="block mb-2 text-sm font-medium text-black" htmlFor="pagesToDelete">
             Pages to Delete (e.g., 1, 3, 5-7):
           </label>
           <input
@@ -124,33 +130,19 @@ const PdfPageDeleter = () => {
             id="pagesToDelete"
             value={pagesToDelete}
             onChange={(e) => setPagesToDelete(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="w-full px-3 py-2 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
             placeholder="e.g., 1, 3, 5-7"
           />
         </div>
       )}
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
       <button
         onClick={handleDeletePages}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        disabled={!pdfFile || pagesToDelete.trim() === ''}
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        disabled={!pdfFile || pagesToDelete.trim() === '' || loading}
       >
-        Delete Pages
+        {loading ? 'Processing...' : 'Delete Pages'}
       </button>
-
-      {modifiedPdfBytes && (
-        <div className="mt-4">
-          <p className="text-green-600 mb-2">Pages deleted successfully!</p>
-          <button
-            onClick={handleDownload}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Download Modified PDF
-          </button>
-        </div>
-      )}
     </div>
   );
 };
