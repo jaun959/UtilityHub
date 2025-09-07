@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import './App.css';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from './context/AuthContext';
+import { AuthContext } from './context/AuthContext.jsx';
 import setAuthToken from './utils/setAuthToken';
 import { ToastContainer } from 'react-toastify';
 import Base64TextConverter from './components/Base64TextConverter.jsx';

@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext.jsx';
 import setAuthToken from '../../utils/setAuthToken';
 
 const Register = () => {

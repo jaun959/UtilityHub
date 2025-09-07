@@ -2,7 +2,7 @@
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../context/AuthContext.jsx';
 
 const ImageCompressor = () => {
   const { state: { isAuthenticated } } = useContext(AuthContext);
