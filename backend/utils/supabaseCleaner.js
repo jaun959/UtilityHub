@@ -11,17 +11,51 @@ const cleanSupabaseStorage = async () => {
   const sevenDaysAgo = new Date(now.setDate(now.getDate() - DAYS_TO_KEEP));
 
   try {
-    const { data: files, error: listError } = await supabase.storage
-      .from(SUPABASE_BUCKET_NAME)
-      .list('', {
-        limit: 100,
-        offset: 0,
-        sortBy: { column: 'created_at', order: 'asc' },
-      });
+    const listAllFilesRecursive = async (currentPath = '') => {
+      /* eslint-disable no-await-in-loop, no-restricted-syntax */
+      let allFiles = [];
+      let hasMore = true;
+      let offset = 0;
+      const limit = 100;
 
-    if (listError) {
-      throw listError;
-    }
+      while (hasMore) {
+        const { data, error } = await supabase.storage
+          .from(SUPABASE_BUCKET_NAME)
+          .list(currentPath, {
+            limit,
+            offset,
+            sortBy: { column: 'created_at', order: 'asc' },
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data && data.length > 0) {
+          for (const item of data) {
+            if (item.id !== null) {
+              allFiles.push({
+                ...item,
+                fullPath: currentPath + item.name,
+              });
+            } else {
+              const subfolderFiles = await listAllFilesRecursive(`${currentPath + item.name}/`);
+              allFiles = allFiles.concat(subfolderFiles);
+            }
+          }
+        }
+
+        if (data.length < limit) {
+          hasMore = false;
+        } else {
+          offset += limit;
+        }
+      }
+      return allFiles;
+      /* eslint-enable no-await-in-loop, no-restricted-syntax */
+    };
+
+    const files = await listAllFilesRecursive();
 
     if (!files || files.length === 0) {
       console.log('No files found in Supabase bucket.');
@@ -29,9 +63,9 @@ const cleanSupabaseStorage = async () => {
     }
 
     const filesToDelete = files.filter((file) => {
-      const fileCreatedAt = new Date(file.created.at);
+      const fileCreatedAt = new Date(file.created_at);
       return fileCreatedAt < sevenDaysAgo;
-    }).map((file) => file.name);
+    }).map((file) => file.fullPath);
 
     if (filesToDelete.length > 0) {
       console.log(`Found ${filesToDelete.length} files older than ${DAYS_TO_KEEP} days to delete.`);

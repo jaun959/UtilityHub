@@ -98,12 +98,8 @@ const ImageFormatConverter = () => {
           <select id="format" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" value={format} onChange={onFormatChange}>
             <option value="avif">AVIF</option>
             <option value="jpeg">JPEG</option>
-            <option value="jpg">JPG</option>
-            <option value="jpe">JPE</option>
             <option value="png">PNG</option>
-            <option value="raw">RAW</option>
             <option value="tiff">TIFF</option>
-            <option value="tif">TIF</option>
             <option value="webp">WebP</option>
             <option value="gif">GIF</option>
           </select>

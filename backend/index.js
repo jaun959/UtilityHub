@@ -58,42 +58,55 @@ const shortener = require('./routes/shortener');
 app.use(shortener);
 
 const imageConverter = require('./routes/imageConverter');
+
 app.use('/api/convert', authMiddleware, uploadLimiter, imageConverter);
 
 const pdfConverter = require('./routes/pdfConverter');
+
 app.use('/api/convert', authMiddleware, uploadLimiter, pdfConverter);
 
 const textToPdf = require('./routes/textToPdf');
+
 app.use('/api/convert', authMiddleware, uploadLimiter, textToPdf);
 
 const officeConverter = require('./routes/officeConverter');
+
 app.use('/api/convert', authMiddleware, uploadLimiter, officeConverter);
 
 const textConverter = require('./routes/textConverter');
+
 app.use('/api/convert', textConverter);
 
 const auth = require('./routes/auth');
+
 app.use('/api/auth', auth);
 
 const keepAlive = require('./routes/keepAlive');
+
 app.use('/api/keep-alive', keepAlive);
 
 const cleanSupabase = require('./routes/cleanSupabase');
+
 app.use('/api/clean-supabase', authMiddleware, cleanSupabase);
 
 const screenshot = require('./routes/screenshot');
+
 app.use('/api/screenshot', authMiddleware, uploadLimiter, screenshot);
 
 const favicon = require('./routes/favicon');
+
 app.use('/api/favicon', authMiddleware, uploadLimiter, favicon);
 
 const redirectChecker = require('./routes/redirectChecker');
+
 app.use('/api/redirect-checker', redirectChecker);
 
 const jsonXmlConverter = require('./routes/jsonXmlConverter');
+
 app.use('/api/convert', jsonXmlConverter);
 
 const seoTools = require('./routes/seoTools');
+
 app.use('/api/seo', seoTools);
 
 app.get('/', (req, res) => {
